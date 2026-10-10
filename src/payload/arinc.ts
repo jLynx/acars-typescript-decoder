@@ -66,6 +66,8 @@ function parseArinc(text: string, direction: 'uplink' | 'downlink'): AcarsInterp
 		if (application === 'AT1') decoded = decodeCpdlc(bytes, direction);
 		// CR1 embeds an uplink PDU regardless of the surrounding ACARS direction.
 		if (application === 'CR1') decoded = decodeCpdlc(bytes, 'uplink');
+		if (application === 'DR1' && bytes.length === 0)
+			decoded = { fields: [], summary: applications.DR1.summary, complete: true, notes: [] };
 		if (application === 'DIS' && bytes.length === 1) {
 			decoded = {
 				fields: [{ label: 'Disconnect reason code', value: String(bytes[0]) }],

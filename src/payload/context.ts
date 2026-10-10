@@ -2,6 +2,9 @@ import type { AcarsRecord } from '@/types';
 import { interpretAcars } from './interpret';
 import type { AcarsInterpretation, InterpretedAcarsRecord } from './types';
 import { assembleAcars } from './protocols/assembly';
+import { assembleOhma } from './protocols/ohma/assembly';
+import { assembleMiamFiles } from './protocols/miam/assembly';
+import { interpretMiamEmbedded } from './protocols/miam/embedded';
 
 const contextLabels = new Set([
 	'Aircraft type',
@@ -35,7 +38,7 @@ export function interpretAcarsLog(
 ): InterpretedAcarsRecord[] {
 	const headers = new Map<string, InterpretedAcarsRecord>();
 	const ordered = [...records].sort((a, b) => a.receivedAt - b.receivedAt || a.id - b.id);
-	const { completed, failures } = assembleAcars(ordered);
+	const { completed, failures, statuses } = assembleAcars(ordered);
 	const interpreted = ordered.map((message) => {
 		const assembly = completed.get(message.id);
 		const result: InterpretedAcarsRecord = {
@@ -89,8 +92,16 @@ export function interpretAcarsLog(
 		return result;
 	});
 	for (const result of interpreted) {
+		const status = statuses.get(result.id);
+		if (status) result.assemblies = [status];
 		const reason = failures.get(result.id);
 		if (reason) result.interpretation.notes.push(`Reassembly unavailable: ${reason}`);
+	}
+	assembleOhma(interpreted, airportLookup);
+	assembleMiamFiles(interpreted);
+	for (const record of interpreted) {
+		if (!record.interpretation.embedded)
+			interpretMiamEmbedded(record.interpretation, record, (message) => interpretAcars(message, airportLookup));
 	}
 	return interpreted;
 }

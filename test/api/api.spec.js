@@ -83,6 +83,9 @@ describe('plugin isolation', () => {
 		() => ({ ...interpretation(), coverage: 'invented' }),
 		() => ({ ...interpretation(), fields: [null] }),
 		() => ({ ...interpretation(), notes: [1] }),
+		() => ({ ...interpretation(), transfer: { integrity: 'verified', text: 'invented' } }),
+		() => ({ ...interpretation(), application: { protocol: 'AFN', values: { altitude: NaN } } }),
+		() => ({ ...interpretation(), embedded: { title: 'incomplete' } }),
 		(message) => {
 			message.text = 'mutated';
 			return interpretation();
@@ -98,6 +101,43 @@ describe('plugin isolation', () => {
 		decoder.decode(input).notes.push('mutated');
 		expect(result.notes).toEqual([]);
 		expect(decoder.decode(input).notes).toEqual([]);
+	});
+	it('accepts every CORE v2 identifier length and rejects inconsistent transfer metadata', () => {
+		const transfer = {
+			protocol: 'MIAM',
+			version: 2,
+			applicationType: 8,
+			application: 'A',
+			encoding: 0,
+			integrity: 'verified',
+			checksum: 0xffff,
+			text: 'payload',
+		};
+		const pluginDecode = (extra) =>
+			createDecoder({
+				plugins: [
+					{
+						name: 'miam',
+						decode: () => ({
+							...interpretation(),
+							transfer: { ...transfer, ...extra },
+						}),
+					},
+				],
+			}).decode({ label: 'Q0', text: '' });
+		for (const type of [0, 1, 2, 3, 8, 9, 10, 11, 12, 14, 15]) {
+			const length = [2, 4, 6, 6][type] ?? type - 7;
+			expect(pluginDecode({ applicationType: type, application: 'A'.repeat(length) }).title).toBe('Custom');
+		}
+		for (const invalid of [
+			{ version: '2' },
+			{ version: 1 },
+			{ applicationType: 13 },
+			{ applicationType: 16 },
+			{ application: 'AA' },
+			{ checksum: 0x10000 },
+		])
+			expect(pluginDecode(invalid).title).toBe('Link test');
 	});
 	it('passes reassembled text to plugins and preserves assembly evidence', () => {
 		const seen = [];

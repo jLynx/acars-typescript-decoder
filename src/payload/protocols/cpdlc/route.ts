@@ -1,5 +1,7 @@
 import type { Bits } from '@/payload/protocols/bits';
-import { coordinate, procedure } from '@/payload/protocols/cpdlc-values';
+import { procedure } from '@/payload/protocols/cpdlc-values';
+import { publishedIdentifier, latitudeLongitude, placeBearing, placeBearingDistance, trackDetail } from './places';
+import { additionalRoute } from './additional';
 
 /** FANS route clearance sequence: ten presence bits, followed by fields in schema order. */
 export function routeClearance(bits: Bits): string {
@@ -12,12 +14,12 @@ export function routeClearance(bits: Bits): string {
 	if (present[4]) parts.push(`arrival runway ${runway(bits)}`);
 	if (present[5]) parts.push(procedure(bits));
 	if (present[6]) parts.push(procedure(bits));
-	if (present[7]) parts.push(`intercept ${bits.text(bits.read(3) + 1, true)}`);
+	if (present[7]) parts.push(`intercept ${bits.text(bits.constrained(3, 1, 5), true)}`);
 	if (present[8]) {
 		const count = bits.read(7) + 1;
 		for (let i = 0; i < count; i++) parts.push(routeInformation(bits));
 	}
-	if (present[9]) throw new Error('Additional route information is unsupported');
+	if (present[9]) parts.push(additionalRoute(bits));
 	return parts.join(' · ') || 'No optional route fields';
 }
 
@@ -27,16 +29,13 @@ function runway(bits: Bits): string {
 }
 
 function routeInformation(bits: Bits): string {
-	const choice = bits.read(3);
-	if (choice === 0) {
-		const coordinates = bits.read(1);
-		const fix = bits.text(bits.read(3) + 1, true);
-		return fix + (coordinates ? ` (${coordinate(bits, true)}°, ${coordinate(bits, false)}°)` : '');
-	}
-	if (choice === 1) return `${coordinate(bits, true)}°, ${coordinate(bits, false)}°`;
-	if (choice === 4 || choice === 5) return `${choice === 4 ? 'airway' : 'track'} ${bits.text(bits.read(3) + 1, true)}`;
-	// Unsupported choices have their own body; never assume they consume no bits.
-	throw new Error(`Unsupported route information choice ${choice}`);
+	const choice = bits.constrained(3, 0, 5);
+	if (choice === 0) return publishedIdentifier(bits);
+	if (choice === 1) return latitudeLongitude(bits);
+	if (choice === 2) return `${placeBearing(bits)} / ${placeBearing(bits)}`;
+	if (choice === 3) return placeBearingDistance(bits);
+	if (choice === 4) return `airway ${bits.text(bits.constrained(3, 1, 5), true)}`;
+	return trackDetail(bits);
 }
 
 export function errorInformation(bits: Bits): string {

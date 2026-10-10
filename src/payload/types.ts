@@ -1,3 +1,6 @@
+import type { AtsResult } from './protocols/ats/types';
+import type { MiamTransfer } from './protocols/miam/types';
+
 export interface AcarsField {
 	label: string;
 	value: string;
@@ -10,6 +13,9 @@ export interface AcarsInterpretation {
 	coverageDetail?: string;
 	fields: AcarsField[];
 	notes: string[];
+	application?: AtsResult;
+	transfer?: MiamTransfer;
+	embedded?: AcarsInterpretation;
 }
 
 export interface AcarsLabel {
@@ -36,4 +42,14 @@ import type { AcarsRecord } from '@/types';
 export interface InterpretedAcarsRecord extends AcarsRecord {
 	interpretation: AcarsInterpretation;
 	assembledText?: string;
+	assemblies?: AssemblyStatus[];
+}
+
+export interface AssemblyStatus {
+	protocol: 'ACARS' | 'MIAM' | 'OHMA';
+	status: 'pending' | 'complete' | 'duplicate' | 'failed' | 'expired';
+	identifier?: string;
+	blocks?: string[];
+	missing?: string[];
+	reason?: string;
 }

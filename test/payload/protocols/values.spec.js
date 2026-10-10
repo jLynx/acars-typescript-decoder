@@ -10,6 +10,24 @@ function packed(...parts) {
 }
 
 describe('FANS parameter units and validation', () => {
+	it('rejects the unused turbulence enumeration in a position report', () => {
+		const position = [
+			[3, 0],
+			[3, 0],
+			[7, 65],
+		];
+		const flags = Array.from({ length: 19 }, (_, index) => [1, index === 7 ? 1 : 0]);
+		const header = [
+			[1, 0],
+			[1, 0],
+			[1, 0],
+			[6, 4],
+			[8, 48],
+		];
+		const required = [...position, [5, 12], [6, 30], [3, 6], [10, 320]];
+		expect(decodeCpdlc(packed(...header, ...flags, ...required, [2, 2]), 'downlink').complete).toBe(true);
+		expect(decodeCpdlc(packed(...header, ...flags, ...required, [2, 3]), 'downlink').complete).toBe(false);
+	});
 	it('applies libacars QNH feet scale rather than displaying encoded tens', () =>
 		expect(altitude(new Bits(packed([3, 0], [12, 1500])))).toBe('15000 ft (QNH)'));
 	it('decodes flight levels and IAS scale', () => {

@@ -1,4 +1,4 @@
-import type { AcarsField } from '@/payload/types';
+import type { AcarsField, AssemblyStatus } from '@/payload/types';
 import type { AcarsRecord } from '@/types';
 
 export interface ApplicationDecode {
@@ -27,4 +27,5 @@ export interface AcarsAssembly {
 export interface AcarsAssemblyResult {
 	completed: Map<number, AcarsAssembly>;
 	failures: Map<number, string>;
+	statuses: Map<number, AssemblyStatus>;
 }

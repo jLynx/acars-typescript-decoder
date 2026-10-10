@@ -1,5 +1,6 @@
 // FANS PER body layouts from MIT xoolive/datalink; units/constraints checked against libacars.
 import type { Bits } from './bits';
+import { placeBearingDistance } from './cpdlc/places';
 
 export function altitude(bits: Bits): string {
 	const choice = bits.read(3);
@@ -32,6 +33,7 @@ export function position(bits: Bits): string {
 	if (choice === 0) return bits.text(bits.constrained(3, 1, 5), true);
 	if (choice === 1) return bits.text(bits.constrained(2, 1, 4), true);
 	if (choice === 2) return bits.text(4, true);
+	if (choice === 4) return placeBearingDistance(bits);
 	if (choice !== 3) throw new Error('Unsupported position choice');
 	return `${coordinate(bits, true)}°, ${coordinate(bits, false)}°`;
 }
@@ -63,8 +65,9 @@ export function direction(bits: Bits): string {
 }
 
 export function degrees(bits: Bits): string {
+	const trueNorth = bits.read(1);
 	const value = bits.constrained(9, 1, 360);
-	return `${value}° ${bits.read(1) ? 'true' : 'magnetic'}`;
+	return `${value}° ${trueNorth ? 'true' : 'magnetic'}`;
 }
 
 export function distance(bits: Bits): string {

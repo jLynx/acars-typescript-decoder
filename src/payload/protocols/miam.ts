@@ -2,6 +2,8 @@ import type { AcarsRecord } from '@/types';
 import type { AcarsField, AcarsInterpretation } from '@/payload/types';
 import { decodeBody } from './miam/body';
 import { interpretV2 } from './miam/v2';
+import { interpretNegotiation } from './miam/negotiation';
+import { interpretMiamFile } from './miam/files';
 
 /** Strict ASCII85 words, with MIAM's explicit byte padding (libacars / datalink). */
 function headerBytes(text: string, padding: number): Uint8Array | undefined {
@@ -29,12 +31,21 @@ function headerBytes(text: string, padding: number): Uint8Array | undefined {
 
 /** Reads CORE headers and verifies complete bounded application bodies. */
 export function interpretMiam(message: AcarsRecord): AcarsInterpretation | undefined {
-	if (message.label !== 'MA' || message.text.length > 8192) return;
+	if (!['MA', 'H1'].includes(message.label) || message.text.length > 8192) return;
+	const file = interpretMiamFile(message);
+	if (file) return file;
+	return interpretMiamCore(message);
+}
+
+/** Internal complete CORE reader also accepts bounded reassembled file content. */
+export function interpretMiamCore(message: AcarsRecord): AcarsInterpretation | undefined {
+	if (message.text.length > 65537) return;
 	const frame = /^T([0-3.-])([0-3])([^|]+)\|([^]*)$/.exec(message.text);
 	if (!frame) return;
 	const [, bodyPadding, headerPadding, encodedHeader] = frame;
 	const header = headerBytes(encodedHeader, Number(headerPadding));
 	if (!header) return;
+	if (header[0] >> 4 === 2 || header[0] >> 4 === 3) return interpretNegotiation(header, frame[4]);
 	if ((header[0] & 15) === 2) return interpretV2(header, frame[4], bodyPadding, message.continuation);
 	if (header.length < 14 || (header[0] & 15) !== 1) return;
 	const type = header[0] >> 4;

@@ -10,7 +10,11 @@ export { interpretText } from './payload/protocols/text';
 export { interpretAcm } from './payload/protocols/monitoring';
 export { interpretUplink } from './payload/protocols/uplink';
 export { interpretMiam } from './payload/protocols/miam';
+export { readMiamFile } from './payload/protocols/miam/files';
+export type { MiamTransfer, MiamFileFrame } from './payload/protocols/miam/types';
 export { interpretOhma } from './payload/protocols/ohma';
+export { interpretAts, interpretAfn, interpretAtis, interpretOceanic } from './payload/protocols/ats/text';
+export type { AtsResult } from './payload/protocols/ats/types';
 export {
 	altitude,
 	speed,

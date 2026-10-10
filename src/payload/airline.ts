@@ -86,7 +86,11 @@ export function interpretLoad(message: AcarsRecord): AcarsInterpretation | undef
 	};
 }
 
+import { interpretAirbusH01 } from './reports/airbus';
+
 export function interpretAirbus(text: string, receivedAt: number): AcarsInterpretation | undefined {
+	const h01 = interpretAirbusH01(text);
+	if (h01) return h01;
 	const multiline = interpretMultilineAirbus(text);
 	if (multiline) return multiline;
 	const compact = interpretCompactAirbus(text);

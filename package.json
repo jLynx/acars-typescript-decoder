@@ -23,6 +23,9 @@
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"sideEffects": false,
+	"bin": {
+		"acars-decode": "./dist/cli.js"
+	},
 	"exports": {
 		"./framing": {
 			"types": "./dist/framing.d.ts",
@@ -61,6 +64,9 @@
 		"test:coverage": "vitest run --coverage",
 		"test:data": "python -m unittest discover -s test/airport-db -p test_*.py",
 		"test:package": "node scripts/package-smoke.mjs",
+		"benchmark": "node scripts/benchmark.mjs",
+		"test:upstream": "vitest run test/upstream",
+		"compare:upstream": "npm run build && node scripts/upstream/compare.mjs",
 		"release:check": "npm pack --dry-run",
 		"build:airport-db": "python scripts/airport-db/build.py",
 		"build:acars-labels": "python scripts/acars-data/build-labels.py",

@@ -1,0 +1,121 @@
+{
+	"schemaVersion": 1,
+	"sources": [
+		{
+			"id": "airframes",
+			"repository": "https://github.com/airframesio/acars-decoder-typescript",
+			"revision": "51c912e75deb211403fe2f984fdefa1114766dce",
+			"license": "MIT",
+			"language": "TypeScript",
+			"status": "integrated dependency and assertion corpus",
+			"paths": ["lib/plugins", "License.md"],
+			"local": ["src/payload/community.ts", "test/upstream/airframes.json"],
+			"dependencyVersion": "1.9.2"
+		},
+		{
+			"id": "datalink",
+			"repository": "https://github.com/xoolive/datalink",
+			"revision": "d3e3e5a5d2bda04fbee83832cb77e3050a87364c",
+			"license": "MIT",
+			"language": "Rust",
+			"status": "partial port",
+			"paths": [
+				"crates/acars/src/decode/payload",
+				"crates/acars/src/decode/avlc.rs",
+				"crates/acars/src/decode/xid.rs",
+				"crates/acars/src/decode/x25.rs",
+				"crates/acars/src/decode/hfdl.rs",
+				"crates/acars/tests/fixtures",
+				"license.md"
+			],
+			"local": [
+				"src/payload/protocols/ats",
+				"src/payload/protocols/cpdlc.ts",
+				"src/payload/protocols/text",
+				"src/transport",
+				"test/upstream/datalink.json",
+				"test/transport",
+				"test/payload/protocols"
+			]
+		},
+		{
+			"id": "libacars",
+			"repository": "https://github.com/szpajder/libacars",
+			"revision": "9af09a0121d4ec577339cbd4c7420d7519da48fa",
+			"license": "MIT",
+			"language": "C",
+			"status": "partial port",
+			"paths": [
+				"libacars/asn1",
+				"libacars/asn1-format-cpdlc-text.c",
+				"libacars/miam.c",
+				"libacars/miam-core.c",
+				"libacars/ohma.c",
+				"libacars/acars.c",
+				"libacars/adsc.c"
+			],
+			"local": [
+				"src/payload/protocols/cpdlc",
+				"src/payload/protocols/miam",
+				"src/payload/protocols/ohma",
+				"src/payload/protocols/adsc.ts"
+			]
+		},
+		{
+			"id": "skyshark",
+			"repository": "https://github.com/ckuethe/skyshark",
+			"revision": "3d66e7d27ce5b9616643faa8a3b29ca9801b9007",
+			"license": "MIT",
+			"language": "Python",
+			"status": "partial port",
+			"paths": ["skyshark"],
+			"local": ["src/payload/protocols/text.ts", "src/payload/reference/labels.json"]
+		},
+		{
+			"id": "dumpvdl2",
+			"repository": "https://github.com/szpajder/dumpvdl2",
+			"revision": "686e87f2294ef6275855ba7364bd4bb9a0f8f56a",
+			"license": "GPL-3.0",
+			"language": "C",
+			"status": "reference only; no copied code",
+			"paths": ["src/asn1", "src/atn.c"],
+			"local": []
+		},
+		{
+			"id": "jaero",
+			"repository": "https://github.com/jontio/JAERO",
+			"revision": "1d4e515921244aec1d85a03f5f38b4e7818fdbe6",
+			"license": "MIT (per-file review required)",
+			"language": "C++",
+			"status": "reference only; no copied code",
+			"paths": ["JAERO"],
+			"local": []
+		}
+	],
+	"notices": "THIRD_PARTY_NOTICES.txt",
+	"specifications": [
+		{
+			"id": "clnp-rfc994",
+			"url": "https://www.rfc-editor.org/rfc/rfc994.txt",
+			"sha256": "82c8a0154ab38875a1d65af1910b6a3524d5fe614de19e6ed4fab8c41c5b3077",
+			"status": "independent implementation; standard document not redistributed",
+			"local": ["src/transport/network/clnp.ts", "src/transport/network/iso.ts", "test/transport/clnp.spec.js"]
+		},
+		{
+			"id": "esis-rfc995",
+			"url": "https://www.rfc-editor.org/rfc/rfc995.txt",
+			"sha256": "8cbe87a5539f12f123d16fd13e53d487b7c01a62f11820c6b14a814698e92644",
+			"status": "independent common/ISH/RD implementation; ESH address lists raw",
+			"local": ["src/transport/network/esis.ts", "test/transport/clnp.spec.js"]
+		},
+		{
+			"id": "esis-timer-x283",
+			"url": "https://www.itu.int/rec/T-REC-X.283-199712-I/en",
+			"revision": "12/97",
+			"sha256": "6082d73b7ebb74fbe1ae069444e2ba18e7e506165b45bdf605f4dd767eec6b58",
+			"status": "timer-unit reference only; standard document not redistributed",
+			"local": ["src/transport/network/esis.ts"]
+		}
+	],
+	"policy": "Only import code and fixtures under an identified compatible license, retain notices and pin revisions. A source listed here is not a claim of complete coverage."
+}

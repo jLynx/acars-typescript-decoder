@@ -62,6 +62,9 @@ assert.equal(published.bugs.url, 'https://github.com/jLynx/acars-typescript-deco
 assert.equal(published.author.name, 'jLynx');
 assert.equal(published.publishConfig.access, 'public');
 assert.equal(published.publishConfig.registry, 'https://registry.npmjs.org/');
+assert.equal(published.bin['acars-decode'], './dist/cli.js');
+assert((await readFile(path.join(installed, 'dist/cli.js'), 'utf8')).startsWith('#!/usr/bin/env node'));
+assert((await readdir(path.join(temporary, 'node_modules/.bin'))).some((name) => name.startsWith('acars-decode')));
 for (const filename of ['LICENSE', 'THIRD_PARTY_NOTICES.txt']) {
 	assert.equal(
 		await readFile(path.join(installed, filename), 'utf8'),
@@ -80,7 +83,7 @@ await writeFile(
 	path.join(temporary, 'consumer.mjs'),
 	`
 import assert from 'node:assert/strict';
-import { decode, decodeLog, createDecoder, decodeFrame } from '@jlynx_/acars-decoder';
+import { decode, decodeLog, createDecoder, createDecoderSession, decodeAvlc, adaptReceiverRecord, decodeFrame, createX25Reassembler, decodeClnp, decodeEsis } from '@jlynx_/acars-decoder';
 import { airportName } from '@jlynx_/acars-decoder/airports';
 import { Bits } from '@jlynx_/acars-decoder/formats';
 assert.equal(decode({ label: 'Q0', text: '' }).coverage, 'decoded');
@@ -88,19 +91,31 @@ assert.deepEqual(decodeLog([]), []);
 assert.equal(createDecoder({ airportLookup: airportName }).decode({ label: '5D', text: 'NZAA' }).fields[0].value, 'NZAA · Auckland International Airport');
 assert.equal(new Bits(Uint8Array.of(128)).read(1), 1);
 assert.equal(decodeFrame(new Uint8Array()), undefined);
+assert.equal(createDecoderSession().push({label:'Q0',text:''}).interpretation.coverage, 'decoded');
+assert.equal(adaptReceiverRecord({label:'Q0',text:''}).message.label, 'Q0');
+assert.throws(() => decodeAvlc(new Uint8Array()));
+assert.equal(createX25Reassembler().push(Uint8Array.of(0x10, 1, 0, 9), {link:'test',receivedAt:0}).status, 'complete');
+assert.equal(decodeClnp(new Uint8Array()), undefined);
+assert.equal(decodeEsis(new Uint8Array()), undefined);
 `,
 );
 command(process.execPath, ['consumer.mjs'], temporary);
 await writeFile(
 	path.join(temporary, 'consumer.ts'),
 	`
-import { decode, createDecoder, type AcarsRecord, type AcarsInterpretation } from '@jlynx_/acars-decoder';
+import { decode, createDecoder, createDecoderSession, decodeAvlc, adaptReceiverRecord, createX25Reassembler, decodeClnp, decodeEsis, type X25Reassembler, type ClnpPdu, type EsisPdu, type DecoderSession, type AvlcFrame, type ReceiverRecord, type AcarsRecord, type AcarsInterpretation } from '@jlynx_/acars-decoder';
 import { airportName } from '@jlynx_/acars-decoder/airports';
 import { Bits } from '@jlynx_/acars-decoder/formats';
 const result: AcarsInterpretation = decode({ label: 'Q0', text: '' });
 const records: AcarsRecord[] = [];
 createDecoder({ airportLookup: airportName }).decodeLog(records);
 new Bits(new Uint8Array());
+const session: DecoderSession = createDecoderSession();
+const receiver: ReceiverRecord | undefined = adaptReceiverRecord({label:'Q0',text:''});
+const transport: AvlcFrame = decodeAvlc(new Uint8Array());
+const assembler: X25Reassembler = createX25Reassembler();
+const clnp: ClnpPdu | undefined = decodeClnp(new Uint8Array());
+const esis: EsisPdu | undefined = decodeEsis(new Uint8Array());
 console.log(result.title);
 `,
 );
@@ -136,6 +151,10 @@ assert(
 	!Object.keys(bundled.metafile.inputs).some((name) => /airports\.json/.test(name)),
 	'Main import must not bundle optional airport dataset',
 );
+assert(
+	!Object.keys(bundled.metafile.inputs).some((name) => /cli\.js/.test(name)),
+	'Browser imports must exclude the CLI',
+);
 await writeFile(entry, "import { AcarsFramer } from '@jlynx_/acars-decoder/framing'; console.log(AcarsFramer);");
 const framing = await build({
 	entryPoints: [entry],
@@ -157,6 +176,7 @@ for (const filename of await readdir(distribution)) {
 		'Declarations must resolve without source aliases',
 	);
 }
+await import('./upstream/replay-smoke.mjs').then(({ replaySmoke }) => replaySmoke(installed, temporary));
 console.log(
 	'Packed package passed metadata, documentation, clean Node runtime, NodeNext TypeScript and browser bundle checks.',
 );

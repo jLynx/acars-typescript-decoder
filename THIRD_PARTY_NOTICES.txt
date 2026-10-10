@@ -59,7 +59,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-xoolive/datalink (Rust FANS CPDLC catalogue/layouts, MIAM headers and ADS-C reference fixtures)
+xoolive/datalink (Rust FANS CPDLC, ATS/AOC text, MIAM, ADS-C fixtures,
+AVLC/XID/X.25/CLNP/COTP/IDRP and HFDL wire layouts and fixtures)
 https://github.com/xoolive/datalink
 
 MIT License
@@ -86,7 +87,8 @@ SOFTWARE.
 
 
 
-szpajder/libacars (C ADS-C scales, tag definitions, ARINC CRC, downlink reassembly and MIAM headers)
+szpajder/libacars (C ADS-C scales, ARINC CRC, uplink/downlink reassembly,
+FANS ASN.1 member layouts/constraints, MIAM lifecycle and OHMA reassembly)
 https://github.com/szpajder/libacars
 
 MIT License

@@ -15,8 +15,8 @@ and reads ARINC 618 frames.
 
 Written in TypeScript for JavaScript and TypeScript applications, the library runs
 locally in Node.js and browsers. It combines documented airline formats, binary
-ADS-C/FANS CPDLC readers, MIAM CORE v1/v2 transfers and Boeing OHMA/RYKO compressed
-JSON. Original messages are preserved, and results distinguish decoded, partial
+ADS-C/FANS CPDLC readers, MIAM CORE/file transfers and Boeing OHMA/RYKO conversations,
+ATS text and VDL2/HFDL transport readers. Original messages are preserved, and results distinguish decoded, partial
 and unknown payloads.
 
 The project builds on research and implementations from
@@ -92,14 +92,48 @@ Each record needs a unique positive `id`, millisecond `receivedAt`, registration
 mode, acknowledgement, label, block ID, direction, text and ETB `continuation` flag.
 Provide `messageNumber` and `flight` when received. Call separately for independent
 channels/sources. Results are chronological copies; original `text` is preserved
-and the final block receives `assembledText` only after consecutive A–Z message
-suffixes and final ETX arrive. Missing blocks never get silently filled.
+and the final block receives `assembledText` after consecutive downlink A–Z message
+suffixes or uplink A–X link blocks and final ETX arrive. Missing blocks never get silently filled.
 
 Batches allow up to 10,000 records, individual/assembled payloads up to 8,192
 characters, and assemblies up to 26 blocks. Reassembly permits two minutes between
 blocks and five minutes overall. Calls do not retain pending messages: pass the
 retained source log again as new blocks arrive. The library does not truncate logs
 to a viewer-specific count.
+
+### Receive a stream or replay a capture
+
+```ts
+import { createDecoderSession, adaptReceiverRecord } from '@jlynx_/acars-decoder';
+
+const session = createDecoderSession();
+const received = adaptReceiverRecord({ label: 'Q0', text: '', timestamp: 1791576000 });
+if (received) {
+	const record = session.push(received.message, received.source);
+	console.log(record.interpretation, record.assemblies);
+}
+const sourceWindow = session.snapshot();
+```
+
+Sessions retain bounded source windows: by default 16 sources, 512 records and
+1 MiB of text per source for twenty minutes. `push` returns the arriving record;
+`snapshot(source)` retrieves earlier records completed by late arrivals. Windows
+are reinterpreted per push, so this API currently favors consistency over
+incremental processing speed. `reset` clears state and `stats` reports retained
+records and evictions. Independent source identities stay isolated.
+
+Receiver adapters accept flat acarsdec/vdlm2dec and nested dumpvdl2/dumphfdl JSON,
+preserve the original receiver object, and keep receiver error counts separate
+from locally verified integrity. Stripped H1 metadata is reconstructed for dispatch.
+
+```sh
+acars-decode messages.jsonl
+acars-decode --capture capture.json
+```
+
+The installed Node CLI also reads JSONL from stdin and writes interpreted JSONL.
+Capture mode accepts the grouped `sources[].messages` viewer export. Radio block,
+MIAM file and OHMA conversation assemblies have structured status metadata.
 
 ### Optional airport names
 
@@ -148,8 +182,36 @@ Use `@jlynx_/acars-decoder/framing` to load transport readers without applicatio
 `AcarsFramer.bit()` accepts demodulated bits, validates parity and block CRC, then
 calls your callback with parity-bearing bytes. `decodeFrame()` interprets those
 validated bytes, excluding the BCS. `decodeFrame()` alone checks parity/layout;
-it cannot verify a BCS that is absent. IQ/audio demodulation, radio drivers, VDL2,
-HFDL and SATCOM transport are outside this package.
+it cannot verify a BCS that is absent.
+
+`decodeAvlc` accepts destuffed VDL2 bytes including FCS. `decodeXid`, `decodeX25`,
+`decodeClnpCompressed`, `decodeClnp`, `decodeEsis`, `decodeCotp` and `decodeIdrp` expose transport headers and
+raw unknown data. COTP user data and checksums remain unverified; ambiguous normal
+versus extended sequence formats require the caller's negotiated `format` option.
+Uncompressed CLNP verifies its header checksum before inner transport dispatch.
+ES-IS exposes common/ISH/redirect headers; ESH address lists remain raw.
+
+`createX25Reassembler()` joins consecutive modulo-8 packets before network decoding.
+Supply a `link` identity containing receiver, peers and direction, plus reception time.
+It bounds channel state, bytes, fragments and lifetime, suppresses retransmissions,
+and rejects conflicting sequences until expiry or `reset(link)`. Link CRC verification
+must occur before calling it. CLNP/COTP fragment reassembly and ATN applications remain pending.
+
+```ts
+import { createX25Reassembler } from '@jlynx_/acars-decoder/framing';
+
+const network = createX25Reassembler({ maxChannels: 64, retentionMs: 60_000 });
+const result = network.push(verifiedX25Bytes, {
+	link: 'receiver-1:aircraft-ABC123:ground-01:downlink',
+	receivedAt: Date.now(),
+});
+if (result.status === 'complete') console.log(result.network ?? result.clnp ?? result.esis);
+```
+
+`decodeHfdl` accepts demodulated SPDU/MPDU bytes, verifies header and individual
+LPDU CRCs, and exposes supported station, performance, frequency and embedded
+ACARS data. Slot allocation and system-table contents remain partly raw.
+IQ/audio demodulation, radio drivers and SATCOM Aero transport remain pending.
 
 `interpretArinc`, `decodeAdsc` and `decodeCpdlc` are exported for protocol use.
 `@jlynx_/acars-decoder/formats` exposes lower-level readers that require normalized records;
@@ -170,7 +232,16 @@ npm run test:coverage
 npm run test:data
 npm run build
 npm run test:package
+npm run test:upstream
+npm run benchmark
 ```
+
+The upstream manifest pins revisions and licenses. Static importers retain
+Airframes assertions and Rust JSON fixtures without executing downloaded tests;
+`scripts/upstream/verify.mjs` checks their hashes against the pinned public files.
+`npm run compare:upstream` classifies public-dispatch display differences using
+nested fields, aliases, JSON equality and explicit refusal reasons. Full typed
+semantic comparisons remain pending. Passing tests does not establish universal coverage.
 
 ## Contributions
 

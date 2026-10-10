@@ -1,0 +1,13 @@
+Transport fixture provenance
+
+The two complete XID wire frames and their expected locations in xid.spec.js,
+including the reused frame in mutation.spec.js,
+come from xoolive/datalink, revision d3e3e5a5d2bda04fbee83832cb77e3050a87364c,
+crates/acars/src/decode/xid.rs (MIT). The full original license is preserved in
+test/upstream/datalink.license.txt and THIRD_PARTY_NOTICES.txt.
+
+Other transport byte encoders and fixtures are locally authored independent
+boundary/checksum examples, distributed under this repository's MIT license.
+CLNP encoders use RFC 994's checksum equations and wire format; ES-IS fixtures
+use the common/ISH/redirect layout in RFC 995. Standards documents are references
+and are not redistributed or presented as MIT-licensed source code.

@@ -4,6 +4,8 @@ import { Bits } from './bits';
 import * as values from './cpdlc-values';
 import { positionReport } from './cpdlc-reports';
 import { routeClearance, errorInformation } from './cpdlc/route';
+import * as extended from './cpdlc/extended';
+import { predepartureClearance } from './cpdlc/predeparture';
 import type { ApplicationDecode, CpdlcElement, CpdlcEntry } from './types';
 import type { AcarsField } from '@/payload/types';
 
@@ -28,18 +30,26 @@ const readers: Record<string, (bits: Bits) => string> = {
 	tp4table: (bits) => (bits.read(1) ? 'Label B' : 'Label A'),
 	routeclearance: routeClearance,
 	errorinformation: errorInformation,
+	verticalrate: extended.verticalRate,
+	remainingfuel: extended.remainingFuel,
+	remainingsouls: extended.remainingSouls,
+	tofrom: extended.toFrom,
+	distance: extended.distance,
 };
 // These bodies consist solely of supported parameters in the catalogue's order.
 const supportedBodies: Record<'uplink' | 'downlink', Set<number>> = {
 	uplink: new Set([
-		6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-		38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 59, 61, 62, 63, 64, 65, 66, 68, 69, 71, 74, 75, 77,
-		78, 81, 82, 88, 90, 92, 93, 98, 100, 104, 105, 106, 108, 109, 111, 112, 115, 117, 118, 119, 120, 121, 123, 128, 129,
-		130, 148, 149, 150, 151, 152, 153, 155, 157, 160, 163, 169, 170, 175, 180, 79, 80, 83, 84, 85, 159,
+		11, 12, 50, 55, 56, 57, 58, 60, 70, 76, 86, 87, 89, 94, 95, 97, 99, 101, 102, 103, 110, 113, 114, 122, 158, 171,
+		172, 173, 174, 181, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 59, 61, 62, 63, 64, 65, 66, 68,
+		69, 71, 74, 75, 77, 78, 81, 82, 88, 90, 92, 93, 98, 100, 104, 105, 106, 108, 109, 111, 112, 115, 117, 118, 119, 120,
+		121, 123, 128, 129, 130, 148, 149, 150, 151, 152, 153, 155, 157, 160, 163, 169, 170, 175, 180, 79, 80, 83, 84, 85,
+		159,
 	]),
 	downlink: new Set([
-		6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 22, 23, 27, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 42, 44, 45, 47, 49,
-		54, 60, 61, 64, 67, 48, 68, 71, 72, 73, 76, 77, 79, 80, 24, 26, 40, 59, 62,
+		17, 19, 21, 35, 36, 43, 46, 50, 57, 70, 78, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 22, 23, 27, 28, 29, 30, 31,
+		32, 33, 34, 37, 38, 39, 42, 44, 45, 47, 49, 54, 60, 61, 64, 67, 48, 68, 71, 72, 73, 76, 77, 79, 80, 24, 26, 40, 59,
+		62,
 	]),
 };
 
@@ -47,6 +57,14 @@ function element(bits: Bits, direction: 'uplink' | 'downlink'): CpdlcElement {
 	const id = bits.read(8);
 	const entry: CpdlcEntry | undefined = catalog[direction].find((item) => item.id === id);
 	if (!entry || /reserved/i.test(entry.template)) throw new Error('Unknown CPDLC element');
+	if (direction === 'uplink' && id === 91) return holdingElement(bits, entry);
+	if (direction === 'uplink' && id === 73) {
+		try {
+			return { phrase: predepartureClearance(bits), complete: true };
+		} catch {
+			return { phrase: `${entry.template} · parameters undecoded (${entry.name})`, complete: false };
+		}
+	}
 	const slots = [...entry.template.matchAll(/\[([^\]]+)\]/g)].map((match) => match[1]);
 	if (slots.length && (!supportedBodies[direction].has(id) || slots.some((slot) => !readers[slot]))) {
 		return { phrase: `${entry.template} · parameters undecoded (${entry.name})`, complete: false };
@@ -59,6 +77,14 @@ function element(bits: Bits, direction: 'uplink' | 'downlink'): CpdlcElement {
 	}
 	let index = 0;
 	return { phrase: entry.template.replace(/\[[^\]]+\]/g, () => parameters[index++]), complete: true };
+}
+
+function holdingElement(bits: Bits, entry: CpdlcEntry): CpdlcElement {
+	try {
+		return { phrase: extended.holdClearance(bits), complete: true };
+	} catch {
+		return { phrase: `${entry.template} · parameters undecoded (${entry.name})`, complete: false };
+	}
 }
 
 function header(bits: Bits): AcarsField[] {

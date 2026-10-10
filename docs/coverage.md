@@ -1,68 +1,89 @@
 # Decoding coverage
 
-This is a combined decoder with explicit gaps, not a universal ACARS decoder.
-`decoded` applies to a supported payload layout; `partial` preserves unsupported
-fields or unverified application structure. Label recognition alone remains
-`unknown`. Source labels may have multiple airline uses.
+`decoded` applies to a supported payload layout. `partial` retains unsupported
+fields or unverified application structure; label recognition alone is `unknown`.
+This project is working toward the union of public decoders. It does not yet
+implement every public format or establish superiority over other projects.
 
-| Area         | Current coverage                                                                                                | Remaining gaps                                                                                                    |
-| ------------ | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| ARINC 618    | Character envelopes, parity, block CRC, downlink/uplink/control, ETB/ETX                                        | Radio demodulation and transport protocols                                                                        |
-| Airline text | Airframes 1.9.2 formats plus documented movement, position, load, operations, free text and tagged messages     | Unseen/proprietary airline layouts                                                                                |
-| Labels       | All 210 two-character entries in pinned Skyshark catalogue                                                      | Labels do not define every payload                                                                                |
-| ADS-C        | Supported uplink contracts/downlink reports with scales, units and CRC-verified ARINC 622 envelope              | Unknown tags/variants remain partial                                                                              |
-| FANS CPDLC   | 183 uplink/129 downlink phrase catalogue, supported PER parameters, position reports, routes and errors         | Predeparture clearance, additional route structures and other unsupported parameter bodies; ATN ASN.1 is separate |
-| MIAM CORE    | v1/v2 data and acknowledgements, ASCII85/plaintext, raw DEFLATE, CRC32/CRC16                                    | ALO/ALR negotiation, file transfers, separate application interpretation                                          |
-| OHMA/RYKO    | Base64/zlib outer and inner JSON, named flight/event/parameter values                                           | Application conversation reassembly, encrypted/signed content, proprietary parameter units/definitions            |
-| DF/ACM       | Supported Airbus/other report headers, event text, route and registration; safe fragment association/reassembly | Numeric measurement dictionaries and scales                                                                       |
-| Airport data | Optional full coded-airport OurAirports snapshot; ICAO/IATA lookup                                              | Uncoded airports, live updates and ATC address resolution                                                         |
+| Area             | Implemented                                                                                                                                     | Remaining                                                                                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| ARINC 618        | Character envelopes, parity, block CRC, downlink/uplink/control, ETB/ETX                                                                        | Audio/IQ demodulation                                                                           |
+| Airline text     | Airframes 1.9.2, documented movement/position/load/operations, SA weather bundles, label-5Z fields and narrow label-16/32/37 telemetry          | Unknown airline variants; weather tokens and proprietary columns                                |
+| Labels           | 210 two-character entries from pinned Skyshark                                                                                                  | Labels do not establish payload semantics                                                       |
+| ATS text         | AFN headers/application fields, TI2 ATIS request/delivery, OC1 oceanic request                                                                  | Application CRC verification; further message variants                                          |
+| ADS-C            | Supported FANS contracts/reports, named scales/units, verified ARINC envelope                                                                   | Unknown tags/variants; ATN ADS-C v2                                                             |
+| FANS CPDLC       | 183 uplink/129 downlink phrases, supported PER bodies, rates/fuel/souls, positions/tracks, predeparture, holds, six additional route structures | Remaining body/schema validation; malformed upstream regressions stay partial                   |
+| MIAM             | CORE v1/v2 data/ack, ALO/ALR, CF F/K/S/A/Y/X controls, bounded files, verified addressed embedded application dispatch; MA and H1               | Additional application identifiers; negotiated pacing/state semantics                           |
+| OHMA/RYKO        | Verified zlib/base64, outer/inner JSON, named fields, source/aircraft/conversation part assembly                                                | Encryption/signatures; proprietary units/dictionaries                                           |
+| Streaming        | Bounded source sessions, snapshots for late arrivals, ACARS/MIAM/OHMA assembly states                                                           | Incremental protocol engines and richer expiry/duplicate events                                 |
+| Receiver imports | Flat acarsdec/vdlm2dec and nested dumpvdl2/dumphfdl JSON, H1 metadata reconstruction, JSONL/capture replay CLI                                  | Additional receiver dialects                                                                    |
+| VDL2 transport   | AVLC/FCS, inner ACARS BCS/parity, XID, X.25 modulo-8 reassembly, compressed/uncompressed CLNP headers, ES-IS common/ISH/redirect, IDRP/COTP     | CLNP/COTP reassembly, ESH address lists, further options/XID parameters, COTP integrity and ATN |
+| HFDL transport   | SPDU/MPDU headers, individual LPDU CRCs, logon fields, HFNPDU headers, performance/frequency reports, embedded ACARS                            | Slot allocations, full system-table assembly, further variants and demodulation                 |
+| SATCOM           | Normalized SATCOM-carried ACARS payloads                                                                                                        | Aero transport and DSP                                                                          |
+| Aircraft reports | Airbus/Boeing DF/ACM/APM/KER identifiers, A350 MIAM report header, explicit event text                                                          | Aircraft-specific measurement dictionaries/scales                                               |
+| Airports         | Optional offline OurAirports coded-airport snapshot                                                                                             | Live data and ATC address lookup                                                                |
 
-All transfers preserve raw text. Binary ARINC applications are interpreted only
-after their application CRC passes. MIAM bodies are exposed after the appropriate
-body CRC verifies; DEFLATE must terminate without trailing input and output is
-limited to 65,536 bytes. OHMA verifies zlib integrity, retains the inner JSON and
-does not assign unknown units. Generic ACARS reassembly is separate from OHMA's
-conversation-part protocol.
+Raw radio text and unknown bytes remain available. Binary ARINC values and MIAM
+bodies are exposed only after their CRC verifies. MIAM and OHMA decompression is
+bounded to 65,536 bytes and requires a complete stream. ATS text integrity remains
+explicitly unverified. An AVLC or HFDL link CRC does not verify every inner layer.
+COTP currently exposes headers and raw application bytes with unverified integrity.
+Derived CLNP fragments and X.25 packets with `more` set do not receive inner decoding.
+The X.25 reassembler dispatches only completed user data. Its default limits are
+64 channels, 8,192 payload bytes, 128 packets and sixty seconds from the first
+packet; caller identities must isolate receiver, circuit and direction. Failed
+sequences stay rejected until expiry/reset. CLNP header checksums are distinct
+from COTP and application integrity; omitted CLNP checksums withhold inner dispatch.
+X.25 has no explicit start-of-NSDU bit. Initialize/reset at a known circuit boundary;
+a stream starting with a final fragment cannot establish whether a prefix was missed.
 
-Observed label-10 `POS` reports retain the header code, hemisphere coordinates
-and additional columns as raw fields. Compact coordinate scales and numeric
-column meanings remain unverified. DF `APM` and `KER` headers expose aircraft,
-flight and route identifiers while retaining date/time codes and measurements
-without assigning a timezone, scale or units. These header-only readers use
-sanitized examples from a user-supplied 10 October 2026 capture; they are pattern
-recognition, not implementations of a published aircraft report specification.
-Exact final-block retransmissions retain a previously completed assembly within
-the same source, aircraft, mode, label, message number and reassembly time limits.
+MIAM files are bounded to 64 KiB/999 segments/fifteen minutes; OHMA conversations
+to 64 KiB/256 parts/twenty minutes. Each supports up to 128 active assemblies per
+batch. Conflicting OHMA parts remain rejected until expiry. Generic radio assembly
+permits at most 26 downlink or 24 uplink blocks and 8,192 characters. Uplink captures
+starting mid-message cannot prove a missing prefix because the link has no message
+start identifier. Session eviction can discard incomplete assemblies.
 
-## Sources and provenance
+Observed seven-column label-10 POS and APM/KER headers from the user's October
+capture remain partial. Compact coordinates, date/time codes and numeric columns
+are retained without invented scales or units. Exact final retransmissions keep
+the previously completed radio assembly within its time window.
 
-| Source                                                                                                            | Reuse / comparison                                                                                            |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| [Airframes TypeScript decoder](https://github.com/airframesio/acars-decoder-typescript) 1.9.2, MIT                | Runtime airline-format dependency; representative regression fixtures                                         |
-| [xoolive/datalink](https://github.com/xoolive/datalink), MIT, revision `d3e3e5a5d2bda04fbee83832cb77e3050a87364c` | Rust FANS catalogue, supported PER layouts, ADS-C fixtures and OHMA JSON format/fixture                       |
-| [libacars](https://github.com/szpajder/libacars), MIT                                                             | C ADS-C scales, ARINC CRC and reassembly rules; CORE v1/v2 wire fields, raw DEFLATE and ARINC CRC polynomials |
-| [Skyshark](https://github.com/ckuethe/skyshark), MIT, revision `3d66e7d27ce5b9616643faa8a3b29ca9801b9007`         | Python label catalogue and documented text layouts                                                            |
-| [OurAirports](https://ourairports.com/data/), public domain                                                       | 10 October 2026 snapshot: 11,764 airports / 10,531 ICAO / 9,051 IATA codes                                    |
+## Sources and validation
 
-The label generator pins its source revision and records SHA-256. Airport metadata
-records the exact source hash and counts. Full MIT notices are retained in
-`THIRD_PARTY_NOTICES.txt` and fixture notices alongside tests. The libacars sources
-were reviewed as protocol references; broad C ASN.1 decoder coverage has not been
-ported. A Rust route fixture with a failed application CRC is retained as a
-rejection regression, not evidence that a complete route decoded successfully.
+[upstreams.json](upstreams.json) records repositories, exact revisions, licenses,
+source paths and local ports. Required notices are in
+[THIRD_PARTY_NOTICES.txt](../THIRD_PARTY_NOTICES.txt). Publicly visible GPL code is
+not translated into this MIT distribution. Sources include MIT Airframes,
+libacars, datalink and Skyshark, plus public-domain OurAirports.
 
-Additional Python/Go/C projects were inspected. Implementations without a verified
-license are not copied. AFN and ATN, MIAM file/session transfers and proprietary
-maintenance dictionaries are explicit future work. Porting a function is not
-enough: it must have validated semantics, licensed provenance and regression tests.
+The Airframes corpus contains 308 extracted cases/3,316 assertions; 304 installed
+plugin cases run. Four test-subclass cases are inventoried but not executable
+through the published dependency. General utilities and remaining upstream test
+infrastructure still need migration. Another 340 Rust JSON fixtures are retained;
+ported checks include all 13 application cases, ADS-C message envelopes and the
+260-PDU shallow CPDLC corpus. That shallow test requires over 200 complete decodes
+in at least one direction; it does not prove the correct direction or all semantics.
+Some upstream fixtures fail application integrity or schema constraints and are
+retained as divergences, not successful-decoding evidence.
 
-## Next coverage work
+Static importers read downloaded tests as syntax/data. A separate verifier checks
+all imported test-file hashes against the pinned public commits. Independent CRC
+encoders and schema-based bit encoders exercise transport boundaries and malformed
+data. Deterministic mutation tests are useful regression checks, not a sustained
+fuzzing campaign. Benchmarks are local measurements, not comparative rankings.
 
-- MIAM embedded application dispatch, negotiation and file-transfer lifecycle.
-- OHMA conversation assembly with source isolation, expiry and integrity checks.
-- AFN logon/contact/application reports with verified CRC and licensed fixtures.
-- Remaining FANS PER bodies and ATN CPDLC through verified ASN.1 schemas.
-- Public, licensed aircraft-report specifications for DF/ACM measurements.
-- Differential corpus comparisons, fuzzing and reproducible performance baselines.
+The public dispatcher also runs all 304 runnable Airframes cases through a display
+comparison. It checks nested results, known field aliases, JSON structural equality,
+wire-preserved flight codes and explicit integrity refusals. The current comparison
+has no unresolved expected display fields; this does not establish complete typed
+semantic equivalence or correctness of upstream interpretations. Benchmark output
+separates a warmed corpus, synthetic cache misses and bounded session replay.
 
-No corpus measurement currently establishes superiority over every other decoder.
+Independent network readers use [RFC 994](https://www.rfc-editor.org/rfc/rfc994)
+(ISO 8473 CLNP), [RFC 995](https://www.rfc-editor.org/rfc/rfc995) (ES-IS common/ISH/RD)
+and [ITU-T X.283 (12/97)](https://www.itu.int/rec/T-REC-X.283-199712-I/en)
+for seconds-based ES-IS timer units. ESH address-list changes from the early RFC
+remain raw. These readers do not redistribute the standards documents.
+
+See [upstream-audit.md](upstream-audit.md) for the migration ledger and next work.

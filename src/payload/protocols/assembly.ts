@@ -1,5 +1,8 @@
 import type { AcarsRecord } from '@/types';
 import type { AcarsAssembly, AcarsAssemblyResult } from './types';
+import { assembleUplinks } from './assembly/uplink';
+import type { AssemblyStatus } from '@/payload/types';
+import { blockStatus, failureStatus, startChain } from './assembly/status';
 
 /** Reassembles only consecutive downlink blocks within one source log. */
 export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyResult {
@@ -8,6 +11,7 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 	const completed = new Map<number, AcarsAssembly>();
 	const failures = new Map<number, string>();
 	const failedChains = new Map<string, string>();
+	const statuses = new Map<number, AssemblyStatus>();
 	for (const message of records) {
 		const number = /^([A-Z0-9]{3})([A-Z])$/.exec(message.messageNumber ?? '');
 		if (!number || message.direction !== 'downlink' || !message.registration) continue;
@@ -15,21 +19,24 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 		const chain = pending.get(key);
 		const repeated = completedRetransmission(chain, finished.get(key), message);
 		if (repeated) {
+			statuses.set(message.id, { protocol: 'ACARS', status: 'duplicate', blocks: [...repeated.blocks] });
 			completed.set(message.id, repeated);
 			finished.set(key, repeated);
 			continue;
 		}
 		if (chain && sameBlock(chain.last, message)) {
 			// A retransmitted payload can carry a newer transport block ID. Keep its latest envelope.
-			if (validRetransmission(chain, message)) chain.last = message;
+			if (validRetransmission(chain, message)) {
+				chain.last = message;
+				statuses.set(message.id, { protocol: 'ACARS', status: 'duplicate', blocks: [...chain.blocks] });
+			} else statuses.set(message.id, failureStatus('The retransmission exceeds the reassembly time window.'));
 			continue;
 		}
 		if (number[2] === 'A') {
 			pending.delete(key);
 			finished.delete(key);
 			failedChains.delete(key);
-			if (message.continuation)
-				pending.set(key, { first: message, last: message, text: message.text, blocks: [message.messageNumber!] });
+			startChain(pending, statuses, key, message, message.messageNumber!);
 			continue;
 		}
 		finished.delete(key);
@@ -37,6 +44,7 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 			? incompatibility(chain, message)
 			: (failedChains.get(key) ?? 'No matching initial ETB block A is available in this source log.');
 		if (mismatch) {
+			statuses.set(message.id, failureStatus(mismatch));
 			failures.set(message.id, mismatch);
 			failedChains.set(key, mismatch);
 			pending.delete(key);
@@ -50,6 +58,7 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 					? 'H1 application prefixes do not match.'
 					: 'The assembled message exceeds its size or block limit.';
 			failures.set(message.id, reason);
+			statuses.set(message.id, { protocol: 'ACARS', status: 'failed', reason });
 			failedChains.set(key, reason);
 			pending.delete(key);
 			continue;
@@ -57,13 +66,19 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 		active.text += suffix;
 		active.last = message;
 		active.blocks.push(message.messageNumber!);
+		statuses.set(message.id, blockStatus(message, active.blocks));
 		if (!message.continuation) {
 			completed.set(message.id, active);
 			finished.set(key, active);
 			pending.delete(key);
 		}
 	}
-	return { completed, failures };
+	const uplinks = assembleUplinks(records);
+	return {
+		completed: new Map([...completed, ...uplinks.completed]),
+		failures: new Map([...failures, ...uplinks.failures]),
+		statuses: new Map([...statuses, ...uplinks.statuses]),
+	};
 }
 
 function completedRetransmission(
