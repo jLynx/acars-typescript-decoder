@@ -39,10 +39,6 @@ evidence for implementation, not a grant to relicense material. Private captures
 and experimental scripts belong in ignored `test-results/`; sanitize public
 fixtures and include only the data necessary for a regression.
 
-Run `npm run release:check` before a release. The `prepack` lifecycle rebuilds and
-validates the packed tarball in a separate consumer, including TypeScript imports,
-a browser bundle, publication metadata and required documentation/license files.
-The outer pack command previews the package file list without uploading it.
-CI does not publish packages. Follow the [release guide](docs/releasing.md).
-Package/repository names do not reserve npm names; check availability again before
-the first publication.
+The package smoke test validates the packed tarball in a separate consumer,
+including TypeScript imports, a browser bundle, package metadata and required
+documentation/license files.

@@ -55,6 +55,60 @@ export function interpretTakeoff(message: AcarsRecord): AcarsInterpretation | un
 	};
 }
 
+/** Recognizes explicit POS markers; compact coordinate scales and extra columns remain unverified. */
+export function interpretPos(message: AcarsRecord): AcarsInterpretation | undefined {
+	const match =
+		/^POS(\d{6}),[ \t]*([NS])[ \t]*(\d{2,4}(?:\.\d+)?),[ \t]*([EW])[ \t]*(\d{3,5}(?:\.\d+)?),([^\r\n]+)$/.exec(
+			message.text.trim(),
+		);
+	if (!match || message.direction !== 'downlink') return;
+	const [, clock, northSouth, latitude, eastWest, longitude, extra] = match;
+	return {
+		title: 'Position report',
+		summary: `POS report · ${northSouth} ${latitude}, ${eastWest} ${longitude} (raw coordinates).`,
+		coverage: 'partial',
+		coverageDetail: 'Position markers identified · coordinate scale and additional fields unverified',
+		fields: [
+			{ label: 'Report code', value: 'POS' },
+			{ label: 'Header time code (raw)', value: clock },
+			{ label: 'Latitude (raw)', value: `${northSouth} ${latitude}` },
+			{ label: 'Longitude (raw)', value: `${eastWest} ${longitude}` },
+			{ label: 'Additional fields (raw)', value: extra },
+		],
+		notes: [
+			'The POS marker and hemisphere fields identify a position report. Compact coordinate scale, time-code semantics and remaining numeric columns are not verified; no degrees, altitude, fuel units or event date are assigned.',
+		],
+	};
+}
+
+/** Extracts visible identifiers from an observed APM header without decoding its numeric body. */
+export function interpretApm(text: string): AcarsInterpretation | undefined {
+	const match =
+		/^APM[ \t]+(\d+)[ \t]+([A-Z0-9-]+)[ \t]+([A-Z]{3}\d+[A-Z]?)[ \t]+([A-Z]{4})([A-Z]{4})(\d{6})(\d{6}),(?:\r?\n|$)/.exec(
+			text,
+		);
+	if (!match) return;
+	const [, report, registration, flight, departure, destination, date, clock] = match;
+	return {
+		title: 'Aircraft report APM',
+		summary: `APM · ${registration} · ${flight} · ${airport(departure)} → ${airport(destination)}.`,
+		coverage: 'partial',
+		coverageDetail: 'Header identified · measurements undecoded',
+		fields: [
+			{ label: 'Report code', value: 'APM' },
+			{ label: 'Report number (raw)', value: report },
+			{ label: 'Reported registration', value: registration },
+			{ label: 'Reported flight code', value: flight },
+			...routeFields(departure, destination),
+			{ label: 'Header date code (raw)', value: date },
+			{ label: 'Header time code (raw)', value: clock },
+		],
+		notes: [
+			'The observed APM header supplies aircraft, flight and route identifiers. The report number, date/time encoding, timezone and numeric measurements require the aircraft report specification; their meanings, scales and units are not assigned.',
+		],
+	};
+}
+
 export function interpretMonitoring(message: AcarsRecord): AcarsInterpretation | undefined {
 	const match = /^01([A-Z]{4}) +([A-Z0-9]+)\/(\d{6})([A-Z]{4})([A-Z]{4})(?:\r?\n|$)/.exec(message.text.trim());
 	if (!match || message.direction !== 'downlink') return;
@@ -81,6 +135,12 @@ export function interpretDf(text: string): AcarsInterpretation {
 	// Some reports have a routing address before the report identifier.
 	text = text.replace(/^\/[A-Z0-9]{7}\./, '');
 	const header = /^<(\d+)>([A-Z0-9]+)/.exec(text);
+	const ker =
+		header?.[2] === 'KER'
+			? /^<\d+>KER\r?\n[ \t]*([A-Z0-9]+-[A-Z0-9]+)([A-Z]{3}\d+)[ \t]+ER[ \t]+(\d{3})(\d{6})(\d{6})([A-Z]{4})([A-Z]{4})(\d+)[ \t]+C[ \t]+(\d+)(?:\r?\n|$)/.exec(
+					text,
+				)
+			: null;
 	const route = header ? /([A-Z]{4})([A-Z]{4})(?=\d+\s*$| \d{3}[A-Z]{2}\d{12})/m.exec(text) : null;
 	const sections = [...text.matchAll(/(?:^|;)A(\d{2})(?=[+-])/g)].map((match) => `A${match[1]}`);
 	return {
@@ -98,12 +158,29 @@ export function interpretDf(text: string): AcarsInterpretation {
 					]
 				: []),
 			...(route ? routeFields(route[1], route[2]) : []),
+			...(ker
+				? [
+						{ label: 'Reported registration', value: ker[1] },
+						{ label: 'Reported flight code', value: ker[2] },
+						...routeFields(ker[6], ker[7]),
+						{ label: 'Header code (raw)', value: ker[3] },
+						{ label: 'Header date code (raw)', value: ker[4] },
+						{ label: 'Header time code (raw)', value: ker[5] },
+						{ label: 'Route suffix (raw)', value: ker[8] },
+						{ label: 'C value (raw)', value: ker[9] },
+					]
+				: []),
 			...(sections.length
 				? [{ label: 'Numeric section identifiers (raw)', value: [...new Set(sections)].join(', ') }]
 				: []),
 		],
 		notes: [
 			'This DF payload is not decoded by the Airframes library or a supported report parser. Numeric sections need the aircraft report specification to assign meanings and units.',
+			...(ker
+				? [
+						'The observed KER header supplies aircraft, flight and route identifiers. Header date/time codes, timezone and other numeric fields remain unverified and are retained as raw values.',
+					]
+				: []),
 			...(header ? [] : ['This block has no recognized report header. Continued blocks are displayed separately.']),
 		],
 	};

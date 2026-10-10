@@ -1,7 +1,14 @@
 import type { AcarsRecord } from '@/types';
 import { interpretArinc } from './arinc';
 import { interpretAirbus, interpretLoad, interpretMovement, interpretOperations } from './airline';
-import { interpretDf, interpretMonitoring, interpretPosition, interpretTakeoff } from './reports';
+import {
+	interpretApm,
+	interpretDf,
+	interpretMonitoring,
+	interpretPos,
+	interpretPosition,
+	interpretTakeoff,
+} from './reports';
 import { timeFields } from './time';
 import type { AcarsInterpretation } from './types';
 import { interpretCommunity } from './community';
@@ -64,7 +71,7 @@ function interpretPayload(message: AcarsRecord): AcarsInterpretation {
 	}
 	let result: AcarsInterpretation | undefined;
 	if (message.label === 'SA') result = interpretAdvisory(message);
-	if (message.label === '10') result = interpretTakeoff(message);
+	if (message.label === '10') result = interpretTakeoff(message) ?? interpretPos(message);
 	if (message.label === '49') result = interpretMonitoring(message);
 	if (message.label === '3L') result = interpretPosition(message);
 	if (message.label === '1L') result = interpretOperations(message);
@@ -133,7 +140,7 @@ function interpretApplication(message: AcarsRecord): AcarsInterpretation {
 }
 
 function interpretReport(text: string, receivedAt: number): AcarsInterpretation | undefined {
-	return interpretAirbus(text, receivedAt) ?? interpretAcm(text);
+	return interpretAirbus(text, receivedAt) ?? interpretAcm(text) ?? interpretApm(text);
 }
 
 function unknown(message: AcarsRecord): AcarsInterpretation {

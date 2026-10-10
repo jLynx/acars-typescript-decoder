@@ -29,7 +29,7 @@ const packed = Array.isArray(packing) ? packing[0] : packing[metadata.name];
 assert(packed && Array.isArray(packed.files), 'npm pack must return package file metadata');
 assert(packed.files.some((file) => file.path === 'dist/index.d.ts'));
 assert(!packed.files.some((file) => /^(?:test|src|node_modules)\//.test(file.path)));
-for (const filename of ['README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.txt', 'CONTRIBUTING.md', 'docs/releasing.md']) {
+for (const filename of ['README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.txt', 'CONTRIBUTING.md', 'docs/coverage.md']) {
 	assert(
 		packed.files.some((file) => file.path === filename),
 		`Missing distribution file: ${filename}`,

@@ -24,6 +24,16 @@ limited to 65,536 bytes. OHMA verifies zlib integrity, retains the inner JSON an
 does not assign unknown units. Generic ACARS reassembly is separate from OHMA's
 conversation-part protocol.
 
+Observed label-10 `POS` reports retain the header code, hemisphere coordinates
+and additional columns as raw fields. Compact coordinate scales and numeric
+column meanings remain unverified. DF `APM` and `KER` headers expose aircraft,
+flight and route identifiers while retaining date/time codes and measurements
+without assigning a timezone, scale or units. These header-only readers use
+sanitized examples from a user-supplied 10 October 2026 capture; they are pattern
+recognition, not implementations of a published aircraft report specification.
+Exact final-block retransmissions retain a previously completed assembly within
+the same source, aircraft, mode, label, message number and reassembly time limits.
+
 ## Sources and provenance
 
 | Source                                                                                                            | Reuse / comparison                                                                                            |

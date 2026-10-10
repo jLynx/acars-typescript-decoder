@@ -57,19 +57,6 @@ npm install @jlynx_/acars-decoder
 
 It is a separate package from the MIT-licensed `@airframes/acars-decoder` dependency.
 
-## Publishing
-
-Run `npm run release:check` to validate a release and preview its package contents
-without uploading anything. Both `npm pack` and `npm publish` automatically run
-lint, formatting, structure, type, decoder, data-generator and clean-install checks
-against a fresh build. Development release checks require Python 3; consumers do not.
-
-See the [release guide](docs/releasing.md) for npm account setup, first publication
-and version updates. Publishing requires an npm account with permission to use the
-package name. Publishing a GitHub release runs validation and submits the package
-to npm staging through a trusted publisher. A maintainer approves the staged release
-on npm with 2FA; see the release guide for the full process.
-
 ## Usage
 
 ### Decode a message

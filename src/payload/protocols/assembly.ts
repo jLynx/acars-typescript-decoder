@@ -4,6 +4,7 @@ import type { AcarsAssembly, AcarsAssemblyResult } from './types';
 /** Reassembles only consecutive downlink blocks within one source log. */
 export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyResult {
 	const pending = new Map<string, AcarsAssembly>();
+	const finished = new Map<string, AcarsAssembly>();
 	const completed = new Map<number, AcarsAssembly>();
 	const failures = new Map<number, string>();
 	const failedChains = new Map<string, string>();
@@ -12,6 +13,12 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 		if (!number || message.direction !== 'downlink' || !message.registration) continue;
 		const key = `${message.registration}\0${message.mode}\0${message.label}\0${number[1]}`;
 		const chain = pending.get(key);
+		const repeated = completedRetransmission(chain, finished.get(key), message);
+		if (repeated) {
+			completed.set(message.id, repeated);
+			finished.set(key, repeated);
+			continue;
+		}
 		if (chain && sameBlock(chain.last, message)) {
 			// A retransmitted payload can carry a newer transport block ID. Keep its latest envelope.
 			if (validRetransmission(chain, message)) chain.last = message;
@@ -19,11 +26,13 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 		}
 		if (number[2] === 'A') {
 			pending.delete(key);
+			finished.delete(key);
 			failedChains.delete(key);
 			if (message.continuation)
 				pending.set(key, { first: message, last: message, text: message.text, blocks: [message.messageNumber!] });
 			continue;
 		}
+		finished.delete(key);
 		const mismatch = chain
 			? incompatibility(chain, message)
 			: (failedChains.get(key) ?? 'No matching initial ETB block A is available in this source log.');
@@ -50,10 +59,21 @@ export function assembleAcars(records: readonly AcarsRecord[]): AcarsAssemblyRes
 		active.blocks.push(message.messageNumber!);
 		if (!message.continuation) {
 			completed.set(message.id, active);
+			finished.set(key, active);
 			pending.delete(key);
 		}
 	}
 	return { completed, failures };
+}
+
+function completedRetransmission(
+	active: AcarsAssembly | undefined,
+	previous: AcarsAssembly | undefined,
+	message: AcarsRecord,
+): AcarsAssembly | undefined {
+	if (active || !previous || !sameBlock(previous.last, message) || !validRetransmission(previous, message)) return;
+	if (previous.last.flight && message.flight && previous.last.flight !== message.flight) return;
+	return { ...previous, last: message };
 }
 
 function sameBlock(previous: AcarsRecord, message: AcarsRecord): boolean {

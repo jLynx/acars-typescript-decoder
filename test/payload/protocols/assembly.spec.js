@@ -73,6 +73,52 @@ describe('ACARS message reassembly', () => {
 		expect(results.at(-1).assembledText).toBe(text);
 		expect(results.at(-1).interpretation.notes.join(' ')).toContain('Reassembled 2 consecutive blocks');
 	});
+	it('preserves the completed assembly on an identical retransmitted final block', () => {
+		const [first, last] = messages();
+		const duplicate = { ...last, id: 3, blockId: '5', receivedAt: last.receivedAt + 13000 };
+		const results = interpretAcarsLog([first, last, duplicate]);
+		expect(results[2].assembledText).toBe(text);
+		expect(results[2].interpretation).toEqual(results[1].interpretation);
+		expect(results[2].text).toBe(duplicate.text);
+		expect(results[2].interpretation.notes.join(' ')).not.toContain('Reassembly unavailable');
+	});
+	it.each([
+		{ text: '#MDBdifferent' },
+		{ flight: 'OTHER' },
+		{ registration: 'OTHER' },
+		{ mode: '1' },
+		{ label: 'AA' },
+		{ receivedAt: Date.parse('2026-10-09T08:04:00Z') },
+		{ continuation: true },
+	])('does not reuse a completed assembly for a conflicting or expired block: %s', (extra) => {
+		const [first, last] = messages();
+		const results = interpretAcarsLog([
+			{ ...first, flight: 'QTR1' },
+			{ ...last, flight: 'QTR1' },
+			{ ...last, id: 3, receivedAt: last.receivedAt + 1000, ...extra },
+		]);
+		expect(results.at(-1).assembledText).toBeUndefined();
+	});
+	it('clears a completed assembly when the same message number begins a new report', () => {
+		const [first, last] = messages();
+		const results = interpretAcarsLog([
+			first,
+			last,
+			{ ...first, id: 3, receivedAt: last.receivedAt + 1000, text: '#DFBnew report' },
+			{ ...last, id: 4, receivedAt: last.receivedAt + 2000 },
+		]);
+		expect(results.at(-1).assembledText).toBeUndefined();
+	});
+	it('does not reuse an old final block after a conflicting final payload was received', () => {
+		const [first, last] = messages();
+		const results = interpretAcarsLog([
+			first,
+			last,
+			{ ...last, id: 3, receivedAt: last.receivedAt + 1000, text: '#MDBdifferent' },
+			{ ...last, id: 4, receivedAt: last.receivedAt + 2000 },
+		]);
+		expect(results.at(-1).assembledText).toBeUndefined();
+	});
 	it('does not refresh an expired sequence with a duplicate retransmission', () => {
 		const [first, last] = messages();
 		const late = first.receivedAt + 121000;
