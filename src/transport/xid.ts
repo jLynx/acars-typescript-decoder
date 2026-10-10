@@ -1,6 +1,7 @@
 // Adapted from MIT xoolive/datalink xid.rs, pinned in docs/upstreams.json.
 import { decodeAvlcAddress } from './address';
 import type { XidFrequency, XidLocation, XidMessage, XidParameter } from './types';
+import { additionalXidParameter, xidParameterDecoded } from './xid/parameters';
 
 const names = [
 	['Unknown', 'Unknown XID type'],
@@ -53,7 +54,7 @@ export function decodeXid(bytes: Uint8Array, response = false, pollFinal = false
 	const [type, description] = names[Number(response) * 8 + Number(pollFinal) * 4 + hr];
 	result.type = type;
 	result.description = description;
-	if (type === 'Unknown' || result.groups.some((group) => group.parameters.some((p) => p.value === undefined))) {
+	if (type === 'Unknown' || result.groups.some((group) => group.parameters.some((p) => !xidParameterDecoded(p)))) {
 		result.coverage = 'partial';
 		result.notes.push('Unsupported parameter values are retained as raw bytes.');
 	}
@@ -97,6 +98,7 @@ function parameter(group: number, id: number, raw: Uint8Array): XidParameter {
 	} else if (group === 0xf0) {
 		result.value = privateValue(id, raw);
 	}
+	additionalXidParameter(group, result);
 	return result;
 }
 

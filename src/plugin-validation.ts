@@ -18,9 +18,36 @@ export function validInterpretation(value: unknown, depth = 0): value is AcarsIn
 		Array.isArray(value.notes) &&
 		value.notes.every((note: unknown) => typeof note === 'string');
 	if (!base) return false;
-	if (value.application !== undefined && !validApplication(value.application)) return false;
-	if (value.transfer !== undefined && !validTransfer(value.transfer)) return false;
+	if (!validOptionalProtocols(value)) return false;
 	return value.embedded === undefined || validInterpretation(value.embedded, depth + 1);
+}
+
+function validOptionalProtocols(value: Record<string, unknown>): boolean {
+	return (
+		(value.application === undefined || validApplication(value.application)) &&
+		(value.transfer === undefined || validTransfer(value.transfer)) &&
+		(value.maintenance === undefined || validMaintenance(value.maintenance))
+	);
+}
+
+function validMaintenance(value: unknown): boolean {
+	return (
+		isRecord(value) &&
+		value.protocol === 'RTR' &&
+		value.coverage === 'partial' &&
+		value.integrity === 'unverified' &&
+		typeof value.raw === 'string' &&
+		value.raw.length <= 8192 &&
+		Array.isArray(value.fields) &&
+		value.fields.length <= 128 &&
+		value.fields.every(
+			(field: unknown) =>
+				isRecord(field) &&
+				typeof field.path === 'string' &&
+				typeof field.label === 'string' &&
+				typeof field.value === 'string',
+		)
+	);
 }
 
 function validTransfer(value: unknown): boolean {

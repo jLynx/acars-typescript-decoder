@@ -3,6 +3,8 @@ import type { AcarsField, AcarsInterpretation } from './types';
 import { timeFields } from './time';
 
 import { airportDescription as airport } from '@/payload/reference/codes';
+import { boeingHeaderFields, interpretApu } from '@/payload/reports/boeing';
+import { interpretParameters, interpretAirbusPart } from '@/payload/reports/parameters';
 
 const routeFields = (departure: string, destination: string): AcarsField[] => [
 	{ label: 'Departure', value: airport(departure) },
@@ -131,16 +133,15 @@ export function interpretMonitoring(message: AcarsRecord): AcarsInterpretation |
 	};
 }
 
-export function interpretDf(text: string): AcarsInterpretation {
+export function interpretDf(text: string, continuation = false): AcarsInterpretation {
 	// Some reports have a routing address before the report identifier.
 	text = text.replace(/^\/[A-Z0-9]{7}\./, '');
 	const header = /^<(\d+)>([A-Z0-9]+)/.exec(text);
-	const ker =
-		header?.[2] === 'KER'
-			? /^<\d+>KER\r?\n[ \t]*([A-Z0-9]+-[A-Z0-9]+)([A-Z]{3}\d+)[ \t]+ER[ \t]+(\d{3})(\d{6})(\d{6})([A-Z]{4})([A-Z]{4})(\d+)[ \t]+C[ \t]+(\d+)(?:\r?\n|$)/.exec(
-					text,
-				)
-			: null;
+	if (!header) {
+		const explicit = interpretApu(text) ?? interpretAirbusPart(text) ?? interpretParameters(text, continuation);
+		if (explicit) return explicit;
+	}
+	const identifiers = boeingHeaderFields(text, continuation);
 	const route = header ? /([A-Z]{4})([A-Z]{4})(?=\d+\s*$| \d{3}[A-Z]{2}\d{12})/m.exec(text) : null;
 	const sections = [...text.matchAll(/(?:^|;)A(\d{2})(?=[+-])/g)].map((match) => `A${match[1]}`);
 	return {
@@ -157,28 +158,16 @@ export function interpretDf(text: string): AcarsInterpretation {
 						{ label: 'Report code', value: header[2] },
 					]
 				: []),
-			...(route ? routeFields(route[1], route[2]) : []),
-			...(ker
-				? [
-						{ label: 'Reported registration', value: ker[1] },
-						{ label: 'Reported flight code', value: ker[2] },
-						...routeFields(ker[6], ker[7]),
-						{ label: 'Header code (raw)', value: ker[3] },
-						{ label: 'Header date code (raw)', value: ker[4] },
-						{ label: 'Header time code (raw)', value: ker[5] },
-						{ label: 'Route suffix (raw)', value: ker[8] },
-						{ label: 'C value (raw)', value: ker[9] },
-					]
-				: []),
+			...(identifiers.length ? identifiers : route ? routeFields(route[1], route[2]) : []),
 			...(sections.length
 				? [{ label: 'Numeric section identifiers (raw)', value: [...new Set(sections)].join(', ') }]
 				: []),
 		],
 		notes: [
 			'This DF payload is not decoded by the Airframes library or a supported report parser. Numeric sections need the aircraft report specification to assign meanings and units.',
-			...(ker
+			...(identifiers.length
 				? [
-						'The observed KER header supplies aircraft, flight and route identifiers. Header date/time codes, timezone and other numeric fields remain unverified and are retained as raw values.',
+						'The observed report header supplies aircraft, flight and route identifiers. Header date/time codes, timezone and other numeric fields remain unverified and are retained as raw values.',
 					]
 				: []),
 			...(header ? [] : ['This block has no recognized report header. Continued blocks are displayed separately.']),

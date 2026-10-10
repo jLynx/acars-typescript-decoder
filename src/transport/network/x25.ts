@@ -68,6 +68,8 @@ export function decodeClnpCompressed(bytes: Uint8Array, options: CotpOptions = {
 		payload: new Uint8Array(),
 	};
 	const derived = [6, 7, 9, 10].includes(type);
+	result.derived = derived;
+	result.more = [7, 10].includes(type);
 	if ([1, 3].includes(type) || derived) {
 		if (position + 2 > bytes.length) return;
 		result.pduId = word(bytes, position);
@@ -80,6 +82,7 @@ export function decodeClnpCompressed(bytes: Uint8Array, options: CotpOptions = {
 		position += 4;
 	}
 	result.payload = bytes.slice(position);
+	if (derived && !validDerived(result)) return;
 	if (!derived && result.payload.length) {
 		if (result.payload[0] === 0x85) result.idrp = decodeIdrp(result.payload);
 		else {
@@ -88,4 +91,10 @@ export function decodeClnpCompressed(bytes: Uint8Array, options: CotpOptions = {
 		}
 	}
 	return result;
+}
+
+function validDerived(result: ClnpCompressed): boolean {
+	return Boolean(
+		result.payload.length && result.totalLength && result.offset! + result.payload.length <= result.totalLength,
+	);
 }

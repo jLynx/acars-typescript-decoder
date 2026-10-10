@@ -95,6 +95,26 @@ describe('combined ACARS binary payload decoders', () => {
 		expect(result.coverage).toBe('decoded');
 		expect(field(result, 'CPDLC instruction 1')).toBeTruthy();
 	});
+	it('decodes the public connection-confirmation PDU through the dispatcher', () => {
+		const fixture = cpdlcFixtures.find((item) => item.expect === 'connect_confirm');
+		const result = interpretAcars(record(fixture.text, fixture.direction, 'BA'));
+		expect(result.coverage).toBe('decoded');
+		expect(field(result, 'Application CRC')).toBe('93E2 · Verified');
+		expect(field(result, 'CPDLC message ID')).toBe('2');
+		expect(field(result, 'CPDLC referenced message')).toBe('2');
+		expect(field(result, 'CPDLC time')).toBe('21:47:54 UTC');
+		expect(field(result, 'CPDLC instruction 1')).toBe('Version number 1');
+		expect(field(result, 'Payload parser')).toContain('CPDLC');
+	});
+	it('withholds confirmation fields for a failed CRC or incompatible direction', () => {
+		const fixture = cpdlcFixtures.find((item) => item.expect === 'connect_confirm');
+		const damaged = interpretArinc(fixture.text.slice(0, -4) + '0000', 'downlink');
+		expect(field(damaged, 'Application CRC')).toContain('Failed');
+		expect(field(damaged, 'CPDLC instruction 1')).toBeUndefined();
+		const uplink = interpretArinc(fixture.text, 'uplink');
+		expect(uplink.coverage).toBe('partial');
+		expect(field(uplink, 'CPDLC instruction 1')).toBeUndefined();
+	});
 	it('rejects empty CPDLC data', () => expect(() => decodeCpdlc(new Uint8Array(), 'downlink')).toThrow());
 	it('isolates cached results from UI mutation and respects message direction', () => {
 		const text = adscFixtures[0].text;

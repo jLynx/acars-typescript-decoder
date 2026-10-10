@@ -6,7 +6,15 @@ const string = (value: unknown): string | undefined => (typeof value === 'string
 
 function timestamp(value: unknown): number | undefined {
 	if (typeof value === 'number' && Number.isFinite(value)) return value * 1000;
-	if (isRecord(value) && typeof value.sec === 'number' && typeof value.usec === 'number')
+	if (
+		isRecord(value) &&
+		typeof value.sec === 'number' &&
+		Number.isFinite(value.sec) &&
+		typeof value.usec === 'number' &&
+		Number.isFinite(value.usec) &&
+		value.usec >= 0 &&
+		value.usec < 1_000_000
+	)
 		return value.sec * 1000 + value.usec / 1000;
 }
 
@@ -20,11 +28,16 @@ function direction(value: unknown, block: string): AcarsInput['direction'] {
 /** JSON application records from acarsdec/vdlm2dec and nested dumpvdl2/dumphfdl outputs. */
 export function adaptReceiverRecord(value: unknown): ReceiverRecord | undefined {
 	if (!isRecord(value)) return;
+	if (typeof value.LABEL === 'string') return adaptJaero(value);
 	const envelope = isRecord(value.vdl2) ? value.vdl2 : isRecord(value.hfdl) ? value.hfdl : value;
 	const found = findAcars(envelope);
 	if (!found) return;
-	const message = applicationInput(found);
-	const time = timestamp(envelope.t ?? envelope.timestamp ?? value.timestamp);
+	const aero = isRecord(value.isu) ? value.isu : undefined;
+	const src = aero && isRecord(aero.src) ? aero.src.type : undefined;
+	const aeroDirection =
+		src === 'Aircraft Earth Station' ? 'downlink' : src === 'Ground Earth Station' ? 'uplink' : undefined;
+	const message = applicationInput(aero ? { ...found, direction: aeroDirection } : found, !aero);
+	const time = timestamp(envelope.t ?? envelope.timestamp ?? value.t ?? value.timestamp);
 	if (time !== undefined) message.receivedAt = time;
 	return {
 		message,
@@ -34,10 +47,10 @@ export function adaptReceiverRecord(value: unknown): ReceiverRecord | undefined 
 	};
 }
 
-function applicationInput(found: Record<string, unknown>): AcarsInput {
+function applicationInput(found: Record<string, unknown>, inferDirection = true): AcarsInput {
 	const block = string(found.block_id) ?? string(found.blockid) ?? string(found.blk_id) ?? '';
 	const end = string(found.end);
-	const messageDirection = direction(found.direction ?? found.msg_dir, block);
+	const messageDirection = direction(found.direction ?? found.msg_dir, inferDirection ? block : '');
 	return {
 		label: string(found.label)!,
 		text: applicationText(found, messageDirection),
@@ -68,7 +81,7 @@ function applicationText(found: Record<string, unknown>, messageDirection: Acars
 function sourceId(value: Record<string, unknown>, envelope: Record<string, unknown>): string {
 	const station = string(envelope.station) ?? string(value.station_id) ?? '';
 	const frequency = envelope.freq ?? value.freq ?? value.channel ?? '';
-	const format = value.vdl2 ? 'vdl2' : value.hfdl ? 'hfdl' : 'acars';
+	const format = value.vdl2 ? 'vdl2' : value.hfdl ? 'hfdl' : value.isu ? 'aero' : 'acars';
 	return `${format}:${station}:${typeof frequency === 'number' || typeof frequency === 'string' ? frequency : ''}`;
 }
 
@@ -79,9 +92,46 @@ function findAcars(value: Record<string, unknown>): Record<string, unknown> | un
 		if (
 			typeof item.label === 'string' &&
 			item.label.length === 2 &&
-			(typeof item.text === 'string' || typeof item.txt === 'string' || typeof item.msg_text === 'string')
+			(typeof item.text === 'string' ||
+				typeof item.txt === 'string' ||
+				typeof item.msg_text === 'string' ||
+				(typeof item.mode === 'string' && typeof item.ack === 'string' && typeof item.blk_id === 'string'))
 		)
 			return item;
-		for (const key of ['acars', 'avlc', 'lpdu', 'hfnpdu', 'data']) if (isRecord(item[key])) candidates.push(item[key]);
+		for (const key of ['acars', 'avlc', 'lpdu', 'hfnpdu', 'data', 'isu'])
+			if (isRecord(item[key])) candidates.push(item[key]);
 	}
+}
+
+/** JAERO native JSON fields (mainwindow.cpp); valid/NONACARS remains receiver evidence, never a local checksum. */
+function adaptJaero(value: Record<string, unknown>): ReceiverRecord | undefined {
+	if (
+		value.NONACARS === true ||
+		typeof value.LABEL !== 'string' ||
+		value.LABEL.length !== 2 ||
+		(value.MESSAGE !== undefined && typeof value.MESSAGE !== 'string') ||
+		(value.MESSAGE === undefined && !['MODE', 'TAK', 'BI', 'REG'].every((key) => typeof value[key] === 'string'))
+	)
+		return;
+	const message = applicationInput(
+		{
+			label: value.LABEL,
+			text: value.MESSAGE ?? '',
+			reg: value.REG,
+			mode: value.MODE,
+			ack: value.TAK,
+			block_id: value.BI,
+			flight: value.FLIGHT,
+			more: value.moretocome,
+			direction: typeof value.downlink === 'boolean' ? (value.downlink ? 'downlink' : 'uplink') : undefined,
+		},
+		false,
+	);
+	const time = timestamp(value.TIME);
+	if (time !== undefined) message.receivedAt = time;
+	return {
+		message,
+		source: `aero:${string(value.station) ?? string(value.NAME) ?? ''}:${string(value.GESID) ?? ''}`,
+		raw: structuredClone(value),
+	};
 }

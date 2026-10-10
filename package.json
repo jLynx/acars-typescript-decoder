@@ -3,7 +3,7 @@
 	"version": "0.1.2",
 	"description": "ACARS message parsing, reassembly and documented application decoding for browsers and Node.js",
 	"type": "module",
-	"license": "MIT",
+	"license": "GPL-3.0-or-later",
 	"author": {
 		"name": "jLynx",
 		"url": "https://github.com/jLynx"

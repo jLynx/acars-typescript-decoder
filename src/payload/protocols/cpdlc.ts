@@ -25,7 +25,7 @@ const readers: Record<string, (bits: Bits) => string> = {
 	freetext: (bits) => bits.text(bits.read(8) + 1),
 	atiscode: (bits) => bits.text(1, true),
 	icaofacilitydesignation: (bits) => bits.text(4, true),
-	versionnumber: (bits) => String(bits.read(4)),
+	versionnumber: (bits) => `Version number ${bits.read(4)}`,
 	positionreport: positionReport,
 	tp4table: (bits) => (bits.read(1) ? 'Label B' : 'Label A'),
 	routeclearance: routeClearance,

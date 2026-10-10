@@ -7,7 +7,44 @@ crates/acars/src/decode/xid.rs (MIT). The full original license is preserved in
 test/upstream/datalink.license.txt and THIRD_PARTY_NOTICES.txt.
 
 Other transport byte encoders and fixtures are locally authored independent
-boundary/checksum examples, distributed under this repository's MIT license.
+boundary/checksum examples. The combined repository is GPL-3.0-or-later;
+the original MIT notice is retained in docs/MIT-LICENSE.txt and applies to
+previously MIT-distributed fixtures. New fixtures use the repository license.
 CLNP encoders use RFC 994's checksum equations and wire format; ES-IS fixtures
 use the common/ISH/redirect layout in RFC 995. Standards documents are references
 and are not redistributed or presented as MIT-licensed source code.
+
+esis-addresses.spec.js uses a locally authored count/list encoder informed by
+NetBSD src revision 8c101a16ae09856a61284f770c2099b38186fe7c,
+sys/netiso/esis.c (esis_eshinput/esis_shoutput) and esis.h (ISH timer constant).
+The adapted implementation's BSD-3-Clause and IBM permission notices are
+preserved in THIRD_PARTY_NOTICES.txt. No upstream fixture bodies were copied.
+COTP service fixtures use RFC 905's ED/release rules and independent checksum
+equations; those standards documents are not redistributed.
+
+cotp-session/wire.js and its negotiation/state/edge-case tests independently
+encode RFC 905 class-4 CR/CC/DT/ED/DR/DC/AK layouts and checksum equations.
+Values are synthetic and no upstream code, tests or private captures were copied.
+
+cotp-session/parameters.spec.js independently exercises RFC 905 section 13.2.3
+duplicate-parameter last-occurrence semantics; every TLV stays in raw wire order.
+
+cotp-session/preferred-size.spec.js independently exercises ITU-T X.224 (11/1995)
+sections 6.5.4/6.5.5 k), 13.1 and 13.3.4 c), including synthetic unsigned
+big-endian preferred sizes in 128-byte units, ordinary fallback and CC exclusivity.
+No standard text, upstream code/tests or private capture bodies are redistributed.
+
+cotp-session/timing.spec.js, large-input.spec.js, acknowledge.spec.js,
+ordering.spec.js and release.spec.js use locally authored synthetic encoders
+for X.224 sections 6.5/6.7/6.11, 12.2.3 and 13.3/13.9/13.10.
+The independent expectations cover per-peer milliseconds, ROA negotiation,
+local large-NSDU bounds, AK/FCC windows, EA matching, non-blocking ED dependencies
+and passive DR/DC lifecycle evidence. No external code/tests were copied.
+
+Compressed CLNP, X.233 options, IDRP/ATN security, XID parameters, HFDL
+system-table and Aero tests use locally authored synthetic bytes and independent
+checksum/wire encoders. Field-layout sources and revisions are pinned in
+docs/upstreams.json, with original implementation notices preserved in
+THIRD_PARTY_NOTICES.txt. No private capture bodies or upstream tests were copied.
+ATN checksum fixtures use closed-form modular equations; independent external
+specification/capture verification remains outstanding.

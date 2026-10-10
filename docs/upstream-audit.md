@@ -25,17 +25,79 @@ summary. Completed portions of the audited work are now implemented locally:
   header readers; HFDL SPDU/MPDU/LPDU and supported network reports.
 - Bounded X.25 M-bit reassembly, uncompressed CLNP checksum/address/segmentation
   headers and ES-IS common/ISH/redirect fields, with unknown ESH address lists retained.
+- Uncompressed CLNP offset reassembly with bounded lifetimes/state, identical
+  overlap/retransmission handling, conflict rejection and complete COTP/IDRP dispatch.
+  Independent RFC 994 wire fixtures cover gaps, isolation, expiry and X.25 composition.
+- ISO 8073 COTP checksum verification from RFC 905, including LI/header/user data
+  and separate checks for concatenated TPDUs; ATN application checksums remain raw.
+- Passive class-4 COTP DT/TSDU reassembly with explicit connection boundaries,
+  normal/extended numbering, bounded resequencing, EOT, retransmission conflict
+  rejection and message/idle expiry. This is a receive-side assembler, not a
+  connection negotiation engine or ATN application decoder.
+- Negotiated passive COTP ED delivery with independent sequence/history state,
+  size/EOT checks, and matching-reference DR/DC closure that releases both services.
+  Explicit session dependency ordering and EA tracking are described below;
+  broader inference from incomplete captures remains pending.
+- Passive bidirectional class-4 CR/CC matching from RFC 905, with normal/extended
+  format, TPDU-size/expedited selection, initial credits, selector echoes, connection
+  generations and bounded reference quarantine. Assemblies report their generation
+  and direction; release/rejection/expiry closes both streams. Unsupported options,
+  class fallback remains pending; checksum omission, selective ACK and tracked
+  credit updates are now implemented as described in the current coverage table.
+- Modern ESH source NSAP lists and the ISH configuration timer, adapted from
+  pinned NetBSD ES-IS under its BSD-3-Clause and IBM notices; explicit legacy/raw
+  ESH modes avoid layout guessing.
 - Public dispatcher display comparisons for all runnable Airframes fixtures,
   including nested/renamed values, JSON equality and documented integrity refusals.
 - Public corpus fixes for POS dispatch, fault/warning whitespace, A350 embedded
   headers and preserved flight-code leading zeroes.
+- CRC-verified downlink CC1 bodies now reach the FANS decoder, including dM73
+  version-number output. A public control fixture plus schema-boundary checks
+  cover the previously omitted dispatch path; wrapper recognition was insufficient.
+- Independently observed AER9/HEG9/KER9 and T5/TOF header variants, APU1 routes,
+  configuration-only Airbus parts and PR identifier/value records; sanitized
+  regression fixtures preserve raw numeric meanings and incomplete sequences.
+- Observed H1/CF RTR XML fields through complete MIAM embedded dispatch and direct
+  downlinks: bounded XML parsing, typed paths, repeated records, transmitted
+  descriptions and unknown raw data. Proprietary flag/code semantics remain partial.
+- RFC 905 duplicate COTP parameter last-occurrence rules, raw TLV preservation,
+  effective checksum-length validation and normalized retransmission comparison.
+- X.224 (11/1995) preferred maximum TPDU size negotiation, independently implemented
+  from §§6.5.4/6.5.5 k), 13.1 and 13.3.4 c): unsigned big-endian 128-byte units,
+  preferred selection or ordinary fallback, CC exclusivity and effective duplicates.
+  Large selected values remain visible; configurable NSDU processing now supports
+  up to 65535 bytes without overriding negotiated sizes or assembly limits.
+- COTP acknowledgement/inactivity declarations and ROA selection, passive AK/FCC
+  directional window tracking and DT window observations. ACKs explicitly report
+  missing capture data and cannot advance receive assembly.
+- EA matches the outstanding observed ED per direction; non-blocking ED dependencies
+  hold normal delivery until the referenced expedited payload is delivered, with
+  bounded state, wraparound, retransmissions and expiry.
+- DR/DC lifecycle evidence continues through frozen records: matching confirmations,
+  crossed requests, pending-CR refusal/cancellation and duplicate controls. Raw
+  reason/data remain available; no active packets or inferred missing responses.
+
+The current priority 2 pass also implements compressed CLNP contexts/offsets,
+X.233 options, IDRP bodies/RD_PATH and ATN security tags, QoS/selective ACK/ISO
+omission, ER lifecycle evidence, retained ATN checksum/address profiles, HFDL
+system tables, demodulated Aero assembly/control/satellite ACARS and JAERO dialects.
+Synthetic regression fixtures cover malformed inputs, integrity, conflicts and
+state boundaries. Remaining edition/specification gaps stay unchecked in the roadmap.
 
 Next work remains: complete upstream utilities/subclass tests and field-level
 typed differential comparisons; audit every FANS body against schema; ATS CRCs;
-CLNP/COTP fragment reassembly and ESH address lists; ATN B1/B2 CPDLC/CM/ADS-C;
-SATCOM Aero; full HFDL system tables; incremental sessions and richer lifecycle
+Mobile SNDCF edition/circuit-group/Deflate audit, complete COTP flow and class
+fallback, missing-capture inference and further ES-IS/XID/IDRP authentication/options;
+independent ATN transport checksum verification and ATN B1/B2 CPDLC/CM/ADS-C;
+further Aero variants and HFDL SPDU slots; incremental sessions and richer lifecycle
 events; sustained fuzzing; licensed aircraft measurement dictionaries. Translation
 of every public repository has not been completed.
+Later capture audits still require encoded T5/TOF/T6 body decoding, application
+part rules and verified aircraft dictionaries. Header/record recognition now exists
+for the observed layouts; [capture-formats.md](capture-formats.md) describes its
+scope. The implementation ledger does not claim their measurement decoding.
+The [completion roadmap](completion-roadmap.md) defines the remaining work and
+the evidence required before claiming comprehensive coverage or a ranking.
 
 ## Original confirmed gaps and suggested order
 
@@ -118,12 +180,13 @@ acarsdec source header and README state GNU Library GPL version 2 despite its
 GitHub license metadata being absent. Several small Go/Python projects have no
 identified license.
 
-Do not put GPL-derived translations into the existing MIT distribution as
-MIT-only code. Options include obtaining compatible permission, choosing a
-permissive implementation, writing an independent implementation from usable
-specifications, or distributing a separate component under compatible terms.
-The language conversion alone does not change this constraint. Tests and
-captured fixture data need their own provenance review.
+GPL implementations are in scope as of 10 October 2026. Preserve original licenses
+and attribution for translated code and tests, and update distribution terms when
+GPL-derived material is incorporated. The combined distribution now uses
+GPL-3.0-or-later for dumphfdl system tables, dumpvdl2 IDRP/security/XID and Wireshark
+ATN transport checksums. Passive COTP procedures are independently implemented
+from RFC 905/X.224. MIT JAERO transport/JSON layouts and original notices are
+retained. Tests and captured fixture data keep their own provenance.
 
 Port upstream tests first, retain their expected semantics, then migrate a
 bounded feature and compare results before expanding coverage. Source errors

@@ -10,6 +10,12 @@ function packed(...parts) {
 }
 
 describe('FANS parameter units and validation', () => {
+	it.each([0, 1, 15])('names constrained dM73 version number %s', (version) => {
+		// FANSVersionNumber is INTEGER (0..15); dM73 is CHOICE index 73.
+		const pdu = packed([1, 0], [1, 0], [1, 0], [6, 4], [8, 73], [4, version]);
+		expect(decodeCpdlc(pdu, 'downlink')).toMatchObject({ complete: true, summary: `Version number ${version}` });
+		expect(() => decodeCpdlc(pdu.slice(0, -1), 'downlink')).toThrow('Truncated application data');
+	});
 	it('rejects the unused turbulence enumeration in a position report', () => {
 		const position = [
 			[3, 0],

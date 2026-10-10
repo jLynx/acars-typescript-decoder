@@ -80,7 +80,10 @@ function decodeInner(result: ClnpPdu, options: CotpOptions): void {
 	if (result.integrity === 'verified' && result.type === 'Data' && !result.more && !result.offset) {
 		if (payload[0] === 0x85) result.idrp = decodeIdrp(payload);
 		else {
-			const cotp = decodeCotp(payload, options);
+			const cotp = decodeCotp(payload, {
+				...options,
+				atnAddresses: { source: result.source!, destination: result.destination! },
+			});
 			if (cotp?.pdus.length) result.cotp = cotp;
 		}
 	}

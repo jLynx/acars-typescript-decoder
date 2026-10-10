@@ -23,6 +23,8 @@ import { interpretOhma } from './protocols/ohma';
 import { describeAirports } from './reference/airports';
 import { interpretAts } from './protocols/ats/text';
 import { interpretMiamEmbedded } from './protocols/miam/embedded';
+import { interpretTof } from '@/payload/reports/boeing';
+import { interpretRtr } from '@/payload/reports/maintenance';
 
 const links: Record<string, string> = {
 	V: 'VHF ACARS',
@@ -134,13 +136,13 @@ function interpretApplication(message: AcarsRecord): AcarsInterpretation {
 	if (sublabel) text = text.slice(sublabel[0].length);
 	const mfi = sublabel ? /^\/([A-Z0-9]{2}) /.exec(text) : null;
 	if (mfi) text = text.slice(mfi[0].length);
-	const report = sublabel?.[1] === 'DF' ? interpretReport(text, message.receivedAt) : undefined;
+	const report = interpretReportApplication(text, message, sublabel?.[1]);
 	const result =
 		interpretStructured({ ...message, text }) ??
 		report ??
 		interpretText({ ...message, text }) ??
 		interpretCommunity(message, text, sublabel?.[1]) ??
-		(sublabel?.[1] === 'DF' ? interpretDf(text) : undefined) ??
+		(sublabel?.[1] === 'DF' ? interpretDf(text, message.continuation) : undefined) ??
 		interpretTagged({ ...message, text }) ??
 		unknown(message);
 	result.fields.unshift(...applicationEnvelope(sublabel?.[1], mfi?.[1]));
@@ -165,6 +167,15 @@ function applicationEnvelope(sublabel?: string, mfi?: string) {
 
 function interpretReport(text: string, receivedAt: number): AcarsInterpretation | undefined {
 	return interpretAirbus(text, receivedAt) ?? interpretAcm(text) ?? interpretApm(text);
+}
+
+function interpretReportApplication(
+	text: string,
+	message: AcarsRecord,
+	sublabel?: string,
+): AcarsInterpretation | undefined {
+	if (message.direction === 'downlink' && sublabel === 'CF' && !message.continuation) return interpretRtr(text);
+	return sublabel === 'DF' ? interpretReport(text, message.receivedAt) : interpretTof(text, sublabel);
 }
 
 function unknown(message: AcarsRecord): AcarsInterpretation {

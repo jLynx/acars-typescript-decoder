@@ -1,0 +1,3 @@
+// Sanitized observed RTR element/attribute layout with entirely synthetic identifiers and descriptions.
+export const xml =
+	'<RTR><HEAD><IDCMS pn="TEST0001" vers="4.0"/><DA>2026/10/10 09:11:49</DA><ACD MSN="0001" tail="B-1234" type="A350-900"/><TID>C00000001</TID></HEAD><HEADRTR><FROM>NZAA</FROM><TO>ZGGG</TO><FNBR>XXX001    </FNBR></HEADRTR><ITD><CB>A</CB><NFDE><MC>0000B001</MC><MD>TEST REPORTED DESCRIPTION</MD></NFDE><MM hdi="y" fo="A" occ="1"><MC>0000F001</MC><MD>TEST COMPONENT(001)</MD><DA>2026/10/09 11:37:53</DA><ATA>0000</ATA><FPH>1</FPH><FCL>3</FCL><PRIO>high</PRIO><STA>1</STA><SYS name="TEST" bite_id="001" side="0"/></MM></ITD></RTR>';

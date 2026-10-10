@@ -102,6 +102,32 @@ describe('plugin isolation', () => {
 		expect(result.notes).toEqual([]);
 		expect(decoder.decode(input).notes).toEqual([]);
 	});
+	it('validates optional typed maintenance results before accepting plugins', () => {
+		const maintenance = {
+			protocol: 'RTR',
+			coverage: 'partial',
+			integrity: 'unverified',
+			raw: '<RTR/>',
+			fields: [{ path: 'RTR/TID', label: 'Transfer identifier', value: 'TEST' }],
+		};
+		const pluginDecode = (extra) =>
+			createDecoder({
+				plugins: [{ name: 'rtr', decode: () => ({ ...interpretation(), maintenance: { ...maintenance, ...extra } }) }],
+			}).decode({ label: 'Q0', text: '' });
+		expect(pluginDecode({}).title).toBe('Custom');
+		for (const invalid of [
+			{ protocol: 'OTHER' },
+			{ coverage: 'decoded' },
+			{ integrity: 'verified' },
+			{ raw: 123 },
+			{ raw: 'x'.repeat(8193) },
+			{ fields: [null] },
+			{ fields: [{ path: 1, label: 'x', value: 'x' }] },
+			{ fields: [{ path: 'x', label: 'x', value: NaN }] },
+			{ fields: Array(129).fill(maintenance.fields[0]) },
+		])
+			expect(pluginDecode(invalid).title).toBe('Link test');
+	});
 	it('accepts every CORE v2 identifier length and rejects inconsistent transfer metadata', () => {
 		const transfer = {
 			protocol: 'MIAM',

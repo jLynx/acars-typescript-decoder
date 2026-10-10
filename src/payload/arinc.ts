@@ -64,6 +64,8 @@ function parseArinc(text: string, direction: 'uplink' | 'downlink'): AcarsInterp
 		let decoded: ApplicationDecode | undefined;
 		if (application === 'ADS') decoded = decodeAdsc(bytes, direction);
 		if (application === 'AT1') decoded = decodeCpdlc(bytes, direction);
+		// libacars dispatches CC1 to the FANS decoder; confirmations carry downlink PDUs.
+		if (application === 'CC1') decoded = decodeConfirmation(bytes, direction);
 		// CR1 embeds an uplink PDU regardless of the surrounding ACARS direction.
 		if (application === 'CR1') decoded = decodeCpdlc(bytes, 'uplink');
 		if (application === 'DR1' && bytes.length === 0)
@@ -93,4 +95,8 @@ function parseArinc(text: string, direction: 'uplink' | 'downlink'): AcarsInterp
 		);
 	}
 	return result;
+}
+
+function decodeConfirmation(bytes: Uint8Array, direction: 'uplink' | 'downlink'): ApplicationDecode | undefined {
+	return direction === 'downlink' ? decodeCpdlc(bytes, direction) : undefined;
 }

@@ -1,7 +1,7 @@
 # acars-typescript-decoder
 
 [![npm version](https://img.shields.io/npm/v/%40jlynx_%2Facars-decoder?logo=npm)](https://www.npmjs.com/package/@jlynx_/acars-decoder)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![CI](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml/badge.svg)](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml)
 [![Contributors](https://img.shields.io/github/contributors/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/graphs/contributors)
 [![Activity](https://img.shields.io/github/commit-activity/m/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/pulse)
@@ -16,7 +16,7 @@ and reads ARINC 618 frames.
 Written in TypeScript for JavaScript and TypeScript applications, the library runs
 locally in Node.js and browsers. It combines documented airline formats, binary
 ADS-C/FANS CPDLC readers, MIAM CORE/file transfers and Boeing OHMA/RYKO conversations,
-ATS text and VDL2/HFDL transport readers. Original messages are preserved, and results distinguish decoded, partial
+ATS text and VDL2/HFDL/Aero transport readers. Original messages are preserved, and results distinguish decoded, partial
 and unknown payloads.
 
 The project builds on research and implementations from
@@ -27,8 +27,9 @@ The project builds on research and implementations from
 [coverage and source references](docs/coverage.md) for supported formats and gaps.
 A recognized label or report header does not imply its measurements are decoded.
 
-Contributions are welcome. You can use this library in your own applications,
-including commercial and closed-source software, under the [MIT license](LICENSE).
+Contributions are welcome. The combined package is distributed under
+[GPL-3.0-or-later](LICENSE), following incorporation of dumphfdl, dumpvdl2 and Wireshark transport code.
+Existing MIT notices remain applicable to their original files and dependencies.
 The repository is [**acars-typescript-decoder**](https://github.com/jLynx/acars-typescript-decoder); the npm package name is
 **@jlynx\_/acars-decoder**, available on [npm](https://www.npmjs.com/package/@jlynx_/acars-decoder).
 
@@ -135,6 +136,16 @@ The installed Node CLI also reads JSONL from stdin and writes interpreted JSONL.
 Capture mode accepts the grouped `sources[].messages` viewer export. Radio block,
 MIAM file and OHMA conversation assemblies have structured status metadata.
 
+Complete H1/CF RTR XML maintenance reports also expose explicit aircraft, route,
+CMS and transfer identifiers, transmitted NFDE/MM descriptions/codes and system
+attributes. `decodeRtr(text)` is exported from the main and `/formats` entry points;
+its typed fields preserve XML paths, raw values and the original document.
+CRC-verified MIAM carries these results in `embedded.maintenance` and displays
+the extracted fields alongside the original application text. Proprietary flags,
+date/timezones and status meanings remain raw; reported descriptions are not
+inferred diagnoses. Coverage is partial until a matching schema and code mappings
+are verified. See [observed report support](docs/capture-formats.md).
+
 ### Optional airport names
 
 ```ts
@@ -186,16 +197,21 @@ it cannot verify a BCS that is absent.
 
 `decodeAvlc` accepts destuffed VDL2 bytes including FCS. `decodeXid`, `decodeX25`,
 `decodeClnpCompressed`, `decodeClnp`, `decodeEsis`, `decodeCotp` and `decodeIdrp` expose transport headers and
-raw unknown data. COTP user data and checksums remain unverified; ambiguous normal
+raw unknown data. COTP verifies the ISO 8073 checksum over each complete TPDU;
+user data remains raw and ATN application integrity remains unverified. Ambiguous normal
 versus extended sequence formats require the caller's negotiated `format` option.
 Uncompressed CLNP verifies its header checksum before inner transport dispatch.
-ES-IS exposes common/ISH/redirect headers; ESH address lists remain raw.
+ES-IS exposes common/ISH/redirect fields, counted ESH source NSAPs and the ISH
+end-system configuration timer in seconds. Addresses remain byte arrays.
+For older ESH layouts select `decodeEsis(bytes, { eshFormat: 'legacy-single' })`;
+`eshFormat: 'raw'` retains an uninterpreted ESH region. Malformed counted lists
+are rejected rather than interpreted as a different layout.
 
 `createX25Reassembler()` joins consecutive modulo-8 packets before network decoding.
 Supply a `link` identity containing receiver, peers and direction, plus reception time.
 It bounds channel state, bytes, fragments and lifetime, suppresses retransmissions,
 and rejects conflicting sequences until expiry or `reset(link)`. Link CRC verification
-must occur before calling it. CLNP/COTP fragment reassembly and ATN applications remain pending.
+must occur before calling it. ATN applications remain pending.
 
 ```ts
 import { createX25Reassembler } from '@jlynx_/acars-decoder/framing';
@@ -208,10 +224,172 @@ const result = network.push(verifiedX25Bytes, {
 if (result.status === 'complete') console.log(result.network ?? result.clnp ?? result.esis);
 ```
 
+`createClnpReassembler()` joins uncompressed CLNP segment offsets, including
+out-of-order offsets and byte-identical overlaps. Every accepted header must verify.
+Conflicting bytes, total lengths or header options reject the message until expiry/reset.
+State defaults to 64 messages, 8,192 payload bytes per message, 128 fragments and
+sixty seconds, with expiry further bounded by the PDU's remaining lifetime.
+Use a receiver/direction `link` scope; source/destination NSAPs and PDU IDs also
+isolate messages. Completed output carries the original received `packet` and
+separate assembled `payload`/`cotp`/`idrp`, without fabricating a wire header/checksum.
+
+```ts
+import { createClnpReassembler } from '@jlynx_/acars-decoder/framing';
+
+const clnp = createClnpReassembler();
+if (result.status === 'complete' && result.network) {
+	const assembled = clnp.push(result.payload!, {
+		link: 'receiver-1:downlink',
+		receivedAt: Date.now(),
+	});
+	if (assembled.status === 'complete') console.log(assembled.cotp ?? assembled.idrp);
+}
+```
+
+CLNP checksums protect headers only. COTP reports integrity per TPDU and in
+aggregate; absent checksums or unparsed trailing bytes keep aggregate integrity
+unverified. Address-bound ATN 16/32-bit COTP checksums have separate
+`atnIntegrity` results when directed source/destination NSAPs are supplied through
+`atnAddresses`. Sessions retain that scheme and reverse NSAPs for the opposite
+direction; missing or changed protection is rejected. The pinned upstream's 16-bit
+routine is marked untested; independent external verification remains outstanding.
+
+`createClnpCompressedReassembler()` joins offsets with explicit local-reference
+address contexts registered by `open(context, receivedAt)`, or by `observe()` on
+a verified uncompressed CLNP option-5 setup. Reception requires a directed `link`,
+`receivedAt` and `linkIntegrity: 'verified'`. Contexts retain priority, version,
+security and both NSAPs; gaps/conflicts, expiry and bounds remain explicit.
+Circuit-group negotiation and Deflate contexts still need an edition audit.
+
+X.233 CLNP options expose typed routes, QoS/security and discard information.
+IDRP exposes Open/Update/Error bodies, RD_PATH segments and ATN security labels
+through `decodeAtnSecurityLabel`; authentication stays unverified. XID exposes
+sequencing, refusal bytes, modulation masks, autotune frequencies, station lists
+and nearest airports. Unknown encodings and timer units stay raw.
+
+`createCotpReassembler()` provides passive class-4 DT/TSDU reassembly after the
+network layer. Open each directional connection with its negotiated format and
+a known message boundary. New connections begin at DT sequence zero; for an
+existing connection supply the first expected sequence at a known TSDU boundary.
+Sequence numbering continues between messages. The library waits for missing
+in-window packets, handles sequence wraparound and retransmissions, and exposes
+complete messages only after every TPDU in the received NSDU verifies.
+
+```ts
+import { createCotpReassembler } from '@jlynx_/acars-decoder/framing';
+
+const cotp = createCotpReassembler();
+cotp.open(
+	{
+		link: 'receiver-1:source-nsap:destination-nsap:connection-1:downlink',
+		destinationReference: 0x1234,
+		format: 'normal',
+	},
+	Date.now(),
+);
+const messages = cotp.push(completeNetworkUserData, {
+	link: 'receiver-1:source-nsap:destination-nsap:connection-1:downlink',
+	receivedAt: Date.now(),
+});
+for (const message of messages.assemblies) {
+	if (message.status === 'complete') console.log(message.payload);
+}
+```
+
+Defaults are 64 connections, 64 KiB pending bytes plus 64 KiB duplicate-history
+bytes per connection, 128 pending fragments, a 32-sequence forward window and
+sixty seconds for pending data/idle connections. History is also capped by the
+window count. Conflicting retransmissions reject a connection until expiry,
+`reset()` or a new `open()`. Expiry discards its known boundary; subsequent data
+requires a new explicit `open()`. DT reassembly supports normal and extended
+formats. For automatic passive negotiation, use `createCotpSession()` below.
+Acknowledgement/flow controls and ATN application decoding remain caller
+responsibilities. An explicit connection can declare `atnChecksum` and
+`atnAddresses`; this retains and enforces its transport profile. Connections using
+ISO checksum omission cannot produce assembled output through this explicit API.
+
+For a connection with negotiated expedited service, include `expedited: {}` in
+`open()` (or set its independent `startSequence` at a known ED boundary). ED
+messages require EOT and 1–16 bytes. Output identifies `service: 'expedited'` or
+`'normal'`; ED and DT numbering, pending data and duplicate history are separate.
+ED pending/history storage is additionally bounded to 16 bytes times the sequence
+window each. A conflict in either stream rejects both until reset/open/expiry.
+This passive reader reports separate receive streams; EA tracking and ordering
+between ED and DT deliveries remain unimplemented.
+
+Declare the known peer `sourceReference` in `open()` to enable passive disconnect
+handling. A checksum-verified DR/DC whose destination and peer references match
+closes that directional state, releases both buffers, returns `status: 'closed'`
+and adds its key to `discarded`. Mismatched/unassociated controls remain raw.
+Release-response generation remains pending.
+
+`createCotpSession()` matches captured class-4 CR/CC handshakes and automatically
+opens both receive directions at sequence zero. Supply a common receiver/peer-pair
+`link`, an explicit direction and ordered timestamps. Every TPDU must have a verified
+ISO checksum unless both peers select omission; failed present checksums are
+always rejected. Version, selectors, normal/extended format, size and expedited selection
+are checked; unsupported negotiation parameters retain raw bytes and prevent opening.
+
+```ts
+import { createCotpSession } from '@jlynx_/acars-decoder/framing';
+
+const transport = createCotpSession({ maxRecords: 64, freezeMs: 60_000 });
+const received = transport.push(completeCotpNsdu, {
+	link: 'receiver-1:aircraft-ABC123:ground-01',
+	direction: 'a-to-b', // keep these peer labels consistent for the capture
+	receivedAt: Date.now(),
+});
+for (const message of received.assemblies) {
+	if (message.status === 'complete') console.log(message.connectionId, message.direction, message.payload);
+}
+```
+
+Sessions report initial credits and track directional AK windows, subsequences,
+credit reductions and matching flow-control confirmations. `acknowledgement`
+events distinguish observed data from ACKs spanning missing capture data. DT
+assemblies expose `transmission` with the advertised window and whether the DT
+falls inside it; `windowSize` still controls local resequencing. EA events match
+the outstanding observed ED. Non-blocking expedited negotiation holds a DT with
+an ED-sequence dependency until that ED has been delivered, then releases complete
+messages in order. Blocking-service DTs report a pending EA; their TS-user request
+order cannot be inferred from packets alone. A matching release, reassembly
+rejection or expiry closes both directions and quarantines the peer references.
+Defaults are 64 total records and sixty-second handshake/pending/idle timeouts
+and quarantine; `reset(link)` clears state at a known capture boundary. Connect
+user data stays raw, separate from assembled DT/ED. X.224 preferred maximum TPDU
+size negotiation supports one-to-four-byte unsigned values in multiples of 128
+bytes, preferred selection and ordinary-size fallback. `tpduSize` reports the
+actual negotiated value. Set `maxNsduBytes` on `decodeCotp`, `createCotpSession`
+or `createCotpReassembler` to process larger NSDUs, up to a local maximum of 65535
+bytes (default 8192). Negotiated sizes and assembly limits still apply.
+`initiatorTiming`/`responderTiming` preserve acknowledgement and inactivity
+indications in milliseconds independently of local capture expiry. ROA use must
+be negotiated. Release events distinguish requested/confirmed/crossed DR/DC,
+refusal, cancellation and unmatched DC, with raw reason codes/user data retained.
+Sessions retain per-peer QoS/protection and negotiated selective ACK ranges,
+including wraparound and cumulative trimming. Mutually selected ISO checksum
+omission is explicit and does not waive failed present checksums. ER retains
+reject cause/header evidence, releases a pending request and preserves an established
+connection until an observed release. Class fallback, complete flow-control
+procedures, broader missing-capture inference and ATN application integrity remain pending. See the [completion checklist](docs/completion-roadmap.md).
+
 `decodeHfdl` accepts demodulated SPDU/MPDU bytes, verifies header and individual
 LPDU CRCs, and exposes supported station, performance, frequency and embedded
-ACARS data. Slot allocation and system-table contents remain partly raw.
-IQ/audio demodulation, radio drivers and SATCOM Aero transport remain pending.
+ACARS data. `createHfdlSystemTableAssembler()` accepts complete verified frames,
+assembles multipart station tables and selects versions per source with 12-bit
+ordering. Tables expose signed coordinates, BCD frequencies and master-frame
+slots; conflicts, expiry and resource bounds are explicit. SPDU slot allocations
+and further documented variants remain raw.
+
+`decodeAeroSignalUnit(bytes, channel)` accepts demodulated R (19-byte) or P/T
+(12-byte) signal units including FCS. `createAeroReassembler()` assembles bounded
+multipart ACARS with an explicit directed link and reception direction. Valid
+satellite envelopes verify parity and BCS and preserve text without requiring a
+VHF message-number/flight prefix. Control fields include C-channel assignments,
+P/R bitrates and satellite/GES frequency broadcasts; remaining bodies stay raw.
+Receiver adapters accept JAERO native/JSONdump records, including empty ACKs and
+source-derived direction. IQ/audio demodulation and radio drivers remain outside
+the implemented scope; further Aero channel variants require evidence.
 
 `interpretArinc`, `decodeAdsc` and `decodeCpdlc` are exported for protocol use.
 `@jlynx_/acars-decoder/formats` exposes lower-level readers that require normalized records;
@@ -266,6 +444,7 @@ Upstream authors and data providers are credited in
 
 ## License
 
-Licensed under **MIT**. See [LICENSE](LICENSE) for the full terms. Upstream
+The combined package is licensed under **GPL-3.0-or-later**. See [LICENSE](LICENSE)
+for the full terms; historical MIT terms are retained in [docs/MIT-LICENSE.txt](docs/MIT-LICENSE.txt). Upstream
 components retain their required notices, and the optional OurAirports dataset
 is public domain. Proprietary reports still require their specifications to decode.

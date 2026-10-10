@@ -1,5 +1,6 @@
 import type { AtsResult } from './protocols/ats/types';
 import type { MiamTransfer } from './protocols/miam/types';
+import type { RtrReport } from './reports/types';
 
 export interface AcarsField {
 	label: string;
@@ -16,6 +17,7 @@ export interface AcarsInterpretation {
 	application?: AtsResult;
 	transfer?: MiamTransfer;
 	embedded?: AcarsInterpretation;
+	maintenance?: RtrReport;
 }
 
 export interface AcarsLabel {

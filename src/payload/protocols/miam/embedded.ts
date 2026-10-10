@@ -10,6 +10,7 @@ export function interpretMiamEmbedded(
 	const transfer = result.transfer;
 	if (
 		!transfer ||
+		transfer.integrity !== 'verified' ||
 		transfer.text === undefined ||
 		transfer.encoding !== 0 ||
 		transfer.applicationType > 2 ||
@@ -26,6 +27,8 @@ export function interpretMiamEmbedded(
 	}
 	const embedded = dispatch({ ...message, label, text, continuation: false });
 	result.embedded = embedded;
+	if (embedded.maintenance)
+		result.fields.push(...embedded.fields.map(({ label, value }) => ({ label: `Embedded ${label}`, value })));
 	result.coverage = embedded.coverage === 'decoded' ? 'decoded' : 'partial';
 	result.coverageDetail = `Transfer body decoded and verified · embedded ${embedded.title}`;
 	result.notes.push(`Embedded application ${label}: ${embedded.summary}`);

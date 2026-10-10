@@ -52,9 +52,11 @@
 				"libacars/miam-core.c",
 				"libacars/ohma.c",
 				"libacars/acars.c",
+				"libacars/arinc.c",
 				"libacars/adsc.c"
 			],
 			"local": [
+				"src/payload/arinc.ts",
 				"src/payload/protocols/cpdlc",
 				"src/payload/protocols/miam",
 				"src/payload/protocols/ohma",
@@ -75,21 +77,57 @@
 			"id": "dumpvdl2",
 			"repository": "https://github.com/szpajder/dumpvdl2",
 			"revision": "686e87f2294ef6275855ba7364bd4bb9a0f8f56a",
-			"license": "GPL-3.0",
+			"license": "GPL-3.0-or-later",
 			"language": "C",
-			"status": "reference only; no copied code",
-			"paths": ["src/asn1", "src/atn.c"],
-			"local": []
+			"status": "IDRP body/RD_PATH, ATN security label and XID parameter layout ports; independent bounded validation",
+			"paths": ["src/idrp.c", "src/atn.c", "src/clnp.c", "src/xid.c", "LICENSE"],
+			"local": [
+				"src/transport/network/idrp",
+				"src/transport/network/atn/security.ts",
+				"src/transport/xid/parameters.ts",
+				"test/transport/idrp",
+				"test/transport/xid-options"
+			]
 		},
 		{
 			"id": "jaero",
 			"repository": "https://github.com/jontio/JAERO",
 			"revision": "1d4e515921244aec1d85a03f5f38b4e7818fdbe6",
-			"license": "MIT (per-file review required)",
+			"license": "MIT (inspected aerol.cpp/h, mainwindow.cpp and LICENSE)",
 			"language": "C++",
-			"status": "reference only; no copied code",
-			"paths": ["JAERO"],
-			"local": []
+			"status": "demodulated Aero R/P/T SU assembly/control fields and receiver JSON layouts adapted",
+			"paths": ["JAERO/aerol.cpp", "JAERO/aerol.h", "JAERO/mainwindow.cpp", "LICENSE"],
+			"local": ["src/transport/aero", "src/transport/receivers.ts", "test/transport/aero", "test/transport/receivers"]
+		},
+		{
+			"id": "netbsd-esis",
+			"repository": "https://github.com/NetBSD/src",
+			"revision": "8c101a16ae09856a61284f770c2099b38186fe7c",
+			"license": "BSD-3-Clause and IBM permission notice (file headers)",
+			"language": "C",
+			"status": "ESH address-count/list and ISH configuration timer adapted; no kernel/network stack port",
+			"paths": ["sys/netiso/esis.c", "sys/netiso/esis.h"],
+			"local": ["src/transport/network/esis.ts", "test/transport/esis-addresses.spec.js", "THIRD_PARTY_NOTICES.txt"]
+		},
+		{
+			"id": "dumphfdl",
+			"repository": "https://github.com/szpajder/dumphfdl",
+			"revision": "bb7234bdf12ff1ca5f1dc99a5710555f968c4e6e",
+			"license": "GPL-3.0-or-later (README and systable.h; other file terms vary)",
+			"language": "C",
+			"status": "system-table layout port with independent bounded streaming assembly",
+			"paths": ["src/systable.c", "src/systable.h", "src/util.c", "README.md", "LICENSE"],
+			"local": ["src/transport/hfdl/system-table.ts", "test/transport/hfdl/system-table.spec.js"]
+		},
+		{
+			"id": "wireshark",
+			"repository": "https://github.com/wireshark/wireshark",
+			"revision": "ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73",
+			"license": "GPL-2.0-or-later (packet-osi.c)",
+			"language": "C",
+			"status": "ATN extended 16/32-bit transport checksum port; separate integrity/profile gating; independent external validation pending",
+			"paths": ["epan/dissectors/packet-osi.c", "epan/dissectors/packet-ositp.c"],
+			"local": ["src/transport/network/atn/integrity.ts", "test/transport/atn/integrity.spec.js"]
 		}
 	],
 	"notices": "THIRD_PARTY_NOTICES.txt",
@@ -99,13 +137,51 @@
 			"url": "https://www.rfc-editor.org/rfc/rfc994.txt",
 			"sha256": "82c8a0154ab38875a1d65af1910b6a3524d5fe614de19e6ed4fab8c41c5b3077",
 			"status": "independent implementation; standard document not redistributed",
-			"local": ["src/transport/network/clnp.ts", "src/transport/network/iso.ts", "test/transport/clnp.spec.js"]
+			"local": [
+				"src/transport/network/clnp.ts",
+				"src/transport/network/clnp-reassembly.ts",
+				"src/transport/network/iso.ts",
+				"test/transport/clnp.spec.js",
+				"test/transport/clnp-reassembly.spec.js"
+			]
+		},
+		{
+			"id": "cotp-rfc905",
+			"url": "https://www.rfc-editor.org/rfc/rfc905.txt",
+			"sha256": "b15fd8a58189016a039c3409eb8f4cd1d9e02d10d9bc2a6fda6a5b5179e084bd",
+			"status": "independent ISO 8073 checksum, passive class-4 CR/CC negotiation, DT/ED and matching-reference release implementation; standard document not redistributed",
+			"local": [
+				"src/transport/network/cotp.ts",
+				"src/transport/network/cotp-reassembly.ts",
+				"src/transport/network/cotp-sequence.ts",
+				"test/transport/cotp-integrity.spec.js",
+				"test/transport/cotp-reassembly.spec.js",
+				"src/transport/network/cotp-service.ts",
+				"test/transport/cotp-services.spec.js",
+				"src/transport/network/cotp-session",
+				"test/transport/cotp-session"
+			]
+		},
+		{
+			"id": "cotp-preferred-size-x224",
+			"url": "https://www.itu.int/rec/T-REC-X.224-199511-I/en",
+			"revision": "11/1995; PDF also identifies ISO/IEC 8073:1997",
+			"sha256": "dd9eedd3d1b9fc035fd2c2d93585ca54f92b7efc040a311cae2fa37b77638d14",
+			"status": "independent preferred-size, timing/ROA, passive AK/FCC, EA/non-blocking ED dependencies and DR/DC lifecycle implementation from sections 6.5/6.7/6.11, 12.2.3 and 13.3/13.9/13.10; standard document not redistributed; local input bound configurable to 65535 bytes",
+			"local": [
+				"src/transport/network/cotp-size.ts",
+				"src/transport/network/cotp.ts",
+				"src/transport/network/cotp-session",
+				"src/transport/network/cotp-sequence.ts",
+				"src/transport/network/cotp-reassembly.ts",
+				"test/transport/cotp-session"
+			]
 		},
 		{
 			"id": "esis-rfc995",
 			"url": "https://www.rfc-editor.org/rfc/rfc995.txt",
 			"sha256": "8cbe87a5539f12f123d16fd13e53d487b7c01a62f11820c6b14a814698e92644",
-			"status": "independent common/ISH/RD implementation; ESH address lists raw",
+			"status": "independent common/ISH/RD and explicitly selected legacy-single ESH layout; modern ESH lists use NetBSD source",
 			"local": ["src/transport/network/esis.ts", "test/transport/clnp.spec.js"]
 		},
 		{
@@ -115,7 +191,36 @@
 			"sha256": "6082d73b7ebb74fbe1ae069444e2ba18e7e506165b45bdf605f4dd767eec6b58",
 			"status": "timer-unit reference only; standard document not redistributed",
 			"local": ["src/transport/network/esis.ts"]
+		},
+		{
+			"id": "clnp-x233",
+			"url": "https://www.itu.int/rec/T-REC-X.233-199708-I/en",
+			"sha256": "1e8a595d77c67f87c1fd99c5443835690c97e6a6807ec0522c47c42236e894e2",
+			"status": "independent X.233 08/1997 option implementation; document not redistributed",
+			"local": ["src/transport/network/options", "test/transport/options"]
+		},
+		{
+			"id": "mobile-sndcf-context",
+			"url": "https://www.icao.int/sites/default/files/Meetings/AMC/MA/2003/ATN_2003/ip11.pdf",
+			"sha256": "b03ab749f488e6bcf89e2f0f20926d9c69482a6338d9ebc3cda2bf0e7c8a2f64",
+			"status": "independent implementation; document not redistributed; informational Mobile SNDCF edition audit remains pending",
+			"local": ["src/transport/network/compressed", "test/transport/compressed"]
 		}
 	],
-	"policy": "Only import code and fixtures under an identified compatible license, retain notices and pin revisions. A source listed here is not a claim of complete coverage."
+	"observedFormats": [
+		{
+			"id": "rtr-xml-observed",
+			"revision": "2026-10-10",
+			"status": "independent extraction of the observed H1/CF RTR XML subset; private captures not redistributed; proprietary code meanings unverified",
+			"license": "locally authored implementation and synthetic fixtures under repository license; no third-party source or capture body copied",
+			"local": [
+				"src/payload/reports/maintenance.ts",
+				"src/payload/reports/xml.ts",
+				"src/payload/reports/types.ts",
+				"test/payload/protocols/reports/rtr.spec.js",
+				"test/payload/protocols/reports/rtr-fixtures.js"
+			]
+		}
+	],
+	"policy": "GPL sources are in scope. Preserve original licenses and attribution for incorporated code/tests, pin revisions and update distribution terms when required. A source listed here is not a claim of complete coverage."
 }

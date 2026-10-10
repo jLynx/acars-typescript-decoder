@@ -2,6 +2,8 @@
 export { interpretAirbus, interpretLoad, interpretMovement, interpretOperations } from './payload/airline';
 export { interpretCommunity, COMMUNITY_FORMATS } from './payload/community';
 export { interpretDf, interpretMonitoring, interpretPosition, interpretTakeoff } from './payload/reports';
+export { decodeRtr, interpretRtr } from './payload/reports/maintenance';
+export type { RtrReport, RtrField } from './payload/reports/types';
 export { interpretTagged } from './payload/tagged';
 export { interpretEvent } from './payload/events';
 export { messageTime, timeFields, timestampFields, datedTime, monthDayTime } from './payload/time';

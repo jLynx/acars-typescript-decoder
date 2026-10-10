@@ -36,6 +36,10 @@ export interface XidParameter {
 	raw: Uint8Array;
 	value?: string | number | number[] | XidLocation | XidFrequency[];
 	unit?: 'ft' | 'MHz';
+	sequencing?: { sequence: number; retry: number };
+	refusal?: { cause: number; delayRaw: number; additional: Uint8Array };
+	modulations?: { mask: number; vdl2: boolean; vdl3: boolean; unknownMask: number };
+	autotune?: { frequency: number; unit: 'MHz'; modulationMask: number };
 }
 
 export interface XidLocation {
