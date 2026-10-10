@@ -27,6 +27,8 @@ Raw radio text and unknown bytes remain available. Binary ARINC values and MIAM
 bodies are exposed only after their CRC verifies. MIAM and OHMA decompression is
 bounded to 65,536 bytes and requires a complete stream. ATS text integrity remains
 explicitly unverified. An AVLC or HFDL link CRC does not verify every inner layer.
+The capture CLI accepts the viewer's null message-number/flight metadata as absent;
+the programmatic API continues to require strings or omitted optional fields.
 COTP currently exposes headers and raw application bytes with unverified integrity.
 Derived CLNP fragments and X.25 packets with `more` set do not receive inner decoding.
 The X.25 reassembler dispatches only completed user data. Its default limits are

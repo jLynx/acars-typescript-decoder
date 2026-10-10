@@ -86,8 +86,18 @@ async function capture(filename: string): Promise<void> {
 	for (const source of value.sources as unknown[]) {
 		if (!isRecord(source) || !Array.isArray(source.messages)) throw new TypeError('Invalid capture source');
 		const name = typeof source.vfoNumber === 'number' ? `vfo:${source.vfoNumber}` : 'capture';
-		for (const message of decodeLog(source.messages as AcarsRecord[])) await output({ ...message, source: name });
+		for (const message of decodeLog(source.messages.map(captureRecord))) await output({ ...message, source: name });
 	}
+}
+
+function captureRecord(value: unknown): AcarsRecord {
+	if (!isRecord(value)) throw new TypeError('Invalid capture message');
+	// Viewer exports represent absent uplink metadata with null; the API uses undefined.
+	return {
+		...value,
+		messageNumber: value.messageNumber ?? undefined,
+		flight: value.flight ?? undefined,
+	} as unknown as AcarsRecord;
 }
 
 async function output(value: unknown): Promise<void> {

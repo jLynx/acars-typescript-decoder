@@ -51,5 +51,42 @@ export async function replaySmoke(installed, temporary) {
 	assert.equal(replay.status, 0, replay.stderr);
 	assert.equal(JSON.parse(replay.stdout).source, 'vfo:1');
 	assert.equal(JSON.parse(replay.stdout).text, input.text);
+	const uplink = {
+		...input,
+		label: '_d',
+		text: '',
+		direction: 'uplink',
+		acknowledgement: '0',
+		messageNumber: null,
+		flight: null,
+	};
+	await writeFile(
+		capture,
+		JSON.stringify({
+			sources: [
+				{ vfoNumber: 1, messages: [input] },
+				{ vfoNumber: 2, messages: [uplink] },
+			],
+		}),
+	);
+	const nullable = run(['--capture', capture]);
+	assert.equal(nullable.status, 0, nullable.stderr);
+	const blocks = nullable.stdout
+		.trim()
+		.split('\n')
+		.map((line) => JSON.parse(line));
+	assert.equal(blocks.length, 2);
+	assert.equal(blocks[0].messageNumber, input.messageNumber);
+	assert.equal(blocks[0].text, input.text);
+	assert.equal(blocks[1].source, 'vfo:2');
+	assert.equal(blocks[1].direction, 'uplink');
+	assert.equal(blocks[1].interpretation.coverage, 'decoded');
+	assert.equal(blocks[1].text, '');
+	assert.equal(blocks[1].messageNumber, undefined);
+	assert.equal(blocks[1].flight, undefined);
+	await writeFile(capture, JSON.stringify({ sources: [{ messages: [{ ...uplink, messageNumber: 123 }] }] }));
+	const invalid = run(['--capture', capture]);
+	assert.equal(invalid.status, 1);
+	assert.match(invalid.stderr, /Invalid messageNumber/);
 	console.log('Replay CLI passed stdin, JSONL, capture, metadata and malformed input checks.');
 }
