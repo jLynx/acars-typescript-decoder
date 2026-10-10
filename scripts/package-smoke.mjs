@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import assert from 'node:assert/strict';
 
 const root = process.cwd();
+const metadata = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
 // npm's JS entry avoids shell-dependent quoting and .cmd execution on Windows.
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run through npm run test:package');
@@ -14,17 +15,67 @@ function command(executable, args, cwd) {
 	return result.stdout;
 }
 const temporary = await mkdtemp(path.join(tmpdir(), 'acars-package-'));
-const packed = JSON.parse(
-	command(process.execPath, [npm, 'pack', '--ignore-scripts', '--json', '--pack-destination', temporary], root),
-)[0];
+// An outer pack/publish preview passes dry-run through the lifecycle environment.
+// These commands must create and install a real tarball locally to validate it.
+const packing = JSON.parse(
+	command(
+		process.execPath,
+		[npm, 'pack', '--ignore-scripts', '--dry-run=false', '--json', '--pack-destination', temporary],
+		root,
+	),
+);
+// npm 11 returns an array; npm 12 returns an object keyed by package name.
+const packed = Array.isArray(packing) ? packing[0] : packing[metadata.name];
+assert(packed && Array.isArray(packed.files), 'npm pack must return package file metadata');
 assert(packed.files.some((file) => file.path === 'dist/index.d.ts'));
 assert(!packed.files.some((file) => /^(?:test|src|node_modules)\//.test(file.path)));
+for (const filename of ['README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.txt', 'CONTRIBUTING.md', 'docs/releasing.md']) {
+	assert(
+		packed.files.some((file) => file.path === filename),
+		`Missing distribution file: ${filename}`,
+	);
+}
 await writeFile(path.join(temporary, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
 command(
 	process.execPath,
-	[npm, 'install', '--ignore-scripts', '--no-audit', '--no-fund', path.join(temporary, packed.filename)],
+	[
+		npm,
+		'install',
+		'--ignore-scripts',
+		'--dry-run=false',
+		'--no-audit',
+		'--no-fund',
+		path.join(temporary, packed.filename),
+	],
 	temporary,
 );
+const installed = path.join(temporary, 'node_modules/acars-decoder');
+const published = JSON.parse(await readFile(path.join(installed, 'package.json'), 'utf8'));
+assert.equal(published.name, 'acars-decoder');
+assert.equal(published.version, metadata.version);
+assert.equal(published.license, 'MIT');
+assert.equal(published.private, undefined);
+assert.equal(published.repository.type, 'git');
+assert.equal(published.repository.url, 'git+https://github.com/jLynx/acars-typescript-decoder.git');
+assert.equal(published.homepage, 'https://github.com/jLynx/acars-typescript-decoder#readme');
+assert.equal(published.bugs.url, 'https://github.com/jLynx/acars-typescript-decoder/issues');
+assert.equal(published.author.name, 'jLynx');
+assert.equal(published.publishConfig.access, 'public');
+assert.equal(published.publishConfig.registry, 'https://registry.npmjs.org/');
+for (const filename of ['LICENSE', 'THIRD_PARTY_NOTICES.txt']) {
+	assert.equal(
+		await readFile(path.join(installed, filename), 'utf8'),
+		await readFile(path.join(root, filename), 'utf8'),
+	);
+}
+for (const entry of Object.values(published.exports)) {
+	for (const filename of Object.values(entry)) {
+		assert(
+			packed.files.some((file) => file.path === filename.replace(/^\.\//, '')),
+			`Missing export: ${filename}`,
+		);
+	}
+}
 await writeFile(
 	path.join(temporary, 'consumer.mjs'),
 	`
@@ -56,7 +107,7 @@ console.log(result.title);
 command(
 	process.execPath,
 	[
-		path.join(root, 'node_modules/typescript/bin/tsc'),
+		path.join(root, 'node_modules/@typescript/native/bin/tsc'),
 		'--noEmit',
 		'--strict',
 		'--skipLibCheck',
@@ -106,5 +157,7 @@ for (const filename of await readdir(distribution)) {
 		'Declarations must resolve without source aliases',
 	);
 }
-console.log('Packed package passed clean Node runtime, NodeNext TypeScript and browser bundle checks.');
+console.log(
+	'Packed package passed metadata, documentation, clean Node runtime, NodeNext TypeScript and browser bundle checks.',
+);
 console.log(`Consumer artifacts: ${temporary}`);

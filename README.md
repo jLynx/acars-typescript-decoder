@@ -5,7 +5,7 @@
 [![CI](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml/badge.svg)](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml)
 [![Contributors](https://img.shields.io/github/contributors/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/graphs/contributors)
 [![Activity](https://img.shields.io/github/commit-activity/m/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/pulse)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?logo=nodedotjs&logoColor=white)](#nodejs-support-policy)
 
 ACARS (Aircraft Communications Addressing and Reporting System) carries messages
@@ -35,10 +35,17 @@ The repository is [**acars-typescript-decoder**](https://github.com/jLynx/acars-
 ## Node.js support policy
 
 - Runtime: Node.js 22.x starting at 22.13.0, or Node.js 24 and later.
-- CI configuration: Node.js 22.x and 24.x on Linux and Windows.
+- CI configuration: Node.js 22.x, 24.x and 26.x on Linux and Windows, with Python 3.14 for generator tests.
 - Distribution: ESM targeting ES2022, with bundled TypeScript declarations and source maps.
 - Browser support: modern browsers providing ES2022 and standard Web APIs. Runtime decoding uses no Node-only APIs or network requests.
 - Node type definitions are a development dependency and do not force consumers to install a particular `@types/node` version.
+
+Development type-checking and consumer checks use stable TypeScript 7.0.2 (`tsc`).
+ESLint and declaration bundling still require the TypeScript 6 compiler API. The
+package follows Microsoft's [side-by-side installation guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0):
+`@typescript/native` aliases TypeScript 7, while `typescript` aliases the official
+`@typescript/typescript6` compatibility package. This preserves type-aware linting;
+both compilers are development dependencies and are absent from consumer installs.
 
 ## Installation
 
@@ -54,6 +61,17 @@ npm install /path/to/acars-decoder-0.1.0.tgz
 
 Once published, the package will be installed with `npm install acars-decoder`.
 It is a separate package from the MIT-licensed `@airframes/acars-decoder` dependency.
+
+## Publishing
+
+Run `npm run release:check` to validate a release and preview its package contents
+without uploading anything. Both `npm pack` and `npm publish` automatically run
+lint, formatting, structure, type, decoder, data-generator and clean-install checks
+against a fresh build. Development release checks require Python 3; consumers do not.
+
+See the [release guide](docs/releasing.md) for npm account setup, first publication
+and version updates. Publishing requires an npm account with permission to use the
+package name. CI currently validates packages without publishing them.
 
 ## Usage
 
@@ -155,6 +173,11 @@ they may throw on malformed binary data and do not provide input validation or
 airport enrichment. Prefer `decode`/`decodeLog` for applications.
 
 ## Development
+
+Use the latest stable Node.js 26 for development; supported older runtimes remain
+in CI. Dependencies use stable releases, and Dependabot checks npm packages and
+GitHub Actions weekly. Dependency updates must pass the same lint, type, decoder,
+data and package checks before merging.
 
 ```sh
 npm run check

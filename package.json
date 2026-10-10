@@ -4,6 +4,22 @@
 	"description": "ACARS message parsing, reassembly and documented application decoding for browsers and Node.js",
 	"type": "module",
 	"license": "MIT",
+	"author": {
+		"name": "jLynx",
+		"url": "https://github.com/jLynx"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jLynx/acars-typescript-decoder.git"
+	},
+	"homepage": "https://github.com/jLynx/acars-typescript-decoder#readme",
+	"bugs": {
+		"url": "https://github.com/jLynx/acars-typescript-decoder/issues"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"sideEffects": false,
@@ -29,6 +45,7 @@
 		"dist",
 		"LICENSE",
 		"THIRD_PARTY_NOTICES.txt",
+		"CONTRIBUTING.md",
 		"docs"
 	],
 	"scripts": {
@@ -44,18 +61,19 @@
 		"test:coverage": "vitest run --coverage",
 		"test:data": "python -m unittest discover -s test/airport-db -p test_*.py",
 		"test:package": "node scripts/package-smoke.mjs",
+		"release:check": "npm pack --dry-run",
 		"build:airport-db": "python scripts/airport-db/build.py",
 		"build:acars-labels": "python scripts/acars-data/build-labels.py",
-		"prepack": "npm run check && npm test && npm run build"
+		"prepack": "npm run check && npm test && npm run test:data && npm run build && npm run test:package"
 	},
 	"dependencies": {
 		"@airframes/acars-decoder": "1.9.2",
-		"pako": "^2.1.0"
+		"pako": "^3.0.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
-		"@types/node": "^22.20.5",
-		"@types/pako": "^2.0.4",
+		"@types/node": "^26.6.5",
+		"@typescript/native": "npm:typescript@~7.0.2",
 		"@vitest/coverage-v8": "^5.0.3",
 		"esbuild": "^0.28.2",
 		"eslint": "^10.12.0",
@@ -64,7 +82,7 @@
 		"prettier": "^3.9.9",
 		"rollup": "^4.64.3",
 		"rollup-plugin-dts": "^6.5.1",
-		"typescript": "~5.9.3",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"typescript-eslint": "^8.71.1",
 		"vitest": "^5.0.3"
 	},

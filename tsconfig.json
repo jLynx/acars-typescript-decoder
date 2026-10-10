@@ -11,9 +11,8 @@
 		"forceConsistentCasingInFileNames": true,
 		"lib": ["ES2022", "DOM"],
 		"types": ["node"],
-		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		},
 		"verbatimModuleSyntax": true,
 		"isolatedModules": true,

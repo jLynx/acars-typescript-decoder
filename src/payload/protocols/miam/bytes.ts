@@ -1,5 +1,4 @@
-import { Inflate } from 'pako';
-import type { InflateState } from './types';
+import { Inflate, type ZStream } from 'pako';
 
 export function base85(text: string, padding: number, maximum = 8192): Uint8Array {
 	const bytes: number[] = [];
@@ -46,6 +45,11 @@ export function crc16(bytes: Uint8Array): number {
 export function inflateBounded(bytes: Uint8Array, maximum = 65536, raw = true): Uint8Array {
 	// MIAM uses raw DEFLATE, not a zlib/gzip envelope.
 	const inflater = new Inflate({ raw, chunkSize: 4096 });
+	let stream: ZStream | undefined;
+	// Pako 3 exposes stream state through this hook; its internal strm is private.
+	inflater.onStart = (state) => {
+		stream = state;
+	};
 	const chunks: Uint8Array[] = [];
 	let size = 0;
 	inflater.onData = (chunk: Uint8Array) => {
@@ -54,8 +58,7 @@ export function inflateBounded(bytes: Uint8Array, maximum = 65536, raw = true): 
 		chunks.push(chunk);
 	};
 	if (!inflater.push(bytes, true) || inflater.err) throw new Error('Invalid or incomplete DEFLATE body');
-	const state = inflater as Inflate & InflateState;
-	if (!state.ended || state.strm.avail_in !== 0) throw new Error('Incomplete DEFLATE stream or trailing data');
+	if (!inflater.ended || stream?.avail_in !== 0) throw new Error('Incomplete DEFLATE stream or trailing data');
 	const result = new Uint8Array(size);
 	let offset = 0;
 	for (const chunk of chunks) {

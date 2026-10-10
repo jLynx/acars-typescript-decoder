@@ -8,7 +8,3 @@ export interface MiamBody {
 	length?: number;
 	headerLength: number;
 }
-export interface InflateState {
-	ended: boolean;
-	strm: { avail_in: number };
-}
