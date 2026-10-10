@@ -391,7 +391,58 @@ Receiver adapters accept JAERO native/JSONdump records, including empty ACKs and
 source-derived direction. IQ/audio demodulation and radio drivers remain outside
 the implemented scope; further Aero channel variants require evidence.
 
-`interpretArinc`, `decodeAdsc` and `decodeCpdlc` are exported for protocol use.
+`interpretArinc`, `decodeAdsc`, `decodeAdscDisconnect` and `decodeCpdlc` are exported
+for protocol use. FANS ADS-C requests retain group wire order and compound-request
+boundaries; a periodic request without an interval stays partial. Vertical-speed
+thresholds retain their greater/less comparator. Rejection reasons name erroneous
+octets/tags, and DIS reasons come from the high nibble with unknown bits preserved.
+The public dispatcher verifies the ARINC CRC before exposing application values.
+The lower-level DIS reader accepts one payload octet without the surrounding CRC.
+`decodeFansCpdlcStructure(bytes, direction)` reads all 213 types in the pinned
+FANS schema, including every uplink/downlink element choice, optional fields and
+constrained values. Its typed tree retains raw bytes, choices and bit spans. Values
+use the ASN.1 constrained representation; scaled measurement units still come from
+the application decoder. Structural validity and zero padding do not verify integrity
+or guarantee complete display interpretation. The public dispatcher exposes this tree
+as `cpdlc` after a verified ARINC CRC; the standalone tree records integrity as
+`unverified` because the caller supplies bytes without that envelope.
+`decodeAtnAcse(bytes, bitLength?)` reads the Doc9705 Ed2 ACSE kernel and retains
+context names, calling title/qualifier, result/diagnostics, release/abort fields,
+EXTERNAL application bit strings and extensions. `decodeAtnUlcs` attaches it to
+explicit context 1 values or connection application bytes. Excluded fields and
+unsupported title forms remain raw with explicit profile/completeness status.
+Association state, authentication and protected application integrity remain open.
+`decodeAtnCm(bytes, direction, bitLength?)` reads CMMessageSetVersion1 aircraft and
+ground messages, including logon/contact/update/forward/abort choices, advertised
+applications/versions, long/short TSAP bytes and optional departure data. The caller
+supplies a known direction and application context; raw bytes, exact bit length,
+unknown extensions and calendar validity are retained. Application integrity is
+unverified at this standalone layer.
+`decodeAtnCpdlc(bytes, {direction, mode, bitLength?})` reads the pinned Doc9705
+CPDLC version 1 plain message schema into typed choices, constrained values and bit
+spans. Both direction and `plain`/`protected` mode must be supplied. Protected
+message and checksum bits remain opaque pending aircraft/flight/facility-bound
+integrity verification. Plain values retain wire representation with documented
+`measurement` scales, units and references from the pinned ASN.1 comments.
+Structural completeness does not establish complete semantic interpretation or
+association validity.
+`decodeAtnB2Structure(bytes, {application, direction, mode, message?, bitLength?})`
+reads pinned B2 CPDLC and ADS-C v2 schema structures. `application` is `cpdlc` or
+`adsc`, and `mode` is `application` or `protected`. ADS-C application mode also
+requires its inner `message` type: `request`, `report`, `accept`, `reject`,
+`noncompliance` or `positiveAcknowledgement`. Requests require uplink; the other
+inner types require downlink. Known extension fields decode with raw open-type
+bytes retained; their bit spans refer to their own open-type payload. Absent ASN.1
+DEFAULT values are marked `defaulted` with zero bit length. Protected bodies stay
+opaque and integrity is `unverified`; this explicit reader does not infer a schema
+from conventional VHF ACARS labels or establish full application semantics.
+METAR weather results also retain directional visibility, recent weather, runway
+wind shear and selected numeric `remarks`: sea-level pressure, precise temperature,
+period temperature extrema, precipitation, pressure tendency, snow depth and ice
+accretion. Remark values keep their units/periods and do not overwrite body values;
+unsupported remark tokens remain available. TI2 requests on documented H1/5Z
+layouts expose typed airport, byte-offset and information-letter fields with
+unverified application checksum status.
 `@jlynx_/acars-decoder/formats` exposes lower-level readers that require normalized records;
 they may throw on malformed binary data and do not provide input validation or
 airport enrichment. Prefer `decode`/`decodeLog` for applications.
@@ -448,3 +499,10 @@ The combined package is licensed under **GPL-3.0-or-later**. See [LICENSE](LICEN
 for the full terms; historical MIT terms are retained in [docs/MIT-LICENSE.txt](docs/MIT-LICENSE.txt). Upstream
 components retain their required notices, and the optional OurAirports dataset
 is public domain. Proprietary reports still require their specifications to decode.
+
+Core METAR observations are available through `decodeMetar(text)` and the normal
+RA/C1/H1 dispatcher (`result.weather`). Typed values retain units, visibility limits,
+raw observations and unsupported trend/remark text. `decodeAtnUlcs(bytes, 'data')`
+reads explicit ATN presentation envelopes; use `'connection'` for short connection
+headers. ATN application payloads and integrity remain partial. See
+[coverage](docs/coverage.md) for the precise implemented scopes.

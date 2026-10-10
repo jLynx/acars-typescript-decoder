@@ -1,5 +1,7 @@
 import { isRecord } from './validation';
 import type { AcarsInterpretation } from '@/payload/types';
+import { validWeatherReports } from '@/payload/protocols/text/metar/validation';
+import { validCpdlcStructure } from '@/payload/protocols/cpdlc/validation';
 
 /** Validate optional protocol output as well as display fields before accepting caller plugins. */
 export function validInterpretation(value: unknown, depth = 0): value is AcarsInterpretation {
@@ -26,7 +28,9 @@ function validOptionalProtocols(value: Record<string, unknown>): boolean {
 	return (
 		(value.application === undefined || validApplication(value.application)) &&
 		(value.transfer === undefined || validTransfer(value.transfer)) &&
-		(value.maintenance === undefined || validMaintenance(value.maintenance))
+		(value.maintenance === undefined || validMaintenance(value.maintenance)) &&
+		(value.weather === undefined || validWeatherReports(value.weather)) &&
+		(value.cpdlc === undefined || validCpdlcStructure(value.cpdlc))
 	);
 }
 

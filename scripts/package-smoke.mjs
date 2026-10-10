@@ -99,6 +99,73 @@ import { decodeRtr } from '@jlynx_/acars-decoder';
 import { decodeRtr as formatsRtr } from '@jlynx_/acars-decoder/formats';
 import { airportName } from '@jlynx_/acars-decoder/airports';
 import { Bits } from '@jlynx_/acars-decoder/formats';
+import { decodeAdsc, decodeAdscDisconnect } from '@jlynx_/acars-decoder';
+import { decodeMetar, decodeAtnUlcs } from '@jlynx_/acars-decoder';
+import { decodeAtnAcse } from '@jlynx_/acars-decoder';
+import { decodeAtnCm } from '@jlynx_/acars-decoder';
+import { decodeAtnCpdlc } from '@jlynx_/acars-decoder';
+import { decodeAtnCpdlc as formatsAtnCpdlc } from '@jlynx_/acars-decoder/formats';
+import { decodeAtnB2Structure } from '@jlynx_/acars-decoder';
+import { decodeAtnB2Structure as formatsB2 } from '@jlynx_/acars-decoder/formats';
+for (const reader of [decodeAtnB2Structure, formatsB2]) {
+ const request = reader(Uint8Array.of(0,0x12,0x40), {application:'adsc',direction:'uplink',mode:'application',message:'request',bitLength:18});
+ assert.equal(request.value.choice, 'demand-contract');
+ assert.equal(request.value.children[0].children[0].value, 73);
+ assert.equal(request.structureComplete, true);
+ assert.equal(request.integrity, 'unverified');
+}
+for (const reader of [decodeAtnCpdlc, formatsAtnCpdlc]) {
+ const startup = reader(Uint8Array.of(0x20), {direction:'uplink',mode:'plain',bitLength:5});
+ assert.equal(startup.value.choice, 'startup');
+ assert.equal(startup.structureComplete, true);
+}
+import { decodeAtnCm as formatsCm } from '@jlynx_/acars-decoder/formats';
+for (const cm of [decodeAtnCm, formatsCm]) {
+ const contact = cm(Uint8Array.of(0x30), 'downlink', 4);
+ assert.equal(contact.type, 'contact-response');
+ assert.equal(contact.response.code, 1);
+ assert.equal(contact.structureComplete, true);
+}
+import { decodeAtnAcse as formatsAcse } from '@jlynx_/acars-decoder/formats';
+for (const acse of [decodeAtnAcse, formatsAcse]) {
+ const request = acse(Uint8Array.of(0,0,0,0x22,0xa0,0x30), 44);
+ assert.equal(request.type, 'AARQ');
+ assert.equal(request.fields.applicationContextName, '1.2.3');
+ assert.equal(request.structureComplete, true);
+}
+import { decodeFansCpdlcStructure } from '@jlynx_/acars-decoder';
+import { decodeFansCpdlcStructure as formatsFans } from '@jlynx_/acars-decoder/formats';
+for (const fans of [decodeFansCpdlcStructure, formatsFans]) {
+ const structure = fans(Uint8Array.of(2,1,128), 'uplink');
+ assert.equal(structure.value.children[1].choice, 'uM3NULL');
+ assert.equal(structure.consumedBits, 17);
+ assert.equal(structure.paddingValid, true);
+ assert.equal(structure.integrity, 'unverified');
+}
+import { decodeMetar as formatsMetar, decodeAtnUlcs as formatsUlcs } from '@jlynx_/acars-decoder/formats';
+for (const metar of [decodeMetar, formatsMetar]) {
+ const remarks = metar('KJFK 100730Z 18005KT 9999 SCT020 18/12 A2992 RMK P0012 SLP182');
+ assert.equal(remarks.remarks.precipitation[0].amount.value, 0.12);
+ assert.equal(remarks.remarks.precipitation[0].amount.unit, 'in');
+ assert.equal(remarks.remarks.seaLevelPressure.value, 1018.2);
+ assert.equal(remarks.pressure.value, 29.92);
+ const observation = metar('NZAA 100730Z 24012KT CAVOK 16/12 Q1018');
+ assert.equal(observation.temperature.value, 16);
+ assert.equal(observation.pressure.unit, 'hPa');
+}
+assert.equal(decode({label:'RA',text:'NZAA 100730Z 24012KT CAVOK 16/12 Q1018'}).weather[0].wind.speed.value, 12);
+for (const ulcs of [decodeAtnUlcs, formatsUlcs]) {
+ assert.equal(ulcs(Uint8Array.of(0xe8,2,0x11), 'connection').session.type, 'SCN');
+ assert.equal(ulcs(Uint8Array.of(0,0xa0,0), 'data').values[0].contextIdentifier, 3);
+}
+
+import { decodeAdscDisconnect as formatsDisconnect } from '@jlynx_/acars-decoder/formats';
+assert.equal(decodeAdsc(Uint8Array.of(7,1,13,2,11,0x81),'uplink').fields.find(field => field.label === 'Reporting interval').value, '16 seconds');
+assert.equal(decodeAdsc(Uint8Array.of(7,1,13,2),'uplink').complete, false);
+for (const disconnect of [decodeAdscDisconnect, formatsDisconnect]) {
+ assert.equal(disconnect(Uint8Array.of(0x80)).fields[0].value, '8');
+ assert.equal(disconnect(Uint8Array.of(0x81)).complete, false);
+}
 import * as transportApis from '@jlynx_/acars-decoder/framing';
 import * as mainApis from '@jlynx_/acars-decoder';
 for (const api of [transportApis, mainApis]) {
@@ -185,6 +252,34 @@ import { createCotpSession, type CotpSession, type CotpSessionReception, type Co
 import { createCotpSession as mainCotpSession, type CotpSession as MainCotpSession, type CotpSessionReception as MainCotpReception, type CotpSessionAssembly as MainCotpAssembly } from '@jlynx_/acars-decoder';
 import { createClnpCompressedReassembler, createAeroReassembler, createHfdlSystemTableAssembler, decodeAtnSecurityLabel, type ClnpCompressedReassembler, type ClnpContextObservation, type AeroReassembler, type AeroControl, type HfdlSystemTableAssembler, type AtnSecurityLabel, type XidParameter } from '@jlynx_/acars-decoder/framing';
 import { type AeroControl as MainAeroControl, type ClnpContextObservation as MainContextObservation } from '@jlynx_/acars-decoder';
+import { decodeFansCpdlcStructure, type FansCpdlcStructure, type FansSchemaValue } from '@jlynx_/acars-decoder';
+import { decodeAtnAcse, type AtnAcse, type AtnAcseExternal } from '@jlynx_/acars-decoder';
+import { decodeAtnCm, type AtnCm, type AtnCmAddress, type AtnCmApplication } from '@jlynx_/acars-decoder';
+import { decodeAtnCpdlc, type AtnCpdlc, type AtnCpdlcValue, type AtnCpdlcOptions } from '@jlynx_/acars-decoder';
+import { type MetarRemarks } from '@jlynx_/acars-decoder';
+import { decodeAtnB2Structure, type AtnB2Structure, type AtnB2Options } from '@jlynx_/acars-decoder';
+import { decodeAtnB2Structure as formatsB2, type AtnB2Structure as FormatsB2 } from '@jlynx_/acars-decoder/formats';
+const b2Options: AtnB2Options = {application:'adsc',direction:'uplink',mode:'application',message:'request',bitLength:18};
+const b2: AtnB2Structure = decodeAtnB2Structure(Uint8Array.of(0,0x12,0x40),b2Options);
+const formatsB2Result: FormatsB2 = formatsB2(b2.raw,b2Options);
+import { decodeAtnCpdlc as formatsAtnCpdlc, type AtnCpdlc as FormatsAtnCpdlc } from '@jlynx_/acars-decoder/formats';
+const atnOptions: AtnCpdlcOptions = {direction:'uplink',mode:'plain',bitLength:5};
+const atnCpdlc: AtnCpdlc = decodeAtnCpdlc(Uint8Array.of(0x20), atnOptions);
+const atnCpdlcValue: AtnCpdlcValue = atnCpdlc.value;
+const formatsAtn: FormatsAtnCpdlc = formatsAtnCpdlc(atnCpdlc.raw, atnOptions);
+import { decodeAtnCm as formatsCm, type AtnCm as FormatsCm } from '@jlynx_/acars-decoder/formats';
+const cm: AtnCm = decodeAtnCm(Uint8Array.of(0x30), 'downlink', 4);
+const cmAddress: AtnCmAddress | undefined = cm.address;
+const cmApplication: AtnCmApplication | undefined = cm.addressedApplications?.[0];
+const formatsContact: FormatsCm = formatsCm(cm.raw, cm.direction, cm.bitLength);
+import { decodeAtnAcse as formatsAcse, type AtnAcse as FormatsAcse } from '@jlynx_/acars-decoder/formats';
+const acse: AtnAcse = decodeAtnAcse(Uint8Array.of(0,0,0,0x22,0xa0,0x30), 44);
+const externalAcse: AtnAcseExternal | undefined = acse.userInformation[0];
+const formatAcse: FormatsAcse = formatsAcse(acse.raw, acse.bitLength);
+import { decodeFansCpdlcStructure as formatsFans, type FansCpdlcStructure as FormatsFans } from '@jlynx_/acars-decoder/formats';
+const fans: FansCpdlcStructure = decodeFansCpdlcStructure(Uint8Array.of(2,1,128), 'uplink');
+const fansValue: FansSchemaValue = fans.value;
+const formatsStructure: FormatsFans = formatsFans(fans.raw, fans.direction);
 const compressed: ClnpCompressedReassembler = createClnpCompressedReassembler();
 const observe: (bytes: Uint8Array, reception: {link:string;receivedAt:number;linkIntegrity:'verified'}) => ClnpContextObservation = compressed.observe;
 const aero: AeroReassembler = createAeroReassembler();
@@ -193,6 +288,10 @@ const mainControl: MainAeroControl | undefined = control;
 const mainObservation: MainContextObservation | undefined = undefined;
 const tables: HfdlSystemTableAssembler = createHfdlSystemTableAssembler();
 const security: AtnSecurityLabel = decodeAtnSecurityLabel(Uint8Array.of(0));
+import { decodeAdscDisconnect, type ApplicationDecode } from '@jlynx_/acars-decoder/formats';
+import { decodeAdscDisconnect as mainDisconnect } from '@jlynx_/acars-decoder';
+const disconnect: ApplicationDecode = decodeAdscDisconnect(Uint8Array.of(0x80));
+const mainDisconnected: ApplicationDecode = mainDisconnect(Uint8Array.of(0x80));
 const xidParameter: XidParameter = {id:3,name:'XID sequencing',raw:Uint8Array.of(0x53),sequencing:{sequence:3,retry:5}};
 import { airportName } from '@jlynx_/acars-decoder/airports';
 import { Bits } from '@jlynx_/acars-decoder/formats';
@@ -262,7 +361,7 @@ command(
 const entry = path.join(temporary, 'browser.ts');
 await writeFile(
 	entry,
-	"import { decode, decodeRtr } from '@jlynx_/acars-decoder'; console.log(decode({label:'Q0',text:''}), decodeRtr('<RTR><HEAD/><HEADRTR/></RTR>'));",
+	"import { decode, decodeRtr, decodeFansCpdlcStructure } from '@jlynx_/acars-decoder'; console.log(decode({label:'Q0',text:''}), decodeRtr('<RTR><HEAD/><HEADRTR/></RTR>'), decodeFansCpdlcStructure(Uint8Array.of(2,1,128), 'uplink'));",
 );
 const { build } = await import('esbuild');
 const bundled = await build({

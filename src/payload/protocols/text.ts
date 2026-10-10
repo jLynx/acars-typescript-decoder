@@ -4,6 +4,7 @@ import type { AcarsField, AcarsInterpretation } from '@/payload/types';
 import { datedTime, timestampFields } from '@/payload/time';
 import { interpretTelemetry } from './text/telemetry';
 import { interpretWeather, interpretSlashFields } from './text/weather';
+import { interpretMetar } from './text/metar';
 
 function positionFields(latitude: number, longitude: number): AcarsField[] | undefined {
 	if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return;
@@ -124,6 +125,10 @@ export function interpretText(message: AcarsRecord): AcarsInterpretation | undef
 	if (message.text.length > 8192) return;
 	const weather = interpretWeather(message) ?? interpretSlashFields(message);
 	if (weather) return weather;
+	if (['RA', 'C1', 'H1'].includes(message.label)) {
+		const observation = interpretMetar(message.text, message.continuation);
+		if (observation) return observation;
+	}
 	if (message.direction === 'uplink') return frequencyChange(message);
 	return gaPosition(message) ?? decimalPosition(message) ?? maintenance(message) ?? interpretTelemetry(message);
 }

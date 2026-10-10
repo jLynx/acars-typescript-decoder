@@ -8,6 +8,7 @@ import * as extended from './cpdlc/extended';
 import { predepartureClearance } from './cpdlc/predeparture';
 import type { ApplicationDecode, CpdlcElement, CpdlcEntry } from './types';
 import type { AcarsField } from '@/payload/types';
+import { decodeFansCpdlcStructure } from './cpdlc/schema';
 
 const readers: Record<string, (bits: Bits) => string> = {
 	altitude: values.altitude,
@@ -105,6 +106,14 @@ function header(bits: Bits): AcarsField[] {
 }
 
 export function decodeCpdlc(bytes: Uint8Array, direction: 'uplink' | 'downlink'): ApplicationDecode {
+	if (!(bytes instanceof Uint8Array) || bytes.length > 8192 || !['uplink', 'downlink'].includes(direction))
+		throw new TypeError('Invalid CPDLC input/direction');
+	let structure: ReturnType<typeof decodeFansCpdlcStructure> | undefined;
+	try {
+		structure = decodeFansCpdlcStructure(bytes, direction);
+	} catch {
+		// Display recognition can still identify a header/element; validity remains partial.
+	}
 	const bits = new Bits(bytes);
 	const additional = bits.read(1);
 	const fields = header(bits);
@@ -123,14 +132,20 @@ export function decodeCpdlc(bytes: Uint8Array, direction: 'uplink' | 'downlink')
 			}
 		}
 	}
-	complete &&= bits.paddingOnly();
+	complete &&= bits.paddingOnly() && Boolean(structure?.paddingValid);
 	fields.push(...phrases.map((phrase, index) => ({ label: `CPDLC instruction ${index + 1}`, value: phrase })));
 	return {
 		fields,
 		summary: phrases.join(' · '),
 		complete,
+		...(structure ? { structure } : {}),
 		notes: complete
 			? []
-			: ['Some CPDLC parameters or trailing elements remain undecoded. The full binary payload is retained.'],
+			: [
+					'Some CPDLC parameters or trailing elements remain undecoded. The full binary payload is retained.',
+					...(!structure
+						? ['FANS ASN.1 schema validation failed; this body is truncated or violates a schema constraint.']
+						: []),
+				],
 	};
 }

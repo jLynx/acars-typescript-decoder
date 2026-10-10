@@ -1,8 +1,9 @@
 # Completion checklist
 
-Updated 10 October 2026 at the close of this priority 2 implementation batch.
-The user requested wrapping up the current work; the nine remaining priority 2
-checkboxes stay open for future work. Priority 1 has not been started in this batch.
+Updated 11 October 2026: the current priority 1 weather/TI2 batch is finished;
+remaining checklist work is paused at the user's request. Priority 2 remains
+deferred with nine open checkboxes. Completed batches' full verification is
+recorded below; resumed work receives its own verification before check-off.
 Checked items describe their implemented scope, not complete coverage of a whole
 protocol. Unchecked items
 are still outstanding. The [coverage table](coverage.md) describes current support,
@@ -17,28 +18,174 @@ source revisions and fixtures. A “best” claim also needs published compariso
 
 ## Application support — priority 1
 
-- [ ] ATN upper-layer session/presentation decoding with typed context identifiers
-      and retained unsupported bytes.
+**Priority 1 progress: 15 of 26 checkboxes complete; 11 remain open.** The total includes narrow
+verified scopes added beneath the original broader rows; those rows remain open
+until their full requirements are met.
+
+Resume order follows the BrowSDR review: encoded T5/T6, Airbus application parts,
+measurement definitions and airline/weather variants, then the remaining ATS/FANS
+and ATN applications. T5 is radio-complete in the supplied example; T6 lacks its
+first radio block. The inspected public sources have not established their encoded
+field dictionary or the Airbus cross-message part relationship. Those scopes remain
+open while independently supported application work continues.
+
+- [x] ATN Doc9705 Ed2 upper-layer short-session/presentation and ACSE kernel
+      decoding with typed context identifiers, context/title OIDs, result/source
+      diagnostics, release/abort fields, EXTERNAL application bit strings and bounded
+      extensions. Excluded title forms/unknown fields retain raw bytes and explicit
+      completeness/profile status. Live association state, authentication and
+      protected application verification remain open; full package/capture checks pass.
 - [ ] ATN B1 CPDLC application decoding using licensed schemas and known directions.
-- [ ] ATN B2 CPDLC and context management.
+- [x] Pinned ATN CPDLC version 1 plain-message structure and protected wrappers:
+      243 descriptors, explicit direction/mode, root elements, constrained values,
+      optional bitmaps, raw extensions and bit spans. Protected content stays opaque
+      pending aircraft/flight/facility-bound integrity. 1,166 new independent and
+      descriptor-conformance regressions pass with full package/capture verification;
+      complete scaled application meanings remain open above.
+- [ ] ATN B2 CPDLC.
+- [x] Pinned B2 CPDLC schema structure: all 424 uplink/182 downlink element
+      alternatives, including known extension open types, optional/default fields,
+      constraints and typed raw spans through explicit direction/application input.
+      Protected wrappers retain opaque bytes; complete application semantics and
+      protected integrity remain open above. Full package/capture verification passes.
+- [x] ATN CMMessageSetVersion1 context-management messages: all aircraft/ground
+      logon/contact/update/forward/abort choices, optional fields, advertised
+      applications/versions, long/short TSAP bytes, date/clock constraints and raw
+      extensions. Known direction required; 20 independent regressions include
+      every optional bitmap, 256-entry boundaries and malformed/truncated bodies.
+      CM live association procedures and integrity remain unverified.
 - [ ] ATN ADS-C v2.
+- [x] Pinned ADS-C v2 request/report/accept/reject/noncompliance/positive-acknowledgement
+      schema structures, all 187 generated source types, member-specific constraints,
+      root/known extension fields and opaque protected wrappers. Explicit inner message
+      type and direction required. Full application measurements and protected integrity
+      remain open above; full package/capture verification passes.
 - [ ] ATN checksum and protected-message integrity verification before measurements.
 - [ ] ATS text CRC verification using documented coverage/encoding rules and
       independently verified valid/corrupt examples.
 - [ ] Further AFN/TI2/OC1 variants; distinguish weather tokens from checksums.
-- [ ] Complete FANS CPDLC body/schema validation for every required element/choice,
-      direction, boundary and malformed/truncated body.
-- [ ] Remaining FANS ADS-C tags/variants with independent field/unit expectations.
+- [x] Documented H1/5Z TI2 request variants through typed public dispatch:
+      airport, byte offset, information letter and raw checksum with explicit
+      unverified integrity; wrong directions, airport mismatches, malformed and
+      trailing data have regressions. Full package/capture verification passes.
+- [x] Complete structural validation of all 213 types in the pinned FANS CPDLC
+      schema: all 183 uplink/129 downlink element choices, constraints, aliases,
+      optional members, string/list boundaries, unused codepoints and truncated
+      bodies. Typed trees retain constrained wire values, raw bytes and bit spans;
+      invalid schemas cannot be marked completely decoded. Independent semantic
+      equivalence and reserved/deleted display meanings remain in the correctness
+      checklist. All required checks and five supplied capture replays pass.
+- [x] All pinned FANS ADS-C downlink report tag families with independent field/unit
+      expectations: signed coordinates/altitudes, eighth-second time, all accuracy
+      meanings, ground/Mach/vertical rates, weather, route/projection extrema,
+      flight/airframe IDs and noncompliance odd/even lists. Nonzero unassigned
+      status/padding bits remain raw and partial. Every supported downlink tag has
+      truncated-prefix and corrupt-CRC tests; 46 new regressions and full required
+      verification pass. ATN ADS-C v2 remains a separate open scope.
+- [x] FANS ADS-C request-group wire-order parsing, reporting interval after other
+      groups, compound request boundaries, signed vertical-threshold comparators,
+      and interval-less requests retained as partial with no invented interval.
+      Repeated/incompatible request groups and empty event requests retain fields
+      while remaining partial; structural recognition does not imply validity.
+- [x] FANS ADS-C NACK reason/extension semantics, DIS high-nibble reason decoding,
+      raw unknown DIS fields, strict flight-ID alphabet and input bounds;
+      48 regressions cover values, malformed boundaries, verified/corrupt CRCs
+      and complete H1 radio assembly. Complete FANS coverage remains open above.
 - [ ] Encoded T5/TOF and T6 aircraft report bodies.
 - [ ] Airbus application-part assembly using verified identifiers and part rules,
       including any documented relationships across radio message numbers.
 - [ ] Licensed Boeing/Airbus measurement dictionaries with explicit units/scales
       and independently checked expected values.
 - [ ] Further airline/weather payload variants through the public dispatcher.
+- [x] Core METAR observations through RA/C1/H1 and SA bundle dispatch: explicit
+      wind units/gusts/variation, metric/fractional visibility and limits, runway
+      visibility, clouds, weather, temperature/dew point and Q/A pressure; raw
+      trends/remarks, malformed/duplicate groups and ETB status remain explicit.
+      33 regressions and full package/capture verification pass.
+- [x] Documented METAR directional visibility, recent weather, runway wind shear
+      and selected numeric remarks with explicit units/periods: sea-level pressure,
+      precise/period temperatures, precipitation, pressure tendency, snow and ice.
+      Main observation values remain separate; unknown/duplicate remarks and
+      ambiguous three/six-hour periods remain explicit. Thirty independent regressions
+      and full package/capture verification pass; other weather variants remain open.
+- [x] Explicit ATN ULCS short-session/presentation headers and bounded X.691
+      Fully-encoded-data values with typed context IDs, OIDs, bit lengths, fragment
+      determinants and raw excluded/extended fields (37 targeted regressions).
+      ACSE/application bytes remain undecoded; full package verification passes.
+- [x] FANS CPDLC procedure/transition length constraints, all eight speed alternatives
+      and public reader input bounds; independently packed valid/invalid bodies
+      and CRC-verified malformed instructions (17 regressions). Full schema coverage
+      remains open above; full package verification passes.
 - [x] Observed H1/CF RTR maintenance XML fields, including CRC-verified MIAM
       embedded dispatch, repeated records and typed paths with original XML retained.
 - [ ] Complete RTR schema/version coverage and independently verified mappings
       for proprietary status/phase/class codes; the observed layout remains partial.
+
+First priority 1 batch verification (11 October): all 2,179 JavaScript tests in
+77 files, five Python data tests, lint/format/structure/type checks, production build
+and packed-package Node/TypeScript/browser checks pass. All five supplied captures
+replay through the API and CLI with preserved metadata/assembly and unchanged
+coverage counts from the completed transport batch. The new 48 regressions verify
+ADS-C application fields; they do not establish T5/T6 body coverage or decode the
+remaining proprietary reports in those captures.
+
+Weather/envelope batch verification (11 October): all 2,266 JavaScript tests in
+80 files, five Python data tests, lint/format/structure/type checks, production
+build and packed Node/NodeNext TypeScript/browser/CLI checks pass. Five supplied
+captures replay with preserved originals and unchanged coverage totals. The new
+87 tests cover core METAR, ULCS envelopes and FANS constraints; no T5/T6 measurement
+coverage or ACSE/protected application coverage is claimed.
+
+FANS schema batch verification (11 October): all 3,252 JavaScript tests, five Python
+data tests, lint/format/structure/type checks, production build and packed
+Node/NodeNext TypeScript/browser/CLI checks pass. The 986 additional tests include
+hand-packed values/CRC examples and descriptor-based conformance matrices, which
+are explicitly distinguished from independent semantic expectations. Five supplied
+captures retain the previous 294 decoded / 74 partial / 119 unknown total.
+The schema audit also fixes the predeparture VHF frequency's incorrect extra
+CHOICE bits. T5/T6 and proprietary report body coverage remain open.
+
+ADS-C report batch verification (11 October): all 3,298 JavaScript tests, five
+Python data tests (unchanged), lint/format/structure/type checks, production build
+and packed-package checks pass. Five supplied captures retain coverage totals.
+The reader now names all eight navigation-accuracy codes and preserves nonzero
+unassigned report bits instead of silently discarding them. The 46 new regressions
+independently cover all supported downlink tag families and failure boundaries.
+
+ACSE batch verification (11 October): all 3,322 JavaScript tests, five Python data
+tests, lint/format/structure/type checks, production build and packed-package
+Node/TypeScript/browser/CLI checks pass. The 24 new independent ACSE regressions
+cover all root APDUs, excluded/extended fields, unpadded payloads, malformed
+boundaries and explicit ULCS integration. Five supplied captures remain unchanged.
+
+CM batch verification (11 October): all 3,342 JavaScript tests, five Python data
+tests (unchanged), lint/format/structure/type checks, production build and packed
+Node/TypeScript/browser/CLI checks pass. Five supplied captures retain prior coverage.
+The earlier combined B2 CPDLC/context-management row is split into its two scopes,
+increasing the total from 20 to 21; B2 CPDLC remains open.
+
+ATN CPDLC structural batch verification (11 October): all 4,508 JavaScript tests,
+five Python data tests (unchanged), lint/format/structure/type checks, production
+build and packed Node/TypeScript/browser/CLI checks pass. Five supplied captures
+retain prior coverage. The structural scope adds one narrow checkbox (total 22),
+with B1 complete semantic decoding and protected integrity still open.
+
+B2/ADS-C v2 structural batch verification (11 October): all 7,515 JavaScript tests
+in 93 files, five Python data tests, lint/format/structure/type checks, production
+build and packed Node/TypeScript/browser/CLI checks pass. The 2,961 additional
+regressions distinguish data-sharing conformance from hand-packed expectations.
+All five supplied captures retain the 294 decoded / 74 partial / 119 unknown totals.
+Documented version 1 scalar annotations also have 46 independent expected-value
+regressions. These explicit ATN APIs do not explain proprietary VHF report bodies.
+
+Supplementary weather/TI2 batch verification (11 October): all 7,551 JavaScript
+tests in 94 files, five Python data tests, lint/format/structure/type checks,
+production build and packed Node/TypeScript/browser/CLI checks pass. Thirty
+independent weather regressions and six TI2 variant/rejection regressions were
+added. Five supplied captures replay with raw metadata preserved and unchanged
+294 decoded / 74 partial / 119 unknown totals. Remaining work is paused at the
+user's request after finishing this batch; unsupported proprietary bodies and
+integrity verification stay open.
 
 ## Transport support — priority 2
 

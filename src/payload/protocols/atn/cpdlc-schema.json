@@ -1,0 +1,5939 @@
+{
+	"revision": "ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73",
+	"nodes": {
+		"CPDLCUserAbortReason": {
+			"kind": "enumerated",
+			"count": 7,
+			"extensible": true,
+			"enumeration": {
+				"0": "undefined",
+				"1": "no-message-identification-numbers-available",
+				"2": "duplicate-message-identification-numbers",
+				"3": "no-longer-next-data-authority",
+				"4": "current-data-authority-abort",
+				"5": "commanded-termination",
+				"6": "invalid-response"
+			}
+		},
+		"CPDLCProviderAbortReason": {
+			"kind": "enumerated",
+			"count": 8,
+			"extensible": true,
+			"enumeration": {
+				"0": "timer-expired",
+				"1": "undefined-error",
+				"2": "invalid-PDU",
+				"3": "protocol-error",
+				"4": "communication-service-error",
+				"5": "communication-service-failure",
+				"6": "invalid-QOS-parameter",
+				"7": "expected-PDU-missing"
+			}
+		},
+		"NULL": {
+			"kind": "null"
+		},
+		"MsgIdentificationNumber": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 63,
+			"extensible": false
+		},
+		"MsgReferenceNumber": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 63,
+			"extensible": false
+		},
+		"Year": {
+			"kind": "constrained_integer",
+			"minimum": 1996,
+			"maximum": 2095,
+			"extensible": false
+		},
+		"Month": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 12,
+			"extensible": false
+		},
+		"Day": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 31,
+			"extensible": false
+		},
+		"Date": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "year",
+					"type": "Year",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "month",
+					"type": "Month",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "day",
+					"type": "Day",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeHours": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 23,
+			"extensible": false
+		},
+		"TimeMinutes": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 59,
+			"extensible": false
+		},
+		"Time": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "hours",
+					"type": "TimeHours",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "minutes",
+					"type": "TimeMinutes",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeSeconds": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 59,
+			"extensible": false
+		},
+		"Timehhmmss": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "hoursminutes",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "seconds",
+					"type": "TimeSeconds",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"DateTimeGroup": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "date",
+					"type": "Date",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "timehhmmss",
+					"type": "Timehhmmss",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LogicalAck": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "required",
+				"1": "notRequired"
+			}
+		},
+		"ATCMessageHeader": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "messageIdNumber",
+					"type": "MsgIdentificationNumber",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "messageRefNumber",
+					"type": "MsgReferenceNumber",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "dateTime",
+					"type": "DateTimeGroup",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "logicalAck",
+					"type": "LogicalAck",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"LevelFeet": {
+			"kind": "constrained_integer",
+			"minimum": -60,
+			"maximum": 7000,
+			"extensible": false
+		},
+		"LevelMeters": {
+			"kind": "constrained_integer",
+			"minimum": -30,
+			"maximum": 25000,
+			"extensible": false
+		},
+		"LevelFlightLevel": {
+			"kind": "constrained_integer",
+			"minimum": 30,
+			"maximum": 700,
+			"extensible": false
+		},
+		"LevelFlightLevelMetric": {
+			"kind": "constrained_integer",
+			"minimum": 100,
+			"maximum": 2500,
+			"extensible": false
+		},
+		"LevelType": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "levelFeet",
+					"type": "LevelFeet",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "levelMeters",
+					"type": "LevelMeters",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "levelFlightLevel",
+					"type": "LevelFlightLevel",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "levelFlightLevelMetric",
+					"type": "LevelFlightLevelMetric",
+					"extension": false,
+					"index": 3
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_2_OF_LevelType": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "LevelType",
+					"type": "LevelType",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"Level": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "singleLevel",
+					"type": "LevelType",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "blockLevel",
+					"type": "SEQUENCE_SIZE_2_OF_LevelType",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"Fix": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 5,
+			"extensible": false
+		},
+		"LatitudeDegrees": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 90000,
+			"extensible": false
+		},
+		"LatitudeWholeDegrees": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 89,
+			"extensible": false
+		},
+		"MinutesLatLon": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 5999,
+			"extensible": false
+		},
+		"LatitudeDegreesMinutes": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latitudeWholeDegrees",
+					"type": "LatitudeWholeDegrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "minutesLatLon",
+					"type": "MinutesLatLon",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LatLonWholeMinutes": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 59,
+			"extensible": false
+		},
+		"SecondsLatLon": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 59,
+			"extensible": false
+		},
+		"LatitudeDegreesMinutesSeconds": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latitudeWholeDegrees",
+					"type": "LatitudeWholeDegrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latlonWholeMinutes",
+					"type": "LatLonWholeMinutes",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "secondsLatLon",
+					"type": "SecondsLatLon",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LatitudeType": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "latitudeDegrees",
+					"type": "LatitudeDegrees",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "latitudeDegreesMinutes",
+					"type": "LatitudeDegreesMinutes",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "latitudeDMS",
+					"type": "LatitudeDegreesMinutesSeconds",
+					"extension": false,
+					"index": 2
+				}
+			],
+			"extensible": false
+		},
+		"LatitudeDirection": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "north",
+				"1": "south"
+			}
+		},
+		"Latitude": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latitudeType",
+					"type": "LatitudeType",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latitudeDirection",
+					"type": "LatitudeDirection",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LongitudeDegrees": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 180000,
+			"extensible": false
+		},
+		"LongitudeWholeDegrees": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 179,
+			"extensible": false
+		},
+		"LongitudeDegreesMinutes": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "longitudeWholeDegrees",
+					"type": "LongitudeWholeDegrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "minutesLatLon",
+					"type": "MinutesLatLon",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LongitudeDegreesMinutesSeconds": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "longitudeWholeDegrees",
+					"type": "LongitudeWholeDegrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latLonWholeMinutes",
+					"type": "LatLonWholeMinutes",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "secondsLatLon",
+					"type": "SecondsLatLon",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LongitudeType": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "longitudeDegrees",
+					"type": "LongitudeDegrees",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "longitudeDegreesMinutes",
+					"type": "LongitudeDegreesMinutes",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "longitudeDMS",
+					"type": "LongitudeDegreesMinutesSeconds",
+					"extension": false,
+					"index": 2
+				}
+			],
+			"extensible": false
+		},
+		"LongitudeDirection": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "east",
+				"1": "west"
+			}
+		},
+		"Longitude": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "longitudeType",
+					"type": "LongitudeType",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "longitudeDirection",
+					"type": "LongitudeDirection",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LatitudeLongitude": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latitude",
+					"type": "Latitude",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "longitude",
+					"type": "Longitude",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"FixName": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "name",
+					"type": "Fix",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latlon",
+					"type": "LatitudeLongitude",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"NavaidName": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 4,
+			"extensible": false
+		},
+		"Navaid": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "name",
+					"type": "NavaidName",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latlon",
+					"type": "LatitudeLongitude",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"Airport": {
+			"kind": "restricted_character_string",
+			"minimum": 4,
+			"maximum": 4,
+			"extensible": false
+		},
+		"PublishedIdentifier": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "fixName",
+					"type": "FixName",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "navaid",
+					"type": "Navaid",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"DegreesMagnetic": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 360,
+			"extensible": false
+		},
+		"DegreesTrue": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 360,
+			"extensible": false
+		},
+		"Degrees": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "degreesMagnetic",
+					"type": "DegreesMagnetic",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "degreesTrue",
+					"type": "DegreesTrue",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"DistanceNm": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 9999,
+			"extensible": false
+		},
+		"DistanceKm": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 8000,
+			"extensible": false
+		},
+		"Distance": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "distanceNm",
+					"type": "DistanceNm",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "distanceKm",
+					"type": "DistanceKm",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"PlaceBearingDistance": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "publishedIdentifier",
+					"type": "PublishedIdentifier",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "distance",
+					"type": "Distance",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"Position": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "fixName",
+					"type": "FixName",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "navaid",
+					"type": "Navaid",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "airport",
+					"type": "Airport",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "latitudeLongitude",
+					"type": "LatitudeLongitude",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "placeBearingDistance",
+					"type": "PlaceBearingDistance",
+					"extension": false,
+					"index": 4
+				}
+			],
+			"extensible": false
+		},
+		"TimeLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LevelTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LevelPosition": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LevelLevel": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "Level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"PositionLevelLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "levels",
+					"type": "LevelLevel",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeTime": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "Time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"PositionTimeTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "times",
+					"type": "TimeTime",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SpeedIndicated": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 400,
+			"extensible": false
+		},
+		"SpeedIndicatedMetric": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 800,
+			"extensible": false
+		},
+		"SpeedTrue": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 2000,
+			"extensible": false
+		},
+		"SpeedTrueMetric": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 4000,
+			"extensible": false
+		},
+		"SpeedGround": {
+			"kind": "constrained_integer",
+			"minimum": -50,
+			"maximum": 2000,
+			"extensible": false
+		},
+		"SpeedGroundMetric": {
+			"kind": "constrained_integer",
+			"minimum": -100,
+			"maximum": 4000,
+			"extensible": false
+		},
+		"SpeedMach": {
+			"kind": "constrained_integer",
+			"minimum": 500,
+			"maximum": 4000,
+			"extensible": false
+		},
+		"Speed": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "speedIndicated",
+					"type": "SpeedIndicated",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "speedIndicatedMetric",
+					"type": "SpeedIndicatedMetric",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "speedTrue",
+					"type": "SpeedTrue",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "speedTrueMetric",
+					"type": "SpeedTrueMetric",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "speedGround",
+					"type": "SpeedGround",
+					"extension": false,
+					"index": 4
+				},
+				{
+					"name": "speedGroundMetric",
+					"type": "SpeedGroundMetric",
+					"extension": false,
+					"index": 5
+				},
+				{
+					"name": "speedMach",
+					"type": "SpeedMach",
+					"extension": false,
+					"index": 6
+				}
+			],
+			"extensible": false
+		},
+		"PositionSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionTimeLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "positionTime",
+					"type": "PositionTime",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionLevelSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "positionlevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimePosition": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimePositionLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "timeposition",
+					"type": "TimePosition",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SpeedSpeed": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "Speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"LevelSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimePositionLevelSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "timeposition",
+					"type": "TimePosition",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "levelspeed",
+					"type": "LevelSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"DistanceSpecifiedNm": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 250,
+			"extensible": false
+		},
+		"DistanceSpecifiedKm": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 500,
+			"extensible": false
+		},
+		"DistanceSpecified": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "distanceSpecifiedNm",
+					"type": "DistanceSpecifiedNm",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "distanceSpecifiedKm",
+					"type": "DistanceSpecifiedKm",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"Direction": {
+			"kind": "enumerated",
+			"count": 11,
+			"extensible": false,
+			"enumeration": {
+				"0": "left",
+				"1": "right",
+				"2": "eitherSide",
+				"3": "north",
+				"4": "south",
+				"5": "east",
+				"6": "west",
+				"7": "northEast",
+				"8": "northWest",
+				"9": "southEast",
+				"10": "southWest"
+			}
+		},
+		"DistanceSpecifiedDirection": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "distanceSpecified",
+					"type": "DistanceSpecified",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "direction",
+					"type": "Direction",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionDistanceSpecifiedDirection": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "distanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeDistanceSpecifiedDirection": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "distanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"AircraftFlightIdentification": {
+			"kind": "restricted_character_string",
+			"minimum": 2,
+			"maximum": 8,
+			"extensible": false
+		},
+		"PlaceBearing": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "publishedIdentifier",
+					"type": "PublishedIdentifier",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PlaceBearingPlaceBearing": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "PlaceBearing",
+					"type": "PlaceBearing",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"ATSRouteDesignator": {
+			"kind": "restricted_character_string",
+			"minimum": 2,
+			"maximum": 7,
+			"extensible": false
+		},
+		"RouteInformation": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "publishedIdentifier",
+					"type": "PublishedIdentifier",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "latitudeLongitude",
+					"type": "LatitudeLongitude",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "placeBearingPlaceBearing",
+					"type": "PlaceBearingPlaceBearing",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "placeBearingDistance",
+					"type": "PlaceBearingDistance",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "aTSRouteDesignator",
+					"type": "ATSRouteDesignator",
+					"extension": false,
+					"index": 4
+				}
+			],
+			"extensible": false
+		},
+		"ProcedureType": {
+			"kind": "enumerated",
+			"count": 3,
+			"extensible": false,
+			"enumeration": {
+				"0": "arrival",
+				"1": "approach",
+				"2": "departure"
+			}
+		},
+		"Procedure": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 20,
+			"extensible": false
+		},
+		"ProcedureTransition": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 5,
+			"extensible": false
+		},
+		"ProcedureName": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "type",
+					"type": "ProcedureType",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "procedure",
+					"type": "Procedure",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "transition",
+					"type": "ProcedureTransition",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"LevelProcedureName": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "procedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LevelsOfFlight": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "procedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "levelProcedureName",
+					"type": "LevelProcedureName",
+					"extension": false,
+					"index": 2
+				}
+			],
+			"extensible": false
+		},
+		"RouteAndLevels": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "routeOfFlight",
+					"type": "RouteInformation",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "levelsOfFlight",
+					"type": "LevelsOfFlight",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"FlightInformation": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "routeOfFlight",
+					"type": "RouteInformation",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "levelsOfFlight",
+					"type": "LevelsOfFlight",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "routeAndLevels",
+					"type": "RouteAndLevels",
+					"extension": false,
+					"index": 2
+				}
+			],
+			"extensible": false
+		},
+		"CodeOctalDigit": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 7,
+			"extensible": false
+		},
+		"Code": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "CodeOctalDigit",
+					"type": "CodeOctalDigit",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 4,
+			"maximum": 4
+		},
+		"FacilityDesignation": {
+			"kind": "restricted_character_string",
+			"minimum": 4,
+			"maximum": 8,
+			"extensible": false
+		},
+		"FacilityName": {
+			"kind": "restricted_character_string",
+			"minimum": 3,
+			"maximum": 18,
+			"extensible": false
+		},
+		"FacilityFunction": {
+			"kind": "enumerated",
+			"count": 9,
+			"extensible": true,
+			"enumeration": {
+				"0": "center",
+				"1": "approach",
+				"2": "tower",
+				"3": "final",
+				"4": "groundControl",
+				"5": "clearanceDelivery",
+				"6": "departure",
+				"7": "control",
+				"8": "radio"
+			}
+		},
+		"UnitName": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "facilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "facilityName",
+					"type": "FacilityName",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "facilityFunction",
+					"type": "FacilityFunction",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"Frequencyhf": {
+			"kind": "constrained_integer",
+			"minimum": 2850,
+			"maximum": 28000,
+			"extensible": false
+		},
+		"Frequencyvhf": {
+			"kind": "constrained_integer",
+			"minimum": 23600,
+			"maximum": 27398,
+			"extensible": false
+		},
+		"Frequencyuhf": {
+			"kind": "constrained_integer",
+			"minimum": 9000,
+			"maximum": 15999,
+			"extensible": false
+		},
+		"Frequencysatchannel": {
+			"kind": "NumericString",
+			"minimum": 12,
+			"maximum": 12,
+			"extensible": false
+		},
+		"Frequency": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "frequencyhf",
+					"type": "Frequencyhf",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "frequencyvhf",
+					"type": "Frequencyvhf",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "frequencyuhf",
+					"type": "Frequencyuhf",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "frequencysatchannel",
+					"type": "Frequencysatchannel",
+					"extension": false,
+					"index": 3
+				}
+			],
+			"extensible": false
+		},
+		"UnitNameFrequency": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "unitName",
+					"type": "UnitName",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "frequency",
+					"type": "Frequency",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeTolerance": {
+			"kind": "enumerated",
+			"count": 3,
+			"extensible": false,
+			"enumeration": {
+				"0": "at",
+				"1": "atorafter",
+				"2": "atorbefore"
+			}
+		},
+		"ControlledTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "timeTolerance",
+					"type": "TimeTolerance",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"DepartureMinimumInterval": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 150,
+			"extensible": false
+		},
+		"TimeDeparture": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "timeDepartureAllocated",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "timeDepartureControlled",
+					"type": "ControlledTime",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "timeDepartureClearanceExpected",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "departureMinimumInterval",
+					"type": "DepartureMinimumInterval",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"RunwayDirection": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 36,
+			"extensible": false
+		},
+		"RunwayConfiguration": {
+			"kind": "enumerated",
+			"count": 4,
+			"extensible": false,
+			"enumeration": {
+				"0": "left",
+				"1": "right",
+				"2": "center",
+				"3": "none"
+			}
+		},
+		"Runway": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "direction",
+					"type": "RunwayDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "configuration",
+					"type": "RunwayConfiguration",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"RevisionNumber": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 16,
+			"extensible": false
+		},
+		"ATISCode": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 1,
+			"extensible": false
+		},
+		"FurtherInstructions": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "code",
+					"type": "Code",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "frequencyDeparture",
+					"type": "UnitNameFrequency",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "clearanceExpiryTime",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "airportDeparture",
+					"type": "Airport",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "airportDestination",
+					"type": "Airport",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "timeDeparture",
+					"type": "TimeDeparture",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "runwayDeparture",
+					"type": "Runway",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "revisionNumber",
+					"type": "RevisionNumber",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "aTISCode",
+					"type": "ATISCode",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"DepartureClearance": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "aircraftFlightIdentification",
+					"type": "AircraftFlightIdentification",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "clearanceLimit",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "flightInformation",
+					"type": "FlightInformation",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "furtherInstructions",
+					"type": "FurtherInstructions",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"PositionPosition": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "Position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 2,
+			"maximum": 2
+		},
+		"RouteClearanceIndex": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 2,
+			"extensible": false
+		},
+		"PositionRouteClearanceIndex": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "routeClearanceIndex",
+					"type": "RouteClearanceIndex",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionProcedureName": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "procedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LegDistanceEnglish": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 50,
+			"extensible": false
+		},
+		"LegDistanceMetric": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 128,
+			"extensible": false
+		},
+		"LegDistance": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "legDistanceEnglish",
+					"type": "LegDistanceEnglish",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "legDistanceMetric",
+					"type": "LegDistanceMetric",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"LegTime": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 10,
+			"extensible": false
+		},
+		"LegType": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "legDistance",
+					"type": "LegDistance",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "legTime",
+					"type": "LegTime",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"HoldClearance": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "direction",
+					"type": "Direction",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "legType",
+					"type": "LegType",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"DirectionDegrees": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "direction",
+					"type": "Direction",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionDegrees": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeSpeedSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speedspeed",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionSpeedSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speeds",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LevelSpeedSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speeds",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"PositionUnitNameFrequency": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "unitname",
+					"type": "UnitName",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "frequency",
+					"type": "Frequency",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeUnitNameFrequency": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "unitName",
+					"type": "UnitName",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "frequency",
+					"type": "Frequency",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SpeedType": {
+			"kind": "enumerated",
+			"count": 9,
+			"extensible": true,
+			"enumeration": {
+				"0": "noneSpecified",
+				"1": "indicated",
+				"2": "true",
+				"3": "ground",
+				"4": "mach",
+				"5": "approach",
+				"6": "cruise",
+				"7": "minimum",
+				"8": "maximum"
+			}
+		},
+		"SpeedTypeSpeedTypeSpeedType": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "SpeedType",
+					"type": "SpeedType",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 3,
+			"maximum": 3
+		},
+		"AltimeterEnglish": {
+			"kind": "constrained_integer",
+			"minimum": 2200,
+			"maximum": 3200,
+			"extensible": false
+		},
+		"AltimeterMetric": {
+			"kind": "constrained_integer",
+			"minimum": 7500,
+			"maximum": 12500,
+			"extensible": false
+		},
+		"Altimeter": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "altimeterEnglish",
+					"type": "AltimeterEnglish",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "altimeterMetric",
+					"type": "AltimeterMetric",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"ErrorInformation": {
+			"kind": "enumerated",
+			"count": 5,
+			"extensible": true,
+			"enumeration": {
+				"0": "unrecognizedMsgReferenceNumber",
+				"1": "logicalAcknowledgmentNotAccepted",
+				"2": "insufficientResources",
+				"3": "invalidMessageElementCombination",
+				"4": "invalidMessageElement"
+			}
+		},
+		"Facility": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "noFacility",
+					"type": "NULL",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "facilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"TrafficType": {
+			"kind": "enumerated",
+			"count": 6,
+			"extensible": true,
+			"enumeration": {
+				"0": "noneSpecified",
+				"1": "oppositeDirection",
+				"2": "sameDirection",
+				"3": "converging",
+				"4": "crossing",
+				"5": "diverging"
+			}
+		},
+		"FreeText": {
+			"kind": "restricted_character_string",
+			"minimum": 1,
+			"maximum": 256,
+			"extensible": false
+		},
+		"VerticalRateEnglish": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 3000,
+			"extensible": false
+		},
+		"VerticalRateMetric": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 1000,
+			"extensible": false
+		},
+		"VerticalRate": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "verticalRateEnglish",
+					"type": "VerticalRateEnglish",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "verticalRateMetric",
+					"type": "VerticalRateMetric",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"ToFrom": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "to",
+				"1": "from"
+			}
+		},
+		"ToFromPosition": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "toFrom",
+					"type": "ToFrom",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"TimeToFromPosition": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "tofrom",
+					"type": "ToFrom",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"FacilityDesignationATISCode": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "facilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "aTISCode",
+					"type": "ATISCode",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"FacilityDesignationAltimeter": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "facilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "altimeter",
+					"type": "Altimeter",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"RVRFeet": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 6100,
+			"extensible": false
+		},
+		"RVRMeters": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 1500,
+			"extensible": false
+		},
+		"RVR": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "rVRFeet",
+					"type": "RVRFeet",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "rVRMeters",
+					"type": "RVRMeters",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"RunwayRVR": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "runway",
+					"type": "Runway",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "rVR",
+					"type": "RVR",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ATCUplinkMsgElementId": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "uM0NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "uM1NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "uM2NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "uM3NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "uM4NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 4
+				},
+				{
+					"name": "uM5NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 5
+				},
+				{
+					"name": "uM6Level",
+					"type": "Level",
+					"extension": false,
+					"index": 6
+				},
+				{
+					"name": "uM7Time",
+					"type": "Time",
+					"extension": false,
+					"index": 7
+				},
+				{
+					"name": "uM8Position",
+					"type": "Position",
+					"extension": false,
+					"index": 8
+				},
+				{
+					"name": "uM9Time",
+					"type": "Time",
+					"extension": false,
+					"index": 9
+				},
+				{
+					"name": "uM10Position",
+					"type": "Position",
+					"extension": false,
+					"index": 10
+				},
+				{
+					"name": "uM11Time",
+					"type": "Time",
+					"extension": false,
+					"index": 11
+				},
+				{
+					"name": "uM12Position",
+					"type": "Position",
+					"extension": false,
+					"index": 12
+				},
+				{
+					"name": "uM13TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 13
+				},
+				{
+					"name": "uM14PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 14
+				},
+				{
+					"name": "uM15TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 15
+				},
+				{
+					"name": "uM16PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 16
+				},
+				{
+					"name": "uM17TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 17
+				},
+				{
+					"name": "uM18PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 18
+				},
+				{
+					"name": "uM19Level",
+					"type": "Level",
+					"extension": false,
+					"index": 19
+				},
+				{
+					"name": "uM20Level",
+					"type": "Level",
+					"extension": false,
+					"index": 20
+				},
+				{
+					"name": "uM21TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 21
+				},
+				{
+					"name": "uM22PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 22
+				},
+				{
+					"name": "uM23Level",
+					"type": "Level",
+					"extension": false,
+					"index": 23
+				},
+				{
+					"name": "uM24TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 24
+				},
+				{
+					"name": "uM25PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 25
+				},
+				{
+					"name": "uM26LevelTime",
+					"type": "LevelTime",
+					"extension": false,
+					"index": 26
+				},
+				{
+					"name": "uM27LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 27
+				},
+				{
+					"name": "uM28LevelTime",
+					"type": "LevelTime",
+					"extension": false,
+					"index": 28
+				},
+				{
+					"name": "uM29LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 29
+				},
+				{
+					"name": "uM30LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 30
+				},
+				{
+					"name": "uM31LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 31
+				},
+				{
+					"name": "uM32LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 32
+				},
+				{
+					"name": "uM33NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 33
+				},
+				{
+					"name": "uM34Level",
+					"type": "Level",
+					"extension": false,
+					"index": 34
+				},
+				{
+					"name": "uM35Level",
+					"type": "Level",
+					"extension": false,
+					"index": 35
+				},
+				{
+					"name": "uM36Level",
+					"type": "Level",
+					"extension": false,
+					"index": 36
+				},
+				{
+					"name": "uM37Level",
+					"type": "Level",
+					"extension": false,
+					"index": 37
+				},
+				{
+					"name": "uM38Level",
+					"type": "Level",
+					"extension": false,
+					"index": 38
+				},
+				{
+					"name": "uM39Level",
+					"type": "Level",
+					"extension": false,
+					"index": 39
+				},
+				{
+					"name": "uM40NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 40
+				},
+				{
+					"name": "uM41NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 41
+				},
+				{
+					"name": "uM42PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 42
+				},
+				{
+					"name": "uM43PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 43
+				},
+				{
+					"name": "uM44PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 44
+				},
+				{
+					"name": "uM45PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 45
+				},
+				{
+					"name": "uM46PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 46
+				},
+				{
+					"name": "uM47PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 47
+				},
+				{
+					"name": "uM48PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 48
+				},
+				{
+					"name": "uM49PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 49
+				},
+				{
+					"name": "uM50PositionLevelLevel",
+					"type": "PositionLevelLevel",
+					"extension": false,
+					"index": 50
+				},
+				{
+					"name": "uM51PositionTime",
+					"type": "PositionTime",
+					"extension": false,
+					"index": 51
+				},
+				{
+					"name": "uM52PositionTime",
+					"type": "PositionTime",
+					"extension": false,
+					"index": 52
+				},
+				{
+					"name": "uM53PositionTime",
+					"type": "PositionTime",
+					"extension": false,
+					"index": 53
+				},
+				{
+					"name": "uM54PositionTimeTime",
+					"type": "PositionTimeTime",
+					"extension": false,
+					"index": 54
+				},
+				{
+					"name": "uM55PositionSpeed",
+					"type": "PositionSpeed",
+					"extension": false,
+					"index": 55
+				},
+				{
+					"name": "uM56PositionSpeed",
+					"type": "PositionSpeed",
+					"extension": false,
+					"index": 56
+				},
+				{
+					"name": "uM57PositionSpeed",
+					"type": "PositionSpeed",
+					"extension": false,
+					"index": 57
+				},
+				{
+					"name": "uM58PositionTimeLevel",
+					"type": "PositionTimeLevel",
+					"extension": false,
+					"index": 58
+				},
+				{
+					"name": "uM59PositionTimeLevel",
+					"type": "PositionTimeLevel",
+					"extension": false,
+					"index": 59
+				},
+				{
+					"name": "uM60PositionTimeLevel",
+					"type": "PositionTimeLevel",
+					"extension": false,
+					"index": 60
+				},
+				{
+					"name": "uM61PositionLevelSpeed",
+					"type": "PositionLevelSpeed",
+					"extension": false,
+					"index": 61
+				},
+				{
+					"name": "uM62TimePositionLevel",
+					"type": "TimePositionLevel",
+					"extension": false,
+					"index": 62
+				},
+				{
+					"name": "uM63TimePositionLevelSpeed",
+					"type": "TimePositionLevelSpeed",
+					"extension": false,
+					"index": 63
+				},
+				{
+					"name": "uM64DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 64
+				},
+				{
+					"name": "uM65PositionDistanceSpecifiedDirection",
+					"type": "PositionDistanceSpecifiedDirection",
+					"extension": false,
+					"index": 65
+				},
+				{
+					"name": "uM66TimeDistanceSpecifiedDirection",
+					"type": "TimeDistanceSpecifiedDirection",
+					"extension": false,
+					"index": 66
+				},
+				{
+					"name": "uM67NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 67
+				},
+				{
+					"name": "uM68Position",
+					"type": "Position",
+					"extension": false,
+					"index": 68
+				},
+				{
+					"name": "uM69Time",
+					"type": "Time",
+					"extension": false,
+					"index": 69
+				},
+				{
+					"name": "uM70Position",
+					"type": "Position",
+					"extension": false,
+					"index": 70
+				},
+				{
+					"name": "uM71Time",
+					"type": "Time",
+					"extension": false,
+					"index": 71
+				},
+				{
+					"name": "uM72NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 72
+				},
+				{
+					"name": "uM73DepartureClearance",
+					"type": "DepartureClearance",
+					"extension": false,
+					"index": 73
+				},
+				{
+					"name": "uM74Position",
+					"type": "Position",
+					"extension": false,
+					"index": 74
+				},
+				{
+					"name": "uM75Position",
+					"type": "Position",
+					"extension": false,
+					"index": 75
+				},
+				{
+					"name": "uM76TimePosition",
+					"type": "TimePosition",
+					"extension": false,
+					"index": 76
+				},
+				{
+					"name": "uM77PositionPosition",
+					"type": "PositionPosition",
+					"extension": false,
+					"index": 77
+				},
+				{
+					"name": "uM78LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 78
+				},
+				{
+					"name": "uM79PositionRouteClearance",
+					"type": "PositionRouteClearanceIndex",
+					"extension": false,
+					"index": 79
+				},
+				{
+					"name": "uM80RouteClearance",
+					"type": "RouteClearanceIndex",
+					"extension": false,
+					"index": 80
+				},
+				{
+					"name": "uM81ProcedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"index": 81
+				},
+				{
+					"name": "uM82DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 82
+				},
+				{
+					"name": "uM83PositionRouteClearance",
+					"type": "PositionRouteClearanceIndex",
+					"extension": false,
+					"index": 83
+				},
+				{
+					"name": "uM84PositionProcedureName",
+					"type": "PositionProcedureName",
+					"extension": false,
+					"index": 84
+				},
+				{
+					"name": "uM85RouteClearance",
+					"type": "RouteClearanceIndex",
+					"extension": false,
+					"index": 85
+				},
+				{
+					"name": "uM86PositionRouteClearance",
+					"type": "PositionRouteClearanceIndex",
+					"extension": false,
+					"index": 86
+				},
+				{
+					"name": "uM87Position",
+					"type": "Position",
+					"extension": false,
+					"index": 87
+				},
+				{
+					"name": "uM88PositionPosition",
+					"type": "PositionPosition",
+					"extension": false,
+					"index": 88
+				},
+				{
+					"name": "uM89TimePosition",
+					"type": "TimePosition",
+					"extension": false,
+					"index": 89
+				},
+				{
+					"name": "uM90LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 90
+				},
+				{
+					"name": "uM91HoldClearance",
+					"type": "HoldClearance",
+					"extension": false,
+					"index": 91
+				},
+				{
+					"name": "uM92PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 92
+				},
+				{
+					"name": "uM93Time",
+					"type": "Time",
+					"extension": false,
+					"index": 93
+				},
+				{
+					"name": "uM94DirectionDegrees",
+					"type": "DirectionDegrees",
+					"extension": false,
+					"index": 94
+				},
+				{
+					"name": "uM95DirectionDegrees",
+					"type": "DirectionDegrees",
+					"extension": false,
+					"index": 95
+				},
+				{
+					"name": "uM96NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 96
+				},
+				{
+					"name": "uM97PositionDegrees",
+					"type": "PositionDegrees",
+					"extension": false,
+					"index": 97
+				},
+				{
+					"name": "uM98DirectionDegrees",
+					"type": "DirectionDegrees",
+					"extension": false,
+					"index": 98
+				},
+				{
+					"name": "uM99ProcedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"index": 99
+				},
+				{
+					"name": "uM100TimeSpeed",
+					"type": "TimeSpeed",
+					"extension": false,
+					"index": 100
+				},
+				{
+					"name": "uM101PositionSpeed",
+					"type": "PositionSpeed",
+					"extension": false,
+					"index": 101
+				},
+				{
+					"name": "uM102LevelSpeed",
+					"type": "LevelSpeed",
+					"extension": false,
+					"index": 102
+				},
+				{
+					"name": "uM103TimeSpeedSpeed",
+					"type": "TimeSpeedSpeed",
+					"extension": false,
+					"index": 103
+				},
+				{
+					"name": "uM104PositionSpeedSpeed",
+					"type": "PositionSpeedSpeed",
+					"extension": false,
+					"index": 104
+				},
+				{
+					"name": "uM105LevelSpeedSpeed",
+					"type": "LevelSpeedSpeed",
+					"extension": false,
+					"index": 105
+				},
+				{
+					"name": "uM106Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 106
+				},
+				{
+					"name": "uM107NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 107
+				},
+				{
+					"name": "uM108Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 108
+				},
+				{
+					"name": "uM109Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 109
+				},
+				{
+					"name": "uM110SpeedSpeed",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"index": 110
+				},
+				{
+					"name": "uM111Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 111
+				},
+				{
+					"name": "uM112Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 112
+				},
+				{
+					"name": "uM113Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 113
+				},
+				{
+					"name": "uM114Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 114
+				},
+				{
+					"name": "uM115Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 115
+				},
+				{
+					"name": "uM116NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 116
+				},
+				{
+					"name": "uM117UnitNameFrequency",
+					"type": "UnitNameFrequency",
+					"extension": false,
+					"index": 117
+				},
+				{
+					"name": "uM118PositionUnitNameFrequency",
+					"type": "PositionUnitNameFrequency",
+					"extension": false,
+					"index": 118
+				},
+				{
+					"name": "uM119TimeUnitNameFrequency",
+					"type": "TimeUnitNameFrequency",
+					"extension": false,
+					"index": 119
+				},
+				{
+					"name": "uM120UnitNameFrequency",
+					"type": "UnitNameFrequency",
+					"extension": false,
+					"index": 120
+				},
+				{
+					"name": "uM121PositionUnitNameFrequency",
+					"type": "PositionUnitNameFrequency",
+					"extension": false,
+					"index": 121
+				},
+				{
+					"name": "uM122TimeUnitNameFrequency",
+					"type": "TimeUnitNameFrequency",
+					"extension": false,
+					"index": 122
+				},
+				{
+					"name": "uM123Code",
+					"type": "Code",
+					"extension": false,
+					"index": 123
+				},
+				{
+					"name": "uM124NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 124
+				},
+				{
+					"name": "uM125NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 125
+				},
+				{
+					"name": "uM126NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 126
+				},
+				{
+					"name": "uM127NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 127
+				},
+				{
+					"name": "uM128Level",
+					"type": "Level",
+					"extension": false,
+					"index": 128
+				},
+				{
+					"name": "uM129Level",
+					"type": "Level",
+					"extension": false,
+					"index": 129
+				},
+				{
+					"name": "uM130Position",
+					"type": "Position",
+					"extension": false,
+					"index": 130
+				},
+				{
+					"name": "uM131NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 131
+				},
+				{
+					"name": "uM132NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 132
+				},
+				{
+					"name": "uM133NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 133
+				},
+				{
+					"name": "uM134SpeedTypeSpeedTypeSpeedType",
+					"type": "SpeedTypeSpeedTypeSpeedType",
+					"extension": false,
+					"index": 134
+				},
+				{
+					"name": "uM135NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 135
+				},
+				{
+					"name": "uM136NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 136
+				},
+				{
+					"name": "uM137NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 137
+				},
+				{
+					"name": "uM138NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 138
+				},
+				{
+					"name": "uM139NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 139
+				},
+				{
+					"name": "uM140NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 140
+				},
+				{
+					"name": "uM141NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 141
+				},
+				{
+					"name": "uM142NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 142
+				},
+				{
+					"name": "uM143NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 143
+				},
+				{
+					"name": "uM144NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 144
+				},
+				{
+					"name": "uM145NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 145
+				},
+				{
+					"name": "uM146NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 146
+				},
+				{
+					"name": "uM147NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 147
+				},
+				{
+					"name": "uM148Level",
+					"type": "Level",
+					"extension": false,
+					"index": 148
+				},
+				{
+					"name": "uM149LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 149
+				},
+				{
+					"name": "uM150LevelTime",
+					"type": "LevelTime",
+					"extension": false,
+					"index": 150
+				},
+				{
+					"name": "uM151Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 151
+				},
+				{
+					"name": "uM152DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 152
+				},
+				{
+					"name": "uM153Altimeter",
+					"type": "Altimeter",
+					"extension": false,
+					"index": 153
+				},
+				{
+					"name": "uM154NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 154
+				},
+				{
+					"name": "uM155Position",
+					"type": "Position",
+					"extension": false,
+					"index": 155
+				},
+				{
+					"name": "uM156NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 156
+				},
+				{
+					"name": "uM157Frequency",
+					"type": "Frequency",
+					"extension": false,
+					"index": 157
+				},
+				{
+					"name": "uM158AtisCode",
+					"type": "ATISCode",
+					"extension": false,
+					"index": 158
+				},
+				{
+					"name": "uM159ErrorInformation",
+					"type": "ErrorInformation",
+					"extension": false,
+					"index": 159
+				},
+				{
+					"name": "uM160Facility",
+					"type": "Facility",
+					"extension": false,
+					"index": 160
+				},
+				{
+					"name": "uM161NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 161
+				},
+				{
+					"name": "uM162NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 162
+				},
+				{
+					"name": "uM163FacilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"index": 163
+				},
+				{
+					"name": "uM164NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 164
+				},
+				{
+					"name": "uM165NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 165
+				},
+				{
+					"name": "uM166TrafficType",
+					"type": "TrafficType",
+					"extension": false,
+					"index": 166
+				},
+				{
+					"name": "uM167NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 167
+				},
+				{
+					"name": "uM168NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 168
+				},
+				{
+					"name": "uM169FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 169
+				},
+				{
+					"name": "uM170FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 170
+				},
+				{
+					"name": "uM171VerticalRate",
+					"type": "VerticalRate",
+					"extension": false,
+					"index": 171
+				},
+				{
+					"name": "uM172VerticalRate",
+					"type": "VerticalRate",
+					"extension": false,
+					"index": 172
+				},
+				{
+					"name": "uM173VerticalRate",
+					"type": "VerticalRate",
+					"extension": false,
+					"index": 173
+				},
+				{
+					"name": "uM174VerticalRate",
+					"type": "VerticalRate",
+					"extension": false,
+					"index": 174
+				},
+				{
+					"name": "uM175Level",
+					"type": "Level",
+					"extension": false,
+					"index": 175
+				},
+				{
+					"name": "uM176NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 176
+				},
+				{
+					"name": "uM177NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 177
+				},
+				{
+					"name": "uM178NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 178
+				},
+				{
+					"name": "uM179NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 179
+				},
+				{
+					"name": "uM180LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 180
+				},
+				{
+					"name": "uM181ToFromPosition",
+					"type": "ToFromPosition",
+					"extension": false,
+					"index": 181
+				},
+				{
+					"name": "uM182NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 182
+				},
+				{
+					"name": "uM183FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 183
+				},
+				{
+					"name": "uM184TimeToFromPosition",
+					"type": "TimeToFromPosition",
+					"extension": false,
+					"index": 184
+				},
+				{
+					"name": "uM185PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 185
+				},
+				{
+					"name": "uM186PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 186
+				},
+				{
+					"name": "uM187FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 187
+				},
+				{
+					"name": "uM188PositionSpeed",
+					"type": "PositionSpeed",
+					"extension": false,
+					"index": 188
+				},
+				{
+					"name": "uM189Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 189
+				},
+				{
+					"name": "uM190Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 190
+				},
+				{
+					"name": "uM191NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 191
+				},
+				{
+					"name": "uM192LevelTime",
+					"type": "LevelTime",
+					"extension": false,
+					"index": 192
+				},
+				{
+					"name": "uM193NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 193
+				},
+				{
+					"name": "uM194FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 194
+				},
+				{
+					"name": "uM195FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 195
+				},
+				{
+					"name": "uM196FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 196
+				},
+				{
+					"name": "uM197FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 197
+				},
+				{
+					"name": "uM198FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 198
+				},
+				{
+					"name": "uM199FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 199
+				},
+				{
+					"name": "uM200NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 200
+				},
+				{
+					"name": "uM201NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 201
+				},
+				{
+					"name": "uM202NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 202
+				},
+				{
+					"name": "uM203FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 203
+				},
+				{
+					"name": "uM204FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 204
+				},
+				{
+					"name": "uM205FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 205
+				},
+				{
+					"name": "uM206FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 206
+				},
+				{
+					"name": "uM207FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 207
+				},
+				{
+					"name": "uM208FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 208
+				},
+				{
+					"name": "uM209LevelPosition",
+					"type": "LevelPosition",
+					"extension": false,
+					"index": 209
+				},
+				{
+					"name": "uM210Position",
+					"type": "Position",
+					"extension": false,
+					"index": 210
+				},
+				{
+					"name": "uM211NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 211
+				},
+				{
+					"name": "uM212FacilityDesignationATISCode",
+					"type": "FacilityDesignationATISCode",
+					"extension": false,
+					"index": 212
+				},
+				{
+					"name": "uM213FacilityDesignationAltimeter",
+					"type": "FacilityDesignationAltimeter",
+					"extension": false,
+					"index": 213
+				},
+				{
+					"name": "uM214RunwayRVR",
+					"type": "RunwayRVR",
+					"extension": false,
+					"index": 214
+				},
+				{
+					"name": "uM215DirectionDegrees",
+					"type": "DirectionDegrees",
+					"extension": false,
+					"index": 215
+				},
+				{
+					"name": "uM216NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 216
+				},
+				{
+					"name": "uM217NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 217
+				},
+				{
+					"name": "uM218NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 218
+				},
+				{
+					"name": "uM219Level",
+					"type": "Level",
+					"extension": false,
+					"index": 219
+				},
+				{
+					"name": "uM220Level",
+					"type": "Level",
+					"extension": false,
+					"index": 220
+				},
+				{
+					"name": "uM221Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 221
+				},
+				{
+					"name": "uM222NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 222
+				},
+				{
+					"name": "uM223NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 223
+				},
+				{
+					"name": "uM224NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 224
+				},
+				{
+					"name": "uM225NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 225
+				},
+				{
+					"name": "uM226Time",
+					"type": "Time",
+					"extension": false,
+					"index": 226
+				},
+				{
+					"name": "uM227NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 227
+				},
+				{
+					"name": "uM228Position",
+					"type": "Position",
+					"extension": false,
+					"index": 228
+				},
+				{
+					"name": "uM229NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 229
+				},
+				{
+					"name": "uM230NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 230
+				},
+				{
+					"name": "uM231NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 231
+				},
+				{
+					"name": "uM232NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 232
+				},
+				{
+					"name": "uM233NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 233
+				},
+				{
+					"name": "uM234NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 234
+				},
+				{
+					"name": "uM235NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 235
+				},
+				{
+					"name": "uM236NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 236
+				},
+				{
+					"name": "uM237NULL",
+					"type": "NULL",
+					"extension": true,
+					"index": 237
+				}
+			],
+			"extensible": true
+		},
+		"SEQUENCE_SIZE_1_5_OF_ATCUplinkMsgElementId": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "ATCUplinkMsgElementId",
+					"type": "ATCUplinkMsgElementId",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 5
+		},
+		"SEQUENCE_SIZE_1_128_OF_RouteInformation": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "RouteInformation",
+					"type": "RouteInformation",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 128
+		},
+		"ATWDistanceTolerance": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "plus",
+				"1": "minus"
+			}
+		},
+		"ATWDistance": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "atwDistanceTolerance",
+					"type": "ATWDistanceTolerance",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "distance",
+					"type": "Distance",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ATWLevelTolerance": {
+			"kind": "enumerated",
+			"count": 3,
+			"extensible": false,
+			"enumeration": {
+				"0": "at",
+				"1": "atorabove",
+				"2": "atorbelow"
+			}
+		},
+		"ATWLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "atw",
+					"type": "ATWLevelTolerance",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ATWLevelSequence": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "ATWLevel",
+					"type": "ATWLevel",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 2
+		},
+		"ATWAlongTrackWaypoint": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "aTWDistance",
+					"type": "ATWDistance",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "aTWLevels",
+					"type": "ATWLevelSequence",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_8_OF_ATWAlongTrackWaypoint": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "ATWAlongTrackWaypoint",
+					"type": "ATWAlongTrackWaypoint",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 8
+		},
+		"LatitudeReportingPoints": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latitudeDirection",
+					"type": "LatitudeDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "latitudeDegrees",
+					"type": "LatitudeDegrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LongitudeReportingPoints": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "longitudeDirection",
+					"type": "LongitudeDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "longitudeDegrees",
+					"type": "LongitudeDegrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"LatLonReportingPoints": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "latitudeReportingPoints",
+					"type": "LatitudeReportingPoints",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "longitudeReportingPoints",
+					"type": "LongitudeReportingPoints",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"DegreeIncrement": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 20,
+			"extensible": false
+		},
+		"ReportingPoints": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "latLonReportingPoints",
+					"type": "LatLonReportingPoints",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degreeIncrement",
+					"type": "DegreeIncrement",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"InterceptCourseFromSelection": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "publishedIdentifier",
+					"type": "PublishedIdentifier",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "latitudeLongitude",
+					"type": "LatitudeLongitude",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "placeBearingPlaceBearing",
+					"type": "PlaceBearingPlaceBearing",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "placeBearingDistance",
+					"type": "PlaceBearingDistance",
+					"extension": false,
+					"index": 3
+				}
+			],
+			"extensible": false
+		},
+		"InterceptCourseFrom": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "fromSelection",
+					"type": "InterceptCourseFromSelection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_4_OF_InterceptCourseFrom": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "InterceptCourseFrom",
+					"type": "InterceptCourseFrom",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 4
+		},
+		"Holdatwaypoint": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "holdatwaypointspeedlow",
+					"type": "Speed",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "aTWlevel",
+					"type": "ATWLevel",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "holdatwaypointspeedhigh",
+					"type": "Speed",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "direction",
+					"type": "Direction",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "degrees",
+					"type": "Degrees",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "eFCtime",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "legtype",
+					"type": "LegType",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_8_OF_Holdatwaypoint": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "Holdatwaypoint",
+					"type": "Holdatwaypoint",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 8
+		},
+		"WaypointSpeedLevel": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "aTWLevels",
+					"type": "ATWLevelSequence",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_32_OF_WaypointSpeedLevel": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "WaypointSpeedLevel",
+					"type": "WaypointSpeedLevel",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 32
+		},
+		"RTATime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "timeTolerance",
+					"type": "TimeTolerance",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"RTATolerance": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 150,
+			"extensible": false
+		},
+		"RTARequiredTimeArrival": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "rTATime",
+					"type": "RTATime",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "rTATolerance",
+					"type": "RTATolerance",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_32_OF_RTARequiredTimeArrival": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "RTARequiredTimeArrival",
+					"type": "RTARequiredTimeArrival",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 32
+		},
+		"RouteInformationAdditional": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "aTWAlongTrackWaypoints",
+					"type": "SEQUENCE_SIZE_1_8_OF_ATWAlongTrackWaypoint",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "reportingpoints",
+					"type": "ReportingPoints",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "interceptCourseFroms",
+					"type": "SEQUENCE_SIZE_1_4_OF_InterceptCourseFrom",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "holdAtWaypoints",
+					"type": "SEQUENCE_SIZE_1_8_OF_Holdatwaypoint",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "waypointSpeedLevels",
+					"type": "SEQUENCE_SIZE_1_32_OF_WaypointSpeedLevel",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "rTARequiredTimeArrivals",
+					"type": "SEQUENCE_SIZE_1_32_OF_RTARequiredTimeArrival",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"RouteClearance": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "airportDeparture",
+					"type": "Airport",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "airportDestination",
+					"type": "Airport",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "runwayDeparture",
+					"type": "Runway",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "procedureDeparture",
+					"type": "ProcedureName",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "runwayArrival",
+					"type": "Runway",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "procedureApproach",
+					"type": "ProcedureName",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "procedureArrival",
+					"type": "ProcedureName",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "routeInformations",
+					"type": "SEQUENCE_SIZE_1_128_OF_RouteInformation",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "routeInformationAdditional",
+					"type": "RouteInformationAdditional",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"SEQUENCE_SIZE_1_2_OF_RouteClearance": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "RouteClearance",
+					"type": "RouteClearance",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 2
+		},
+		"T_atcuplinkmessagedata_constraineddata": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "routeClearanceData",
+					"type": "SEQUENCE_SIZE_1_2_OF_RouteClearance",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": true
+		},
+		"ATCUplinkMessageData": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "elementIds",
+					"type": "SEQUENCE_SIZE_1_5_OF_ATCUplinkMsgElementId",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "constrainedData",
+					"type": "T_atcuplinkmessagedata_constraineddata",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"ATCUplinkMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "header",
+					"type": "ATCMessageHeader",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "messageData",
+					"type": "ATCUplinkMessageData",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"UplinkMessage": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "noMessage",
+					"type": "NULL",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "aTCUplinkMessage",
+					"type": "ATCUplinkMessage",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"AircraftAddress": {
+			"kind": "bit_string",
+			"minimum": 24,
+			"maximum": 24,
+			"extensible": false
+		},
+		"ForwardHeader": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "dateTime",
+					"type": "DateTimeGroup",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "aircraftID",
+					"type": "AircraftFlightIdentification",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "aircraftAddress",
+					"type": "AircraftAddress",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"BIT_STRING": {
+			"kind": "bit_string",
+			"minimum": null,
+			"maximum": null,
+			"extensible": false
+		},
+		"ForwardMessage": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "upElementIDs",
+					"type": "BIT_STRING",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "downElementIDs",
+					"type": "BIT_STRING",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"ATCForwardMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "forwardHeader",
+					"type": "ForwardHeader",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "forwardMessage",
+					"type": "ForwardMessage",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ATCForwardResponse": {
+			"kind": "enumerated",
+			"count": 3,
+			"extensible": true,
+			"enumeration": {
+				"0": "success",
+				"1": "service-not-supported",
+				"2": "version-not-equal"
+			}
+		},
+		"GroundPDUs": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "abortUser",
+					"type": "CPDLCUserAbortReason",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "abortProvider",
+					"type": "CPDLCProviderAbortReason",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "startup",
+					"type": "UplinkMessage",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "send",
+					"type": "ATCUplinkMessage",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "forward",
+					"type": "ATCForwardMessage",
+					"extension": false,
+					"index": 4
+				},
+				{
+					"name": "forwardresponse",
+					"type": "ATCForwardResponse",
+					"extension": false,
+					"index": 5
+				}
+			],
+			"extensible": true
+		},
+		"Mode": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "cpdlc",
+				"1": "dsc"
+			}
+		},
+		"ClearanceType": {
+			"kind": "enumerated",
+			"count": 12,
+			"extensible": true,
+			"enumeration": {
+				"0": "noneSpecified",
+				"1": "approach",
+				"2": "departure",
+				"3": "further",
+				"4": "start-up",
+				"5": "pushback",
+				"6": "taxi",
+				"7": "take-off",
+				"8": "landing",
+				"9": "oceanic",
+				"10": "en-route",
+				"11": "downstream"
+			}
+		},
+		"RemainingFuel": {
+			"kind": "alias",
+			"type": "Time"
+		},
+		"Temperature": {
+			"kind": "constrained_integer",
+			"minimum": -100,
+			"maximum": 100,
+			"extensible": false
+		},
+		"WindDirection": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 360,
+			"extensible": false
+		},
+		"WindSpeedEnglish": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 255,
+			"extensible": false
+		},
+		"WindSpeedMetric": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 511,
+			"extensible": false
+		},
+		"WindSpeed": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "windSpeedEnglish",
+					"type": "WindSpeedEnglish",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "windSpeedMetric",
+					"type": "WindSpeedMetric",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"Winds": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "direction",
+					"type": "WindDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "WindSpeed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"Turbulence": {
+			"kind": "enumerated",
+			"count": 3,
+			"extensible": false,
+			"enumeration": {
+				"0": "light",
+				"1": "moderate",
+				"2": "severe"
+			}
+		},
+		"Icing": {
+			"kind": "enumerated",
+			"count": 4,
+			"extensible": false,
+			"enumeration": {
+				"0": "reserved",
+				"1": "light",
+				"2": "moderate",
+				"3": "severe"
+			}
+		},
+		"VerticalDirection": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "up",
+				"1": "down"
+			}
+		},
+		"VerticalChange": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "direction",
+					"type": "VerticalDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "rate",
+					"type": "VerticalRate",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"Humidity": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 100,
+			"extensible": false
+		},
+		"PositionReport": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "positioncurrent",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "timeatpositioncurrent",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "level",
+					"type": "Level",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "fixnext",
+					"type": "Position",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "timeetaatfixnext",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "fixnextplusone",
+					"type": "Position",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "timeetaatdestination",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "remainingFuel",
+					"type": "RemainingFuel",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "temperature",
+					"type": "Temperature",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "winds",
+					"type": "Winds",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "turbulence",
+					"type": "Turbulence",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "icing",
+					"type": "Icing",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "speedground",
+					"type": "SpeedGround",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "verticalChange",
+					"type": "VerticalChange",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "trackAngle",
+					"type": "Degrees",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "heading",
+					"type": "Degrees",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "distance",
+					"type": "Distance",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "humidity",
+					"type": "Humidity",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "reportedWaypointPosition",
+					"type": "Position",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "reportedWaypointTime",
+					"type": "Time",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "reportedWaypointLevel",
+					"type": "Level",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"PersonsOnBoard": {
+			"kind": "constrained_integer",
+			"minimum": 1,
+			"maximum": 1024,
+			"extensible": false
+		},
+		"RemainingFuelPersonsOnBoard": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "remainingFuel",
+					"type": "RemainingFuel",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "personsOnBoard",
+					"type": "PersonsOnBoard",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"VersionNumber": {
+			"kind": "constrained_integer",
+			"minimum": 0,
+			"maximum": 15,
+			"extensible": false
+		},
+		"TimeDistanceToFromPosition": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "distance",
+					"type": "Distance",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "tofrom",
+					"type": "ToFrom",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "position",
+					"type": "Position",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SpeedTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"DistanceSpecifiedDirectionTime": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "distanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "time",
+					"type": "Time",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"SpeedTypeSpeedTypeSpeedTypeSpeed": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "speedTypes",
+					"type": "SpeedTypeSpeedTypeSpeedType",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "speed",
+					"type": "Speed",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ATCDownlinkMsgElementId": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "dM0NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "dM1NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "dM2NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "dM3NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "dM4NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 4
+				},
+				{
+					"name": "dM5NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 5
+				},
+				{
+					"name": "dM6Level",
+					"type": "Level",
+					"extension": false,
+					"index": 6
+				},
+				{
+					"name": "dM7LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 7
+				},
+				{
+					"name": "dM8Level",
+					"type": "Level",
+					"extension": false,
+					"index": 8
+				},
+				{
+					"name": "dM9Level",
+					"type": "Level",
+					"extension": false,
+					"index": 9
+				},
+				{
+					"name": "dM10Level",
+					"type": "Level",
+					"extension": false,
+					"index": 10
+				},
+				{
+					"name": "dM11PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 11
+				},
+				{
+					"name": "dM12PositionLevel",
+					"type": "PositionLevel",
+					"extension": false,
+					"index": 12
+				},
+				{
+					"name": "dM13TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 13
+				},
+				{
+					"name": "dM14TimeLevel",
+					"type": "TimeLevel",
+					"extension": false,
+					"index": 14
+				},
+				{
+					"name": "dM15DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 15
+				},
+				{
+					"name": "dM16PositionDistanceSpecifiedDirection",
+					"type": "PositionDistanceSpecifiedDirection",
+					"extension": false,
+					"index": 16
+				},
+				{
+					"name": "dM17TimeDistanceSpecifiedDirection",
+					"type": "TimeDistanceSpecifiedDirection",
+					"extension": false,
+					"index": 17
+				},
+				{
+					"name": "dM18Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 18
+				},
+				{
+					"name": "dM19SpeedSpeed",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"index": 19
+				},
+				{
+					"name": "dM20NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 20
+				},
+				{
+					"name": "dM21Frequency",
+					"type": "Frequency",
+					"extension": false,
+					"index": 21
+				},
+				{
+					"name": "dM22Position",
+					"type": "Position",
+					"extension": false,
+					"index": 22
+				},
+				{
+					"name": "dM23ProcedureName",
+					"type": "ProcedureName",
+					"extension": false,
+					"index": 23
+				},
+				{
+					"name": "dM24RouteClearance",
+					"type": "RouteClearanceIndex",
+					"extension": false,
+					"index": 24
+				},
+				{
+					"name": "dM25ClearanceType",
+					"type": "ClearanceType",
+					"extension": false,
+					"index": 25
+				},
+				{
+					"name": "dM26PositionRouteClearance",
+					"type": "PositionRouteClearanceIndex",
+					"extension": false,
+					"index": 26
+				},
+				{
+					"name": "dM27DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 27
+				},
+				{
+					"name": "dM28Level",
+					"type": "Level",
+					"extension": false,
+					"index": 28
+				},
+				{
+					"name": "dM29Level",
+					"type": "Level",
+					"extension": false,
+					"index": 29
+				},
+				{
+					"name": "dM30Level",
+					"type": "Level",
+					"extension": false,
+					"index": 30
+				},
+				{
+					"name": "dM31Position",
+					"type": "Position",
+					"extension": false,
+					"index": 31
+				},
+				{
+					"name": "dM32Level",
+					"type": "Level",
+					"extension": false,
+					"index": 32
+				},
+				{
+					"name": "dM33Position",
+					"type": "Position",
+					"extension": false,
+					"index": 33
+				},
+				{
+					"name": "dM34Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 34
+				},
+				{
+					"name": "dM35Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 35
+				},
+				{
+					"name": "dM36Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 36
+				},
+				{
+					"name": "dM37Level",
+					"type": "Level",
+					"extension": false,
+					"index": 37
+				},
+				{
+					"name": "dM38Level",
+					"type": "Level",
+					"extension": false,
+					"index": 38
+				},
+				{
+					"name": "dM39Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 39
+				},
+				{
+					"name": "dM40RouteClearance",
+					"type": "RouteClearanceIndex",
+					"extension": false,
+					"index": 40
+				},
+				{
+					"name": "dM41NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 41
+				},
+				{
+					"name": "dM42Position",
+					"type": "Position",
+					"extension": false,
+					"index": 42
+				},
+				{
+					"name": "dM43Time",
+					"type": "Time",
+					"extension": false,
+					"index": 43
+				},
+				{
+					"name": "dM44Position",
+					"type": "Position",
+					"extension": false,
+					"index": 44
+				},
+				{
+					"name": "dM45Position",
+					"type": "Position",
+					"extension": false,
+					"index": 45
+				},
+				{
+					"name": "dM46Time",
+					"type": "Time",
+					"extension": false,
+					"index": 46
+				},
+				{
+					"name": "dM47Code",
+					"type": "Code",
+					"extension": false,
+					"index": 47
+				},
+				{
+					"name": "dM48PositionReport",
+					"type": "PositionReport",
+					"extension": false,
+					"index": 48
+				},
+				{
+					"name": "dM49Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 49
+				},
+				{
+					"name": "dM50SpeedSpeed",
+					"type": "SpeedSpeed",
+					"extension": false,
+					"index": 50
+				},
+				{
+					"name": "dM51NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 51
+				},
+				{
+					"name": "dM52NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 52
+				},
+				{
+					"name": "dM53NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 53
+				},
+				{
+					"name": "dM54Level",
+					"type": "Level",
+					"extension": false,
+					"index": 54
+				},
+				{
+					"name": "dM55NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 55
+				},
+				{
+					"name": "dM56NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 56
+				},
+				{
+					"name": "dM57RemainingFuelPersonsOnBoard",
+					"type": "RemainingFuelPersonsOnBoard",
+					"extension": false,
+					"index": 57
+				},
+				{
+					"name": "dM58NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 58
+				},
+				{
+					"name": "dM59PositionRouteClearance",
+					"type": "PositionRouteClearanceIndex",
+					"extension": false,
+					"index": 59
+				},
+				{
+					"name": "dM60DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 60
+				},
+				{
+					"name": "dM61Level",
+					"type": "Level",
+					"extension": false,
+					"index": 61
+				},
+				{
+					"name": "dM62ErrorInformation",
+					"type": "ErrorInformation",
+					"extension": false,
+					"index": 62
+				},
+				{
+					"name": "dM63NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 63
+				},
+				{
+					"name": "dM64FacilityDesignation",
+					"type": "FacilityDesignation",
+					"extension": false,
+					"index": 64
+				},
+				{
+					"name": "dM65NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 65
+				},
+				{
+					"name": "dM66NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 66
+				},
+				{
+					"name": "dM67FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 67
+				},
+				{
+					"name": "dM68FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 68
+				},
+				{
+					"name": "dM69NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 69
+				},
+				{
+					"name": "dM70Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 70
+				},
+				{
+					"name": "dM71Degrees",
+					"type": "Degrees",
+					"extension": false,
+					"index": 71
+				},
+				{
+					"name": "dM72Level",
+					"type": "Level",
+					"extension": false,
+					"index": 72
+				},
+				{
+					"name": "dM73Versionnumber",
+					"type": "VersionNumber",
+					"extension": false,
+					"index": 73
+				},
+				{
+					"name": "dM74NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 74
+				},
+				{
+					"name": "dM75NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 75
+				},
+				{
+					"name": "dM76LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 76
+				},
+				{
+					"name": "dM77LevelLevel",
+					"type": "LevelLevel",
+					"extension": false,
+					"index": 77
+				},
+				{
+					"name": "dM78TimeDistanceToFromPosition",
+					"type": "TimeDistanceToFromPosition",
+					"extension": false,
+					"index": 78
+				},
+				{
+					"name": "dM79AtisCode",
+					"type": "ATISCode",
+					"extension": false,
+					"index": 79
+				},
+				{
+					"name": "dM80DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 80
+				},
+				{
+					"name": "dM81LevelTime",
+					"type": "LevelTime",
+					"extension": false,
+					"index": 81
+				},
+				{
+					"name": "dM82Level",
+					"type": "Level",
+					"extension": false,
+					"index": 82
+				},
+				{
+					"name": "dM83SpeedTime",
+					"type": "SpeedTime",
+					"extension": false,
+					"index": 83
+				},
+				{
+					"name": "dM84Speed",
+					"type": "Speed",
+					"extension": false,
+					"index": 84
+				},
+				{
+					"name": "dM85DistanceSpecifiedDirectionTime",
+					"type": "DistanceSpecifiedDirectionTime",
+					"extension": false,
+					"index": 85
+				},
+				{
+					"name": "dM86DistanceSpecifiedDirection",
+					"type": "DistanceSpecifiedDirection",
+					"extension": false,
+					"index": 86
+				},
+				{
+					"name": "dM87Level",
+					"type": "Level",
+					"extension": false,
+					"index": 87
+				},
+				{
+					"name": "dM88Level",
+					"type": "Level",
+					"extension": false,
+					"index": 88
+				},
+				{
+					"name": "dM89UnitnameFrequency",
+					"type": "UnitNameFrequency",
+					"extension": false,
+					"index": 89
+				},
+				{
+					"name": "dM90FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 90
+				},
+				{
+					"name": "dM91FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 91
+				},
+				{
+					"name": "dM92FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 92
+				},
+				{
+					"name": "dM93FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 93
+				},
+				{
+					"name": "dM94FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 94
+				},
+				{
+					"name": "dM95FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 95
+				},
+				{
+					"name": "dM96FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 96
+				},
+				{
+					"name": "dM97FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 97
+				},
+				{
+					"name": "dM98FreeText",
+					"type": "FreeText",
+					"extension": false,
+					"index": 98
+				},
+				{
+					"name": "dM99NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 99
+				},
+				{
+					"name": "dM100NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 100
+				},
+				{
+					"name": "dM101NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 101
+				},
+				{
+					"name": "dM102NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 102
+				},
+				{
+					"name": "dM103NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 103
+				},
+				{
+					"name": "dM104PositionTime",
+					"type": "PositionTime",
+					"extension": false,
+					"index": 104
+				},
+				{
+					"name": "dM105Airport",
+					"type": "Airport",
+					"extension": false,
+					"index": 105
+				},
+				{
+					"name": "dM106Level",
+					"type": "Level",
+					"extension": false,
+					"index": 106
+				},
+				{
+					"name": "dM107NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 107
+				},
+				{
+					"name": "dM108NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 108
+				},
+				{
+					"name": "dM109Time",
+					"type": "Time",
+					"extension": false,
+					"index": 109
+				},
+				{
+					"name": "dM110Position",
+					"type": "Position",
+					"extension": false,
+					"index": 110
+				},
+				{
+					"name": "dM111TimePosition",
+					"type": "TimePosition",
+					"extension": false,
+					"index": 111
+				},
+				{
+					"name": "dM112NULL",
+					"type": "NULL",
+					"extension": false,
+					"index": 112
+				},
+				{
+					"name": "dM113SpeedTypeSpeedTypeSpeedTypeSpeed",
+					"type": "SpeedTypeSpeedTypeSpeedTypeSpeed",
+					"extension": false,
+					"index": 113
+				}
+			],
+			"extensible": true
+		},
+		"SEQUENCE_SIZE_1_5_OF_ATCDownlinkMsgElementId": {
+			"kind": "constrained_sequence_of",
+			"members": [
+				{
+					"name": "ATCDownlinkMsgElementId",
+					"type": "ATCDownlinkMsgElementId",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false,
+			"minimum": 1,
+			"maximum": 5
+		},
+		"T_atcdownlinkmessagedata_constraineddata": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "routeClearanceData",
+					"type": "SEQUENCE_SIZE_1_2_OF_RouteClearance",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": true
+		},
+		"ATCDownlinkMessageData": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "elementIds",
+					"type": "SEQUENCE_SIZE_1_5_OF_ATCDownlinkMsgElementId",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "constrainedData",
+					"type": "T_atcdownlinkmessagedata_constraineddata",
+					"extension": false,
+					"optional": true
+				}
+			],
+			"extensible": false
+		},
+		"ATCDownlinkMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "header",
+					"type": "ATCMessageHeader",
+					"extension": false,
+					"optional": false
+				},
+				{
+					"name": "messageData",
+					"type": "ATCDownlinkMessageData",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"DownlinkMessage": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "noMessage",
+					"type": "NULL",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "aTCDownlinkMessage",
+					"type": "ATCDownlinkMessage",
+					"extension": false,
+					"index": 1
+				}
+			],
+			"extensible": false
+		},
+		"StartDownMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "mode",
+					"type": "Mode",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "startDownlinkMessage",
+					"type": "DownlinkMessage",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"AircraftPDUs": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "abortUser",
+					"type": "CPDLCUserAbortReason",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "abortProvider",
+					"type": "CPDLCProviderAbortReason",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "startdown",
+					"type": "StartDownMessage",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "send",
+					"type": "ATCDownlinkMessage",
+					"extension": false,
+					"index": 3
+				}
+			],
+			"extensible": true
+		},
+		"PMCPDLCUserAbortReason": {
+			"kind": "enumerated",
+			"count": 13,
+			"extensible": true,
+			"enumeration": {
+				"0": "undefined",
+				"1": "no-message-identification-numbers-available",
+				"2": "duplicate-message-identification-numbers",
+				"3": "no-longer-next-data-authority",
+				"4": "current-data-authority-abort",
+				"5": "commanded-termination",
+				"6": "invalid-response",
+				"7": "time-out-of-synchronisation",
+				"8": "unknown-integrity-check",
+				"9": "validation-failure",
+				"10": "unable-to-decode-message",
+				"11": "invalid-pdu",
+				"12": "invalid-CPDLC-message"
+			}
+		},
+		"PMCPDLCProviderAbortReason": {
+			"kind": "enumerated",
+			"count": 8,
+			"extensible": true,
+			"enumeration": {
+				"0": "timer-expired",
+				"1": "undefined-error",
+				"2": "invalid-PDU",
+				"3": "protocol-error",
+				"4": "communication-service-error",
+				"5": "communication-service-failure",
+				"6": "invalid-QOS-parameter",
+				"7": "expected-PDU-missing"
+			}
+		},
+		"AlgorithmIdentifier": {
+			"kind": "relative-oid"
+		},
+		"CPDLCMessage": {
+			"kind": "bit_string",
+			"minimum": null,
+			"maximum": null,
+			"extensible": false
+		},
+		"ProtectedUplinkMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "algorithmIdentifier",
+					"type": "AlgorithmIdentifier",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "protectedMessage",
+					"type": "CPDLCMessage",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "integrityCheck",
+					"type": "BIT_STRING",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": true
+		},
+		"ProtectedGroundPDUs": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "abortUser",
+					"type": "PMCPDLCUserAbortReason",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "abortProvider",
+					"type": "PMCPDLCProviderAbortReason",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "startup",
+					"type": "ProtectedUplinkMessage",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "startup",
+					"type": "ProtectedUplinkMessage",
+					"extension": false,
+					"index": 3
+				},
+				{
+					"name": "forward",
+					"type": "ATCForwardMessage",
+					"extension": false,
+					"index": 4
+				},
+				{
+					"name": "forwardresponse",
+					"type": "ATCForwardResponse",
+					"extension": false,
+					"index": 5
+				}
+			],
+			"extensible": true
+		},
+		"ProtectedMode": {
+			"kind": "enumerated",
+			"count": 2,
+			"extensible": false,
+			"enumeration": {
+				"0": "cpdlc",
+				"1": "dsc"
+			}
+		},
+		"ProtectedDownlinkMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "algorithmIdentifier",
+					"type": "AlgorithmIdentifier",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "protectedMessage",
+					"type": "CPDLCMessage",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "integrityCheck",
+					"type": "BIT_STRING",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": true
+		},
+		"ProtectedStartDownMessage": {
+			"kind": "sequence",
+			"members": [
+				{
+					"name": "mode",
+					"type": "ProtectedMode",
+					"extension": false,
+					"optional": true
+				},
+				{
+					"name": "startDownlinkMessage",
+					"type": "ProtectedDownlinkMessage",
+					"extension": false,
+					"optional": false
+				}
+			],
+			"extensible": false
+		},
+		"ProtectedAircraftPDUs": {
+			"kind": "choice",
+			"members": [
+				{
+					"name": "abortUser",
+					"type": "PMCPDLCUserAbortReason",
+					"extension": false,
+					"index": 0
+				},
+				{
+					"name": "abortProvider",
+					"type": "PMCPDLCProviderAbortReason",
+					"extension": false,
+					"index": 1
+				},
+				{
+					"name": "startdown",
+					"type": "ProtectedStartDownMessage",
+					"extension": false,
+					"index": 2
+				},
+				{
+					"name": "send",
+					"type": "ProtectedDownlinkMessage",
+					"extension": false,
+					"index": 3
+				}
+			],
+			"extensible": true
+		}
+	}
+}

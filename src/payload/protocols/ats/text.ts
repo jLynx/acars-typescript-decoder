@@ -84,7 +84,7 @@ export function interpretAfn(message: AcarsRecord): AcarsInterpretation | undefi
 }
 
 export function interpretAtis(message: AcarsRecord): AcarsInterpretation | undefined {
-	if (message.label === 'B9' && message.direction === 'downlink') return atisRequest(message);
+	if (['B9', 'H1', '5Z'].includes(message.label) && message.direction === 'downlink') return atisRequest(message);
 	if (message.label === 'A9' && message.direction === 'uplink') return atisDelivery(message);
 }
 
@@ -94,7 +94,8 @@ function atisRequest(message: AcarsRecord): AcarsInterpretation | undefined {
 	);
 	if (!match || match[1] !== match[3]) return;
 	const [, airport, offset, , currentAtis, checksum] = match;
-	return result(
+	const prefix = message.text.trim().split('/')[0];
+	const interpretation = result(
 		{
 			protocol: 'TI2',
 			variant: 'AtisRequest',
@@ -112,6 +113,12 @@ function atisRequest(message: AcarsRecord): AcarsInterpretation | undefined {
 			{ label: 'Application checksum', value: `${checksum} · Unverified` },
 		],
 	);
+	if (['H1', '5Z'].includes(message.label)) interpretation.title = 'ATIS Subscription';
+	if (prefix) {
+		interpretation.application!.values.prefix = prefix;
+		interpretation.fields.unshift({ label: 'Message prefix (raw)', value: prefix });
+	}
+	return interpretation;
 }
 
 function atisDelivery(message: AcarsRecord): AcarsInterpretation | undefined {

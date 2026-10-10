@@ -317,3 +317,81 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Python-Metar core weather token layouts and scales
+https://github.com/python-metar/python-metar
+Revision 281fb19e4f8870074844cba5e4b390a1f5fe7c6e
+Adapted metar/Metar.py in src/payload/protocols/text/metar.
+The source header names BSD-2-Clause; the repository LICENSE contains the
+following single redistribution condition, reproduced verbatim:
+
+Copyright (c) 2004-2018, Tom Pollard
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+Wireshark ATN ULCS short headers and presentation layouts
+https://github.com/wireshark/wireshark
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-ulcs/packet-atn-ulcs-template.c and
+atn-ulcs.asn in src/payload/protocols/atn.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.
+
+dumpvdl2 B2 CPDLC and ADS-C v2 data-only descriptors
+https://github.com/szpajder/dumpvdl2
+Revision 686e87f2294ef6275855ba7364bd4bb9a0f8f56a
+src/asn1 generated CPDLCMessageSetVersion2BCVersion1, ADSMessageSetVersion2,
+PMCPDLCAPDUsVersion1, PMADSCAPDUVersion1 and ATNCommonTypes tables extracted
+without execution by scripts/upstream/atn-b2-schema.py into
+src/payload/protocols/atn/b2/schema.json. Generated source headers identify
+asn1c-0.9.28 and the original ASN.1 module names. No C runtime copied or executed.
+GPL-3.0-or-later; the dumpvdl2 notice reproduced above and LICENSE apply.
+The bounded TypeScript reader and independent/conformance fixtures are locally authored.
+
+FANS data-only ASN.1 schema descriptors
+MIT libacars revision 9af09a0121d4ec577339cbd4c7420d7519da48fa
+213 libacars/asn1/FANS*.c descriptors extracted without executing upstream code
+into src/payload/protocols/cpdlc/schema.json by scripts/upstream/fans-schema.py.
+The libacars copyright and MIT permission notice reproduced above apply.
+The bounded generic UPER reader and synthetic conformance encoder are locally authored.
+
+Wireshark ATN ACSE and CMMessageSetVersion1 layouts
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-ulcs/atn-ulcs.asn and atn-cm/atn-cm.asn
+in src/payload/protocols/atn/acse*.ts and cm*.ts.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.
+
+Wireshark ATN CPDLC version 1 data-only schemas
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-cpdlc/atn-cpdlc.asn and generated
+epan/dissectors/packet-atn-cpdlc.c into src/payload/protocols/atn/cpdlc-schema.json.
+Extracted by locally authored scripts/upstream/atn-schema.py without execution.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.

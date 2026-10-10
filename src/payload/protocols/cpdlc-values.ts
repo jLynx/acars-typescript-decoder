@@ -23,7 +23,8 @@ export function speed(bits: Bits): string {
 	const choice = bits.read(3);
 	const widths = [5, 7, 6, 7, 6, 8, 5, 9];
 	const minima = [7, 10, 7, 10, 7, 10, 61, 93];
-	const value = bits.read(widths[choice]) + minima[choice];
+	const maxima = [38, 137, 70, 137, 70, 265, 92, 604];
+	const value = bits.constrained(widths[choice], minima[choice], maxima[choice]);
 	if (choice >= 6) return `Mach ${(value / 100).toFixed(2)}`;
 	return `${value * 10} ${choice % 2 ? 'km/h' : 'kt'} (${['IAS', 'IAS', 'TAS', 'TAS', 'ground', 'ground'][choice]})`;
 }
@@ -105,8 +106,8 @@ export function unit(bits: Bits): string {
 export function procedure(bits: Bits): string {
 	const transition = bits.read(1);
 	const type = ['arrival', 'approach', 'departure'][bits.constrained(2, 0, 2)];
-	const name = bits.text(bits.read(3) + 1, true);
-	return `${type} ${name}${transition ? ` transition ${bits.text(bits.read(3) + 1, true)}` : ''}`;
+	const name = bits.text(bits.constrained(3, 1, 6), true);
+	return `${type} ${name}${transition ? ` transition ${bits.text(bits.constrained(3, 1, 5), true)}` : ''}`;
 }
 
 export function altimeter(bits: Bits): string {

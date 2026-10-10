@@ -7,6 +7,16 @@ bodies are in `test/payload/protocols/reports/capture-variants.spec.js` and
 `parameters.spec.js`; RTR XML tests are in `rtr.spec.js`. The original captures are
 private and excluded from packages.
 
+The 11 October priority 1 audit inspected the pinned datalink Boeing/application
+tree, libacars application readers, Skyshark tree, Airframes definitions/research
+trees and Ibosoft entry points. These inspected portions have not established
+usable encoded T5/TOF or T6 measurement definitions. Their byte/code mappings,
+scales, units and report-version rules remain outstanding; no numeric body is
+promoted to decoded based on a plausible value or header. Research-only revisions
+are recorded in `docs/upstreams.json`; no new source/fixtures from those research
+repositories are distributed. This is a targeted audit, not proof that no public
+documentation exists.
+
 | Layout                                                                                 | Current extraction                                                                              | Unverified content                                                             |
 | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `<id>AER9` followed by aircraft/flight, two six-digit codes and adjacent ICAO airports | Report ID/code, registration, flight code, route, raw date/time codes                           | Remaining header and numeric body                                              |

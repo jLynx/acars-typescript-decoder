@@ -71,9 +71,9 @@ describe('combined ACARS binary payload decoders', () => {
 		expect(field(result, 'Application CRC')).toContain('Failed');
 		expect(field(result, 'Latitude')).toBeUndefined();
 	});
-	it('rejects truncated tags, invalid coordinates and missing interval markers', () => {
+	it('rejects truncated tags and invalid coordinates while accepting contracts without interval groups', () => {
 		expect(() => decodeAdsc(hexBytes('0701'), 'downlink')).toThrow();
-		expect(() => decodeAdsc(hexBytes('07010D01'), 'uplink')).toThrow();
+		expect(decodeAdsc(hexBytes('07010D01'), 'uplink')).toMatchObject({ complete: false });
 		expect(() => decodeAdsc(hexBytes('077FFFF8000000000000'), 'downlink')).toThrow();
 	});
 	it('retains decoded tags before unsupported data, without inventing a length', () => {

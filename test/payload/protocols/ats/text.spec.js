@@ -41,7 +41,7 @@ describe('ATS text application ports from pinned MIT datalink', () => {
 		['/ZHHH.TI2/040ZHHHD9F98', 'ZHHH', 'D', 40, '9F98'],
 	])('ports upstream B9 test %s', (text, airport, currentAtis, offset, checksum) => {
 		const result = parse('B9', text);
-		expect(result.application.values).toEqual({ airport, currentAtis, offset });
+		expect(result.application.values).toMatchObject({ airport, currentAtis, offset });
 		expect(result.application.integrity.checksum).toBe(checksum);
 		expect(result.coverage).toBe('partial');
 	});
@@ -56,6 +56,23 @@ describe('ATS text application ports from pinned MIT datalink', () => {
 	});
 	it('does not apply B9 downlink requests to uplinks', () => {
 		expect(parse('B9', '/EHAM.TI2/000EHAMA0E3C', 'uplink').application).toBeUndefined();
+	});
+	it.each([
+		['H1', 'L95AQF0073/KSFO.TI2/030KSFOAFF5C', 'KSFO', 30, 'A', 'FF5C'],
+		['H1', 'L01AMC5477/OERK.TI2/024OERKC8781', 'OERK', 24, 'C', '8781'],
+		['H1', 'L11AMC5477/LICC.TI2/024LICCAFBD9', 'LICC', 24, 'A', 'FBD9'],
+		['5Z', 'L95AQF0073/KSFO.TI2/030KSFOAFF5C', 'KSFO', 30, 'A', 'FF5C'],
+	])('types documented %s TI2 request %s', (label, text, airport, offset, currentAtis, checksum) => {
+		const result = parse(label, text);
+		expect(result.application.values).toMatchObject({ airport, offset, currentAtis });
+		expect(result.application.integrity).toEqual({ status: 'unverified', checksum });
+		expect(result.application.raw).toBe(text);
+		expect(result.coverage).toBe('partial');
+		expect(parse(label, text, 'uplink').application).toBeUndefined();
+	});
+	it.each(['H1', '5Z'])('rejects mismatched, malformed and trailing data in %s requests', (label) => {
+		for (const text of ['/KSFO.TI2/030NZAAAFF5C', '/KSFO.TI2/030KSFO1FF5C', '/KSFO.TI2/030KSFOAFF5Cjunk'])
+			expect(parse(label, text).application).toBeUndefined();
 	});
 	it('ports the A9 payload expectations without stripping weather tokens as checksums', () => {
 		const text = '/JEDATYA.TI2/OEMA ARR ATIS S\n1500Z WIND 220/11KT\nQNH 1009HPA\n40A4';

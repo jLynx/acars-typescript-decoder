@@ -1,6 +1,6 @@
 // FANSPredepartureClearance optional bitmap and members from MIT libacars.
 import type { Bits } from '@/payload/protocols/bits';
-import { altitude, beacon, frequency, time } from '@/payload/protocols/cpdlc-values';
+import { altitude, beacon, time } from '@/payload/protocols/cpdlc-values';
 import { routeClearance } from './route';
 
 const equipment = [
@@ -50,7 +50,7 @@ export function predepartureClearance(bits: Bits): string {
 	parts.push(`EDCT ${time(bits)}`, routeClearance(bits));
 	if (restriction) parts.push(`altitude restriction ${altitude(bits)}`);
 	parts.push(
-		`departure frequency ${frequency(bits)}`,
+		`departure frequency ${(bits.constrained(15, 117000, 138000) / 1000).toFixed(3)} MHz`,
 		`squawk ${beacon(bits)}`,
 		`revision ${bits.constrained(4, 1, 16)}`,
 	);

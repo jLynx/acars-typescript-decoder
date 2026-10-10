@@ -18,6 +18,13 @@ summary. Completed portions of the audited work are now implemented locally:
 - FANS rates/fuel/souls, constructed positions/tracks, holding legs, predeparture
   and all six additional route structures; corrected magnetic/true degree ordering.
 - AFN and TI2/OC1 text fields, with application integrity explicitly unverified.
+- 11 October priority 1: FANS ADS-C request-group ordering, optional structural
+  parsing without invented intervals, signed vertical-threshold comparisons,
+  NACK reason/extensions, DIS high-nibble reasons and flight-ID validation.
+  Interval-less periodic requests stay partial: pinned libacars retains them
+  structurally, while datalink rejects them. Forty-eight independent synthetic
+  regressions cover values, boundaries, CRC gating and H1 assembly. This does
+  not complete every FANS variant or provide T5/T6 measurement definitions.
 - MIAM negotiation/CF controls/files and verified embedded dispatch, including H1.
 - OHMA conversation assembly, conflict rejection and bounded source sessions.
 - Uplink radio assembly, structured statuses and snapshots for late completions.
@@ -208,3 +215,88 @@ Repository searches also located additional Go, Python, Rust and C++ projects.
 Many primarily provide demodulation, wrappers or receiver viewers; some lack
 an identified license. They require file-level review before they can be called
 new application-decoder sources. This audit did not port or execute their code.
+
+## Priority 1 weather and envelope audit (11 October 2026)
+
+Python-Metar revision `281fb19e4f8870074844cba5e4b390a1f5fe7c6e` supplies core
+METAR token layouts and named scales. Its LICENSE contains a BSD redistribution
+notice with one condition; the source header calls it BSD-2-Clause. The full exact
+notice is retained rather than silently treating those texts as identical. The port
+requires explicit wind units and validates clocks; missing/unknown values and trend
+or remark suffixes are retained. Independent tests verify values through public APIs,
+SA bundles and radio assembly.
+
+Pinned Wireshark Doc9705 Ed2 ULCS definitions establish one extensible presentation
+list with context IDs 1..127 and excluded transfer-syntax/encoding alternatives.
+The Rust adapter represents the list's leading extension bit as an optional spare
+and tries both CPDLC directions without protected integrity verification. The new
+reader follows the ASN.1 definition, retains extensions and requires explicit mode;
+it does not adopt application inference or claim protected-message coverage.
+
+The FANS schema audit confirmed procedure lengths 1..6 and transition lengths 1..5.
+The older reader permitted up to eight characters. Those unused codepoints are now
+rejected and malformed instructions remain partial even with a verified CRC. Speed
+constraints cover all eight alternatives; all representable speed codepoints happen
+to be valid in this schema, so there are no fabricated unused speed-value tests.
+
+The data-only extractor `scripts/upstream/fans-schema.py` reads 213 pinned libacars
+FANS C descriptors without executing upstream code. A bounded local UPER reader
+preserves constrained values, optional members, aliases, enum/choice names and bit
+spans. Conformance fixtures exercise every descriptor and CHOICE, primitive/list
+boundaries, unused codepoints, optional combinations and truncated prefixes. They
+share descriptor data and do not establish independent complete semantic equivalence.
+Separate hand-packed examples check selected values, message structure and CRC gating.
+This audit found FANSFrequencyDeparture directly aliases FANSFrequencyvhf; the old
+predeparture reader and its synthetic fixture incorrectly inserted a frequency CHOICE.
+That reader and fixture are corrected. Full display/semantic comparison remains open
+in the correctness checklist.
+
+The ULCS audit now includes the Doc9705 Ed2 ACSE kernel. Independent bit fixtures
+check every root APDU, optional bitmap ordering, context/title OIDs, signed integer
+qualifiers/invocations, five-bit release reasons, result/source diagnostics and
+EXTERNAL payloads without byte padding. Unknown extensions and excluded title forms
+remain raw; no application profile is selected from guessed direction. The pinned
+protected CPDLC template describes coverage including aircraft address, flight ID
+and ground facility, but provides no checksum implementation; application integrity
+remains open rather than substituting a FANS CRC.
+
+Pinned Wireshark atn-cm.asn defines CMMessageSetVersion1. The port reads all nine
+direction-specific message choices, optional fields, fixed/constrained strings,
+TSAP components, application lists, date/clock constraints and enum/extensions.
+Independent tests include all 64 logon optional bitmaps, all response bitmaps,
+list/version/address boundaries and truncated prefixes for every family. No
+semantic aircraft address is inferred from a generic address-reference field.
+
+The data-only `scripts/upstream/atn-schema.py` extractor reads 243 pinned Wireshark
+CPDLC functions/tables without execution. The reader handles root constraints,
+optional bitmaps, CHOICE/list/extensible enum values, strings and open types.
+The extraction overrides the generated C display label for `*pdus_send`, whose
+registered display name is incorrectly `startup`; the ASN.1 member is `send`.
+Protected `AlgorithmIdentifier` is read as RELATIVE-OID per ASN.1 rather than
+copying the generated callback, which performs no explicit decoding there.
+Protected message bytes remain opaque; no guessed-direction or unverified
+application measurement dispatch is copied from the upstream template.
+
+Pinned dumpvdl2 generated C contributes data-only B2 CPDLC/ADS-C v2 member and
+constraint tables. The extractor follows public roots, local anonymous types,
+aliases, member-specific constraints and extension boundaries without execution.
+ADS-C v2 application roots include ADSRequestContract, ADSReport, ADSAccept,
+ADSReject, ADSNonCompliance and ADSPositiveAcknowledgement; PMADSC RequestType
+is a cancellation enum and must not be selected as the contract request root.
+The only omitted B2 generated type, AircraftIdentificationO, is not referenced
+from these public roots. Default logical acknowledgement is explicit in typed
+output when absent from the wire. Known extension payloads retain local spans and
+raw bytes. X.691/asn1c open-type NULL occupies one zero octet; independent tests
+fix the earlier zero-length fixture assumption. Protected bodies remain opaque.
+
+Python-Metar supplementary/remark handlers now supply directional visibility,
+recent weather, runway wind shear and selected numeric remark scales. This port
+retains precise/period temperature values separately from the main observation;
+it does not copy upstream overwriting or infer an ambiguous three/six-hour cycle.
+Unsupported or duplicate remark tokens remain explicit. Existing pinned Airframes
+H1/5Z TI2 fixtures now receive typed ATS results rather than display fields alone,
+with strict layout/direction and unverified application integrity.
+The display comparison explicitly records TI2's three-digit byte offset and
+information-letter/four-hex-checksum boundary. Airframes combines the information
+letter with the checksum in these fixtures; matching that five-character value
+would discard the distinction. Prefix values remain raw with comparison evidence.

@@ -26,6 +26,8 @@ export function compareFields(expected, actual, input) {
 	return expected.map((field) => {
 		const same = have.find((item) => item.label === field.label && normalized(item.value) === normalized(field.value));
 		if (same) return { ...field, classification: 'equal' };
+		const ti2 = compareTi2(field, actual, input);
+		if (ti2) return ti2;
 		const alias = aliases.get(field.label);
 		const renamed = have.find((item) => item.label === alias && normalized(item.value) === normalized(field.value));
 		if (renamed) return { ...field, classification: 'renamed', actual: renamed };
@@ -60,4 +62,32 @@ export function compareFields(expected, actual, input) {
 			return { ...field, classification: 'integrity-refusal', reason: refusal };
 		return { ...field, classification: 'unresolved' };
 	});
+}
+
+/** Evidence for corrected TI2 semantics, rather than accepting upstream's conflated checksum. */
+function compareTi2(field, actual, input) {
+	if (actual.application?.variant !== 'AtisRequest') return;
+	const values = actual.application.values;
+	if (field.label === 'Destination' && field.value === values.airport)
+		return { ...field, classification: 'renamed', actual: { airport: values.airport } };
+	if (field.label === 'ATIS Code' && Number(field.value) === values.offset)
+		return {
+			...field,
+			classification: 'corrected-byte-offset',
+			actual: { offset: values.offset, currentAtis: values.currentAtis },
+		};
+	const suffix = values.currentAtis + actual.application.integrity.checksum;
+	if (
+		field.label === 'Message Checksum' &&
+		field.value.toLowerCase() === `0x${suffix.toLowerCase()}` &&
+		input.text.endsWith(suffix)
+	)
+		return { ...field, classification: 'corrected-ti2-checksum-boundary', actual: actual.application.integrity };
+	const legacy = /^[A-Z](\d{2})[A-Z]([A-Z0-9]+)$/.exec(values.prefix ?? '');
+	if (
+		legacy &&
+		((field.label === 'Flight Number' && field.value === legacy[2]) ||
+			(field.label === 'Sequence Number' && Number(field.value) === Number(legacy[1])))
+	)
+		return { ...field, classification: 'retained-raw-prefix', actual: { prefix: values.prefix } };
 }

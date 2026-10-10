@@ -44,7 +44,7 @@
 			"revision": "9af09a0121d4ec577339cbd4c7420d7519da48fa",
 			"license": "MIT",
 			"language": "C",
-			"status": "partial port",
+			"status": "partial application port; all 213 pinned FANS schema descriptors with bounded UPER structural validation",
 			"paths": [
 				"libacars/asn1",
 				"libacars/asn1-format-cpdlc-text.c",
@@ -60,7 +60,12 @@
 				"src/payload/protocols/cpdlc",
 				"src/payload/protocols/miam",
 				"src/payload/protocols/ohma",
-				"src/payload/protocols/adsc.ts"
+				"src/payload/protocols/adsc.ts",
+				"src/payload/protocols/adsc/control.ts",
+				"src/payload/protocols/contracts.ts",
+				"test/payload/protocols/adsc",
+				"scripts/upstream/fans-schema.py",
+				"test/payload/protocols/cpdlc"
 			]
 		},
 		{
@@ -79,14 +84,17 @@
 			"revision": "686e87f2294ef6275855ba7364bd4bb9a0f8f56a",
 			"license": "GPL-3.0-or-later",
 			"language": "C",
-			"status": "IDRP body/RD_PATH, ATN security label and XID parameter layout ports; independent bounded validation",
-			"paths": ["src/idrp.c", "src/atn.c", "src/clnp.c", "src/xid.c", "LICENSE"],
+			"status": "IDRP body/RD_PATH, ATN security label and XID parameter layout ports; independent bounded validation; data-only reachable B2 CPDLC and full ADS-C v2 generated schema tables with opaque protected wrappers",
+			"paths": ["src/idrp.c", "src/atn.c", "src/clnp.c", "src/xid.c", "LICENSE", "src/asn1/*.c"],
 			"local": [
 				"src/transport/network/idrp",
 				"src/transport/network/atn/security.ts",
 				"src/transport/xid/parameters.ts",
 				"test/transport/idrp",
-				"test/transport/xid-options"
+				"test/transport/xid-options",
+				"scripts/upstream/atn-b2-schema.py",
+				"src/payload/protocols/atn/b2",
+				"test/payload/protocols/atn/b2"
 			]
 		},
 		{
@@ -123,11 +131,40 @@
 			"id": "wireshark",
 			"repository": "https://github.com/wireshark/wireshark",
 			"revision": "ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73",
-			"license": "GPL-2.0-or-later (packet-osi.c)",
+			"license": "GPL-2.0-or-later (inspected OSI and ULCS files)",
 			"language": "C",
-			"status": "ATN extended 16/32-bit transport checksum port; separate integrity/profile gating; independent external validation pending",
-			"paths": ["epan/dissectors/packet-osi.c", "epan/dissectors/packet-ositp.c"],
-			"local": ["src/transport/network/atn/integrity.ts", "test/transport/atn/integrity.spec.js"]
+			"status": "ATN transport checksum, ULCS/ACSE kernel, CM version 1 and CPDLC version 1 structural ports; protected integrity, B2, live state and independent checksum audit pending",
+			"paths": [
+				"epan/dissectors/packet-osi.c",
+				"epan/dissectors/packet-ositp.c",
+				"epan/dissectors/asn1/atn-ulcs/atn-ulcs.asn",
+				"epan/dissectors/asn1/atn-ulcs/packet-atn-ulcs-template.c",
+				"epan/dissectors/asn1/atn-cm/atn-cm.asn",
+				"epan/dissectors/asn1/atn-cpdlc/atn-cpdlc.asn",
+				"epan/dissectors/packet-atn-cpdlc.c"
+			],
+			"local": [
+				"src/transport/network/atn/integrity.ts",
+				"test/transport/atn/integrity.spec.js",
+				"src/payload/protocols/atn",
+				"test/payload/protocols/atn",
+				"scripts/upstream/atn-schema.py"
+			]
+		},
+		{
+			"id": "python-metar",
+			"repository": "https://github.com/python-metar/python-metar",
+			"revision": "281fb19e4f8870074844cba5e4b390a1f5fe7c6e",
+			"license": "BSD notice in LICENSE (single redistribution condition)",
+			"language": "Python",
+			"status": "core observation token layouts/scales adapted; remarks/trends retained; supplementary observations and selected numeric remarks with explicit periods",
+			"paths": ["metar/Metar.py", "LICENSE"],
+			"local": [
+				"src/payload/protocols/text/metar",
+				"src/payload/protocols/text/metar.ts",
+				"test/payload/protocols/text/metar.spec.js",
+				"test/payload/protocols/text/metar-remarks.spec.js"
+			]
 		}
 	],
 	"notices": "THIRD_PARTY_NOTICES.txt",
@@ -220,6 +257,26 @@
 				"test/payload/protocols/reports/rtr.spec.js",
 				"test/payload/protocols/reports/rtr-fixtures.js"
 			]
+		}
+	],
+	"reviewedSources": [
+		{
+			"repository": "https://github.com/airframesio/acars-message-documentation",
+			"revision": "d2a44817ae0a059603c816ae737b02e7730983bd",
+			"license": "No license identified in inspected tree",
+			"status": "Research only; H1 notes/tree did not establish T5/T6 encoded measurement mapping; no source or fixture copied"
+		},
+		{
+			"repository": "https://github.com/airframesio/acars-decoder",
+			"revision": "e7c66e1f0b71a8835b1b82733a1245ae3646ce8e",
+			"license": "No license identified in inspected tree",
+			"status": "Research only; inspected definition tree and CRC/ATIS definitions do not establish T5/T6 body coverage; no source or fixture copied"
+		},
+		{
+			"repository": "https://github.com/ibosoftnet/acars-decoding-library",
+			"revision": "57bce2e750e9f477727b03c41807c9698fb25160",
+			"license": "Elastic-2.0 (inspected LICENSE)",
+			"status": "Research only; inspected Python/JavaScript entry points and license; no source or fixture copied"
 		}
 	],
 	"policy": "GPL sources are in scope. Preserve original licenses and attribution for incorporated code/tests, pin revisions and update distribution terms when required. A source listed here is not a claim of complete coverage."

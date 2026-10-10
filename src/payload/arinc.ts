@@ -1,6 +1,7 @@
 import type { AcarsInterpretation } from './types';
 import { hexBytes, validArincCrc } from './protocols/bits';
 import { decodeAdsc } from './protocols/adsc';
+import { decodeAdscDisconnect } from './protocols/adsc/control';
 import { decodeCpdlc } from './protocols/cpdlc';
 import type { ApplicationDecode } from './protocols/types';
 
@@ -70,23 +71,18 @@ function parseArinc(text: string, direction: 'uplink' | 'downlink'): AcarsInterp
 		if (application === 'CR1') decoded = decodeCpdlc(bytes, 'uplink');
 		if (application === 'DR1' && bytes.length === 0)
 			decoded = { fields: [], summary: applications.DR1.summary, complete: true, notes: [] };
-		if (application === 'DIS' && bytes.length === 1) {
-			decoded = {
-				fields: [{ label: 'Disconnect reason code', value: String(bytes[0]) }],
-				summary: 'ADS-C disconnect request.',
-				complete: true,
-				notes: [],
-			};
-		}
+		if (application === 'DIS') decoded = decodeAdscDisconnect(bytes);
 		if (decoded) {
+			if (decoded.structure) result.cpdlc = decoded.structure;
 			result.fields.push(...decoded.fields);
 			result.summary = decoded.summary;
 			result.coverage = decoded.complete ? 'decoded' : 'partial';
 			result.notes.push(...decoded.notes);
 			result.fields.push({
 				label: 'Payload parser',
-				value:
-					application === 'ADS' ? 'ACARS decoder · libacars / datalink ADS-C' : 'ACARS decoder · datalink FANS CPDLC',
+				value: ['ADS', 'DIS'].includes(application)
+					? 'ACARS decoder · libacars / datalink ADS-C'
+					: 'ACARS decoder · datalink FANS CPDLC',
 			});
 		} else result.notes.push('The binary application body is preserved; this control-body layout is not decoded.');
 	} catch {

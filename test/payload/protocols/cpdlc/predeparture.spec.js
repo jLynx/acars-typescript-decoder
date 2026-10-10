@@ -8,7 +8,8 @@ const bytes = (binary) =>
 const flight = integer(3, 4) + text('ANZ123');
 const route = '1100000000' + text('NZAA') + text('NZCH');
 const edct = integer(5, 8) + integer(6, 30);
-const frequency = '01' + integer(15, 121900 - 117000);
+// FANSFrequencyDeparture aliases FANSFrequencyvhf directly; there is no CHOICE prefix.
+const frequency = integer(15, 121900 - 117000);
 const squawk = '001010011100';
 const decode = (body, additional = '') =>
 	decodeCpdlc(bytes((additional ? '1' : '0') + '00' + integer(6, 1) + integer(8, 73) + body + additional), 'uplink');

@@ -1,6 +1,8 @@
 import type { AtsResult } from './protocols/ats/types';
 import type { MiamTransfer } from './protocols/miam/types';
 import type { RtrReport } from './reports/types';
+import type { MetarReport } from './protocols/text/metar/types';
+import type { FansCpdlcStructure } from './protocols/cpdlc/schema.types';
 
 export interface AcarsField {
 	label: string;
@@ -18,6 +20,8 @@ export interface AcarsInterpretation {
 	transfer?: MiamTransfer;
 	embedded?: AcarsInterpretation;
 	maintenance?: RtrReport;
+	weather?: MetarReport[];
+	cpdlc?: FansCpdlcStructure;
 }
 
 export interface AcarsLabel {

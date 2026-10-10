@@ -24,4 +24,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+adsc/control.spec.js and adsc/wire.js are locally authored synthetic regressions
+under the current repository license (GPL-3.0-or-later). They use independent
+polynomial division and bit packing, not runtime encoder/checksum functions.
+Request-group structure and rejection/DIS field meanings are checked against
+MIT libacars revision 9af09a0121d4ec577339cbd4c7420d7519da48fa, libacars/adsc.c/h,
+and MIT datalink revision d3e3e5a5d2bda04fbee83832cb77e3050a87364c,
+crates/acars/src/decode/payload/arinc622/adsc.rs. No private captures or additional
+upstream fixture bytes were copied. Interval-less requests remain partial because
+libacars preserves them structurally while datalink rejects their semantics.
 
+
+
+text/metar.spec.js, atn/ulcs.spec.js and cpdlc/constraints.spec.js are locally
+authored GPL-3.0-or-later regressions with independent expected values and
+X.691 bit construction. The SA bundle example is from the pinned MIT datalink
+aoc/weather.rs test. METAR token scales reference Python-Metar revision
+281fb19e4f8870074844cba5e4b390a1f5fe7c6e; its notice is in THIRD_PARTY_NOTICES.txt.
+ULCS layouts reference the pinned Wireshark ASN.1/template; FANS bounds reference
+MIT libacars generated ASN.1 descriptors at the revision recorded above.
+
+cpdlc/schema.spec.js contains locally authored, independently hand-packed fixtures.
+cpdlc/schema-wire.js, schema-coverage.spec.js and schema-boundaries.spec.js are
+locally authored X.691 conformance tests using pinned MIT libacars descriptor data.
+Shared descriptors establish structural consistency, not independent measurement
+semantics. All local test code is GPL-3.0-or-later; no private capture bytes copied.
+
+adsc/reports.spec.js is locally authored GPL-3.0-or-later, using the independent
+encoder/CRC in adsc/wire.js. Tag sizes/measurement scales and accuracy names are
+checked against pinned MIT libacars adsc.c. Nonzero unassigned bit fields retain
+raw values without speculative semantics; no private fixture bytes were copied.
+
+atn/acse.spec.js is locally authored GPL-3.0-or-later, with independently packed
+Doc9705 Ed2 ASN.1 profile fixtures checked against pinned Wireshark atn-ulcs.asn.
+No private capture bytes or upstream test bytes were copied. Kernel structure
+tests do not verify protected application integrity or association state.
+
+atn/cm.spec.js is locally authored GPL-3.0-or-later, with independently packed
+CMMessageSetVersion1 fixtures checked against pinned Wireshark atn-cm.asn.
+No private capture bytes or upstream fixture bytes were copied.
+
+atn/cpdlc.spec.js contains independently hand-packed local GPL-3.0-or-later
+Doc9705 plain/protected wrapper examples. cpdlc-wire.js, cpdlc-coverage.spec.js
+and cpdlc-boundaries.spec.js are local X.691 conformance tests sharing pinned
+Wireshark schema descriptors; they do not establish independent complete
+measurement semantics or protected integrity. Wireshark GPL-2.0-or-later notices
+and pinned source paths are in THIRD_PARTY_NOTICES.txt and docs/upstreams.json.
+
+atn/b2/structure.spec.js is locally authored GPL-3.0-or-later with hand-packed
+values checked against pinned dumpvdl2 generated member/constraint tables.
+atn/b2/wire.js, coverage.spec.js and boundaries.spec.js are locally authored
+X.691 conformance tests sharing extracted descriptor data. Such conformance
+does not verify complete semantics, protected integrity or real receiver captures.
+No private capture bytes copied. atn/cpdlc-measurements.spec.js independently
+expects selected scalar scales from the pinned Wireshark ASN.1 comments.
+
+text/metar-remarks.spec.js is locally authored GPL-3.0-or-later with independent
+numeric/unit/period expectations checked against pinned Python-Metar Metar.py.
+ATS H1/5Z TI2 examples are from the pinned MIT Airframes assertion corpus.
+Malformed, duplicate, wrong-direction and radio assembly tests are locally authored.

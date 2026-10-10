@@ -10,11 +10,11 @@ complete application coverage; captured examples still need end-to-end field che
 | Area             | Implemented                                                                                                                                                                                                                         | Remaining                                                                                                                                                                                                |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ARINC 618        | Character envelopes, parity, block CRC, downlink/uplink/control, ETB/ETX                                                                                                                                                            | Audio/IQ demodulation                                                                                                                                                                                    |
-| Airline text     | Airframes 1.9.2, documented movement/position/load/operations, SA weather bundles, label-5Z fields and narrow label-16/32/37 telemetry                                                                                              | Unknown airline variants; weather tokens and proprietary columns                                                                                                                                         |
+| Airline text     | Airframes 1.9.2, documented movement/position/load/operations, core METAR observations, SA weather bundles, label-5Z fields and narrow label-16/32/37 telemetry                                                                     | Unknown airline variants; METAR trends/remarks and proprietary columns                                                                                                                                   |
 | Labels           | 210 two-character entries from pinned Skyshark                                                                                                                                                                                      | Labels do not establish payload semantics                                                                                                                                                                |
 | ATS text         | AFN headers/application fields, TI2 ATIS request/delivery, OC1 oceanic request                                                                                                                                                      | Application CRC verification; further message variants                                                                                                                                                   |
 | ADS-C            | Supported FANS contracts/reports, named scales/units, verified ARINC envelope                                                                                                                                                       | Unknown tags/variants; ATN ADS-C v2                                                                                                                                                                      |
-| FANS CPDLC       | 183 uplink/129 downlink phrases, supported PER bodies, rates/fuel/souls, positions/tracks, predeparture, holds, six additional route structures                                                                                     | Remaining body/schema validation; malformed upstream regressions stay partial                                                                                                                            |
+| FANS CPDLC       | 213 pinned ASN.1 types, all 183 uplink/129 downlink schema choices, optional fields and bounded UPER validation; phrases and supported scaled display values                                                                        | Independent complete semantic expectations; reserved/deleted or unsupported display meanings stay partial                                                                                                |
 | MIAM             | CORE v1/v2 data/ack, ALO/ALR, CF F/K/S/A/Y/X controls, bounded files, verified addressed embedded application dispatch; MA and H1                                                                                                   | Additional application identifiers; negotiated pacing/state semantics                                                                                                                                    |
 | OHMA/RYKO        | Verified zlib/base64, outer/inner JSON, named fields, source/aircraft/conversation part assembly                                                                                                                                    | Encryption/signatures; proprietary units/dictionaries                                                                                                                                                    |
 | Streaming        | Bounded source sessions, snapshots for late arrivals, ACARS/MIAM/OHMA assembly states                                                                                                                                               | Incremental protocol engines and richer expiry/duplicate events                                                                                                                                          |
@@ -210,6 +210,35 @@ or source-derived directions; unknown native directions stay unknown.
 
 ## Sources and validation
 
+The 11 October priority 1 ADS-C batch adds request-group ordering and compound
+boundaries, NACK reason/extension meanings, DIS reason-nibble interpretation and
+strict six-bit flight identification. Independent synthetic regressions check
+reporting-interval scales, signed vertical-threshold comparators, weather/velocity
+values, truncation, unknown data, H1 assembly and ARINC CRC gating. Interval-less
+periodic requests retain parsed fields but stay partial; libacars structural
+acceptance and datalink semantic rejection do not establish a valid request.
+T5/T6 bodies, complete FANS coverage and aircraft measurement dictionaries remain
+open on the roadmap.
+
+The FANS structural reader retains a typed tree with constrained wire values,
+enumeration names, choices, raw bytes and bit spans. Its 213-descriptor conformance
+matrix checks every choice, scalar/string/list boundaries, unused codepoints,
+optional bitmap ordering and truncated prefixes. Optional scopes up to ten fields
+use all combinations; the 19-field position report uses singles, pairs and complements.
+These tests share descriptor data and establish structure, while hand-packed fixtures
+independently check selected values and CRC integration. A correct schema is separate
+from measurement semantics and phrase completeness. A schema-invalid body cannot
+be marked completely decoded. The independent audit also corrected departure
+frequency: FANSFrequencyDeparture aliases the VHF integer directly, without the
+two-bit FANSFrequency choice discriminator.
+
+FANS ADS-C report regressions independently check all pinned downlink tag families,
+signed coordinate/altitude/rate extrema, time and measurement scales, all eight
+navigation-accuracy meanings and noncompliance parameter nibbles. Nonzero unassigned
+status/remainder/padding bits are explicitly retained as raw fields and keep the
+report partial. Each supported downlink tag has truncated-prefix and corrupt-CRC
+examples. These do not establish ATN ADS-C v2 or proprietary aircraft report scales.
+
 [upstreams.json](upstreams.json) records repositories, exact revisions, licenses,
 source paths and local ports. Required notices are in
 [THIRD_PARTY_NOTICES.txt](../THIRD_PARTY_NOTICES.txt). The combined distribution is
@@ -255,3 +284,70 @@ with BSD/IBM notices preserved. These readers do not redistribute the standards 
 See [upstream-audit.md](upstream-audit.md) for the migration ledger and next work.
 See [completion-roadmap.md](completion-roadmap.md) for the remaining support and
 validation work, and the criteria for a defensible comparison with other libraries.
+
+## Core weather observations and ATN presentation envelopes
+
+`decodeMetar()` reads the supported core observation with typed numeric values,
+transmitted units, visibility qualifiers, raw groups, provenance and unconsumed
+suffixes. RA/C1/H1 direct observations and RA/C1 SA bundles expose `weather` results.
+No month/year is inferred. ETB observations remain incomplete; the complete radio
+assembly is decoded again. TEMPO/BECMG forecasts and remarks never overwrite current
+observation measurements. Directional visibility, recent weather and runway wind
+shear now decode separately. Selected numeric remarks retain sea-level pressure,
+precise temperatures, period extrema/precipitation, three-hour pressure tendency,
+snow depth and ice accretion with units and original text. The ambiguous `6` group
+retains its three-or-six-hour period without guessing a station reporting cycle.
+Unknown, duplicate and malformed remark tokens keep the report partial.
+Application integrity remains unverified. This is a core-format scope, not every
+METAR regional extension, forecast or remark convention.
+Documented H1 and 5Z TI2 request layouts now expose typed airport, byte-offset,
+information-letter and checksum fields through public dispatch. Wrong direction,
+airport mismatches, malformed fields and trailing data reject the typed layout;
+the application checksum remains unverified.
+
+`decodeAtnUlcs(bytes, mode)` accepts complete caller-identified COTP user data and an
+explicit `data` or `connection` mode. Short session/presentation headers retain
+refusal flags and reasons. Fully-encoded-data reads context identifiers, transfer
+syntax OIDs, presentation choices and exact bit lengths, including bounded PER
+fragment determinants. Context 1 is ACSE, 2 is reserved and 3 is user ASE; none of
+these chooses CPDLC versus context management. Unsupported profile fields and
+application bytes remain available. The output is partial with unverified integrity;
+ACSE AARQ/AARE/RLRQ/RLRE/ABRT kernel fields now decode with named context OIDs,
+calling AP-title/AE-qualifier, associate result/source diagnostics, release/abort
+reasons and exact EXTERNAL user-information bit strings. Root optional fields and
+bounded extension open types are preserved; excluded directory title forms stay
+raw and incomplete. No live association state, authentication or protected
+application verification is claimed. Explicit ULCS context 1/connection bytes
+attach the ACSE result; unknown/user contexts do not infer an application.
+
+The explicit CMMessageSetVersion1 reader covers every aircraft/ground message
+choice and all optional logon/response fields. Advertised application lists retain
+qualifiers, versions and long/short TSAP bytes, with 1..256 entry bounds. Departure
+date fields retain calendar validity and have no inferred timezone or operational
+use. Known direction is required; root/enum extensions remain raw. CM integrity
+and live association state remain unverified, and ATN CPDLC/ADS-C are separate scopes.
+
+ATN CPDLC version 1 plain messages now expose a typed UPER tree from 243 pinned
+Wireshark layouts, with known direction and explicit profile. All root element
+choices and constraints decode; unsupported extension open types retain bytes.
+Protected wrappers retain algorithm relative OIDs, protected message/integrity bit
+strings, forwarding structures and abort information, while embedded protected
+message values stay opaque until integrity can be verified. Conformance tests share
+descriptor data; independent hand-packed examples check selected fields. Documented
+plain scalar types now carry measurement scales/units/references from the ASN.1
+comments, covered by 46 independently expected value regressions. Complete application
+semantics and protected integrity remain open.
+There is no extra zero octet before the data PER value: the observed leading zero
+belongs to the Fully-encoded-data encoding.
+
+`decodeAtnB2Structure` accepts explicitly identified B2 CPDLC or ADS-C v2 input,
+direction and application/protected mode. ADS-C inner type must also be supplied
+for requests, reports, accept/reject/noncompliance or positive acknowledgements.
+The 780 data-only descriptors include all 187 pinned ADS-C v2 generated files,
+508 reachable CPDLC B2 generated files, protected wrappers, common types and
+member-specific constraints. All 424 uplink/182 downlink element alternatives,
+including 186/68 known extensions, have conformance checks. Independent fixtures
+check selected header/default/contract/extension values. Protected bytes remain
+opaque; constrained values do not claim complete scaled application meanings or
+context-bound integrity. Unknown extensions remain raw. No conventional VHF ACARS
+payload dispatch or proprietary report decoding follows from this explicit schema API.

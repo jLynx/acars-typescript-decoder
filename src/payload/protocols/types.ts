@@ -1,10 +1,17 @@
 import type { AcarsField, AssemblyStatus } from '@/payload/types';
 import type { AcarsRecord } from '@/types';
+import type { FansCpdlcStructure } from './cpdlc/schema.types';
 
 export interface ApplicationDecode {
 	fields: AcarsField[];
 	summary: string;
 	complete: boolean;
+	notes: string[];
+	structure?: FansCpdlcStructure;
+}
+
+export interface AdscContractDecode {
+	fields: AcarsField[];
 	notes: string[];
 }
 
