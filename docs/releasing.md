@@ -32,7 +32,7 @@ by the package file allowlist. Source maps contain source content; review them a
 part of the public distribution.
 
 Keep reviewed release changes committed in Git before publishing. This gives each
-release a reproducible source revision. CI on Linux and Windows should pass for
+release a reproducible source revision. CI on Linux should pass for
 that revision; local success does not establish the hosted CI result.
 
 ## First publication
@@ -89,14 +89,53 @@ An npm name/version pair cannot be reused, even after unpublishing. Fix an alrea
 released package by incrementing the version. Publish prereleases with an explicit
 tag such as `npm publish --tag next` so they do not replace `latest`.
 
-## Optional automated publishing
+## Complete a staged release
 
-CI currently validates packages and never publishes. After the initial release,
-you can configure [npm trusted publishing](https://docs.npmjs.com/trusted-publishers)
-for an explicitly triggered GitHub Actions release workflow. This uses OIDC instead
-of stored npm tokens and supplies provenance for supported GitHub builds. Configure
-the npm trusted publisher to match the repository and workflow before enabling it;
-no npm token or automatic release workflow is needed for local publication.
+If the npm page shows **Temporary Holding Version** and version `0.0.0-stage`,
+check **Staged Packages** and the registry version before drawing conclusions.
+The public page may be cached even after approval. If the intended version appears
+in Staged Packages but is absent from the registry, the actual release is still staged. This is npm's
+placeholder README, not the library README. Review and approve the staged package
+before consumers install it or the receiver switches to a registry dependency.
+
+Sign in as `jlynx_`, then open **Staged Packages** on npmjs.com, review the intended
+`0.1.0` release and click **Approve**. Complete the required 2FA prompt. Alternatively,
+use a current npm CLI (staging requires npm 11.15+ and Node 22.14+):
+
+```sh
+npx npm@latest stage list @jlynx_/acars-decoder --registry=https://registry.npmjs.org/
+npx npm@latest stage view STAGE_ID --registry=https://registry.npmjs.org/
+npx npm@latest stage approve STAGE_ID --registry=https://registry.npmjs.org/
+npm view @jlynx_/acars-decoder@0.1.0 version --registry=https://registry.npmjs.org/
+```
+
+Replace `STAGE_ID` with the ID from the list command. Approval publishes the staged
+tarball publicly; local edits made after staging are not included. After approval,
+update the README's unpublished badge and installation text and release a new
+patch version if the published README needs correcting. Do not try to overwrite
+the already released `0.1.0` version. See [npm's staged publishing guide](https://docs.npmjs.com/staged-publishing).
+
+## GitHub release publishing
+
+`.github/workflows/publish.yml` runs when you publish a GitHub release. It checks
+that the release tag is `v` followed by the package version, installs dependencies,
+runs coverage and the full prepack checks, and stages the package on npm with
+provenance. Prereleases use `next`; ordinary releases use `latest`. A maintainer
+then reviews and approves the staged release on npm with 2FA. No npm token is stored.
+
+Configure [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) with:
+
+- GitHub organization/user: `jLynx`
+- Repository: `acars-typescript-decoder`
+- Workflow filename: `publish.yml`
+- Environment: leave blank
+- Allowed action: staged publishing; direct publishing and dist-tag management are unnecessary.
+
+Commit and push the workflow and release changes before creating a GitHub release.
+The tag must point at the commit containing the intended package version. Publishing
+a GitHub release uploads the package to npm staging; it does not approve it. Check
+the workflow result, then approve the staged package and verify its public version.
+The regular CI workflow only validates code.
 
 The commands above follow npm's
 [public scoped package guide](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages)

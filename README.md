@@ -1,6 +1,6 @@
 # acars-typescript-decoder
 
-[![npm: Not yet published](https://img.shields.io/badge/npm-not%20yet%20published-lightgrey?logo=npm)](#installation)
+[![npm version](https://img.shields.io/npm/v/%40jlynx_%2Facars-decoder?logo=npm)](https://www.npmjs.com/package/@jlynx_/acars-decoder)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml/badge.svg)](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml)
 [![Contributors](https://img.shields.io/github/contributors/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/graphs/contributors)
@@ -30,12 +30,12 @@ A recognized label or report header does not imply its measurements are decoded.
 Contributions are welcome. You can use this library in your own applications,
 including commercial and closed-source software, under the [MIT license](LICENSE).
 The repository is [**acars-typescript-decoder**](https://github.com/jLynx/acars-typescript-decoder); the npm package name is
-**@jlynx\_/acars-decoder**. The package has not yet been published to npm.
+**@jlynx\_/acars-decoder**, available on [npm](https://www.npmjs.com/package/@jlynx_/acars-decoder).
 
 ## Node.js support policy
 
 - Runtime: Node.js 22.x starting at 22.13.0, or Node.js 24 and later.
-- CI configuration: Node.js 22.x, 24.x and 26.x on Linux and Windows, with Python 3.14 for generator tests.
+- CI configuration: Node.js 22.x, 24.x and 26.x on Linux, with Python 3.14 for generator tests.
 - Distribution: ESM targeting ES2022, with bundled TypeScript declarations and source maps.
 - Browser support: modern browsers providing ES2022 and standard Web APIs. Runtime decoding uses no Node-only APIs or network requests.
 - Node type definitions are a development dependency and do not force consumers to install a particular `@types/node` version.
@@ -49,17 +49,12 @@ both compilers are development dependencies and are absent from consumer install
 
 ## Installation
 
-Until the first npm release, build and install a local package:
+Install from npm:
 
 ```sh
-npm ci
-npm run build
-npm pack
-# In your consuming project:
-npm install /path/to/jlynx_-acars-decoder-0.1.0.tgz
+npm install @jlynx_/acars-decoder
 ```
 
-Once published, the package will be installed with `npm install @jlynx_/acars-decoder`.
 It is a separate package from the MIT-licensed `@airframes/acars-decoder` dependency.
 
 ## Publishing
@@ -71,7 +66,9 @@ against a fresh build. Development release checks require Python 3; consumers do
 
 See the [release guide](docs/releasing.md) for npm account setup, first publication
 and version updates. Publishing requires an npm account with permission to use the
-package name. CI currently validates packages without publishing them.
+package name. Publishing a GitHub release runs validation and submits the package
+to npm staging through a trusted publisher. A maintainer approves the staged release
+on npm with 2FA; see the release guide for the full process.
 
 ## Usage
 
