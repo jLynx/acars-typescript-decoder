@@ -172,34 +172,6 @@ label count and the number of copied files do not measure decoding completeness.
 An accurate goal is to match or improve every supported semantic result in the
 reviewed public corpus, while retaining explicit integrity and unknown-data rules.
 
-## Licensing and migration approach
-
-Public visibility is not permission to redistribute code or tests. Translating
-C, Rust, Python or Go into TypeScript generally preserves the original code's
-licensing obligations. Check individual files and bundled dependencies; a
-repository-level label is only a starting point.
-
-libacars, Airframes, datalink and Skyshark identify their main code as MIT and
-are the strongest initial port sources. JAERO identifies its main code as MIT,
-but its dependencies and individual bundled files still need review. dumpvdl2
-and dumphfdl identify as GPL-3.0; vdlm2dec identifies as GPL-2.0. The inspected
-acarsdec source header and README state GNU Library GPL version 2 despite its
-GitHub license metadata being absent. Several small Go/Python projects have no
-identified license.
-
-GPL implementations are in scope as of 10 October 2026. Preserve original licenses
-and attribution for translated code and tests, and update distribution terms when
-GPL-derived material is incorporated. The combined distribution now uses
-GPL-3.0-or-later for dumphfdl system tables, dumpvdl2 IDRP/security/XID and Wireshark
-ATN transport checksums. Passive COTP procedures are independently implemented
-from RFC 905/X.224. MIT JAERO transport/JSON layouts and original notices are
-retained. Tests and captured fixture data keep their own provenance.
-
-Port upstream tests first, retain their expected semantics, then migrate a
-bounded feature and compare results before expanding coverage. Source errors
-should be captured as explicit divergences and regression cases rather than
-copied into the new decoder.
-
 ## Sources inspected
 
 | Repository                                                                                      | Inspected revision                                                  | Relevant source                                                                                                                                                                                                                                                                                                                        |
