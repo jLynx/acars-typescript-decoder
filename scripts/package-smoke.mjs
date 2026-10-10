@@ -49,9 +49,9 @@ command(
 	],
 	temporary,
 );
-const installed = path.join(temporary, 'node_modules/acars-decoder');
+const installed = path.join(temporary, 'node_modules/@jlynx_/acars-decoder');
 const published = JSON.parse(await readFile(path.join(installed, 'package.json'), 'utf8'));
-assert.equal(published.name, 'acars-decoder');
+assert.equal(published.name, '@jlynx_/acars-decoder');
 assert.equal(published.version, metadata.version);
 assert.equal(published.license, 'MIT');
 assert.equal(published.private, undefined);
@@ -80,9 +80,9 @@ await writeFile(
 	path.join(temporary, 'consumer.mjs'),
 	`
 import assert from 'node:assert/strict';
-import { decode, decodeLog, createDecoder, decodeFrame } from 'acars-decoder';
-import { airportName } from 'acars-decoder/airports';
-import { Bits } from 'acars-decoder/formats';
+import { decode, decodeLog, createDecoder, decodeFrame } from '@jlynx_/acars-decoder';
+import { airportName } from '@jlynx_/acars-decoder/airports';
+import { Bits } from '@jlynx_/acars-decoder/formats';
 assert.equal(decode({ label: 'Q0', text: '' }).coverage, 'decoded');
 assert.deepEqual(decodeLog([]), []);
 assert.equal(createDecoder({ airportLookup: airportName }).decode({ label: '5D', text: 'NZAA' }).fields[0].value, 'NZAA · Auckland International Airport');
@@ -94,9 +94,9 @@ command(process.execPath, ['consumer.mjs'], temporary);
 await writeFile(
 	path.join(temporary, 'consumer.ts'),
 	`
-import { decode, createDecoder, type AcarsRecord, type AcarsInterpretation } from 'acars-decoder';
-import { airportName } from 'acars-decoder/airports';
-import { Bits } from 'acars-decoder/formats';
+import { decode, createDecoder, type AcarsRecord, type AcarsInterpretation } from '@jlynx_/acars-decoder';
+import { airportName } from '@jlynx_/acars-decoder/airports';
+import { Bits } from '@jlynx_/acars-decoder/formats';
 const result: AcarsInterpretation = decode({ label: 'Q0', text: '' });
 const records: AcarsRecord[] = [];
 createDecoder({ airportLookup: airportName }).decodeLog(records);
@@ -122,7 +122,7 @@ command(
 	temporary,
 );
 const entry = path.join(temporary, 'browser.ts');
-await writeFile(entry, "import { decode } from 'acars-decoder'; console.log(decode({label:'Q0',text:''}));");
+await writeFile(entry, "import { decode } from '@jlynx_/acars-decoder'; console.log(decode({label:'Q0',text:''}));");
 const { build } = await import('esbuild');
 const bundled = await build({
 	entryPoints: [entry],
@@ -136,7 +136,7 @@ assert(
 	!Object.keys(bundled.metafile.inputs).some((name) => /airports\.json/.test(name)),
 	'Main import must not bundle optional airport dataset',
 );
-await writeFile(entry, "import { AcarsFramer } from 'acars-decoder/framing'; console.log(AcarsFramer);");
+await writeFile(entry, "import { AcarsFramer } from '@jlynx_/acars-decoder/framing'; console.log(AcarsFramer);");
 const framing = await build({
 	entryPoints: [entry],
 	bundle: true,
@@ -149,7 +149,7 @@ assert(
 	!Object.keys(framing.metafile.inputs).some((name) => /airframes|pako|airports/.test(name)),
 	'Framing import must remain independent from application decoders',
 );
-const distribution = path.join(temporary, 'node_modules/acars-decoder/dist');
+const distribution = path.join(temporary, 'node_modules/@jlynx_/acars-decoder/dist');
 for (const filename of await readdir(distribution)) {
 	if (!filename.endsWith('.d.ts')) continue;
 	assert(

@@ -1,8 +1,13 @@
 # Releasing to npm
 
-The public npm package is `acars-decoder`. Its repository is
+The public npm package is `@jlynx_/acars-decoder`. Its repository is
 [jLynx/acars-typescript-decoder](https://github.com/jLynx/acars-typescript-decoder).
 Preparing or packing a release does not publish it or reserve the npm name.
+
+This guide publishes to **npmjs.com**, not GitHub Packages. The GitHub repository
+hosts the source and CI; `npm.pkg.github.com` is a separate registry with different
+authentication and consumer setup. Keep `publishConfig.registry` pointed at
+`https://registry.npmjs.org/` for normal public npm installation.
 
 ## Prepare and preview
 
@@ -34,12 +39,14 @@ that revision; local success does not establish the hosted CI result.
 
 Create an [npm account](https://www.npmjs.com/signup) and enable
 [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication).
+Publish using the npm account `jlynx_`, which owns the `@jlynx_` scope. The GitHub
+username remains `jLynx`; GitHub and npm account names do not need to match.
 Sign in interactively; do not put credentials in repository files:
 
 ```sh
-npm login --registry=https://registry.npmjs.org/
+npm login --scope=@jlynx_ --registry=https://registry.npmjs.org/
 npm whoami --registry=https://registry.npmjs.org/
-npm view acars-decoder name version --registry=https://registry.npmjs.org/
+npm view @jlynx_/acars-decoder name version --registry=https://registry.npmjs.org/
 ```
 
 An `E404` from the final command means no package is visible under that name at
@@ -61,11 +68,11 @@ on the official npm registry. For a final npm publication preview, use
 Confirm the released version and package page:
 
 ```sh
-npm view acars-decoder@0.1.0 version dist.integrity --registry=https://registry.npmjs.org/
+npm view @jlynx_/acars-decoder@0.1.0 version dist.integrity --registry=https://registry.npmjs.org/
 ```
 
-Open [npmjs.com/package/acars-decoder](https://www.npmjs.com/package/acars-decoder)
-and test `npm install acars-decoder@0.1.0` in a separate consumer. After the first
+Open [npmjs.com/package/@jlynx_/acars-decoder](https://www.npmjs.com/package/@jlynx_/acars-decoder)
+and test `npm install @jlynx_/acars-decoder@0.1.0` in a separate consumer. After the first
 publication, replace the README's unpublished badge with a live npm version badge
 and update its installation instructions. Tag the reviewed release revision
 `v0.1.0` and push the tag to GitHub.
@@ -92,5 +99,5 @@ the npm trusted publisher to match the repository and workflow before enabling i
 no npm token or automatic release workflow is needed for local publication.
 
 The commands above follow npm's
-[public package guide](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages)
+[public scoped package guide](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages)
 and [publish command reference](https://docs.npmjs.com/cli/v11/commands/npm-publish).

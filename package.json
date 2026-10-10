@@ -1,5 +1,5 @@
 {
-	"name": "acars-decoder",
+	"name": "@jlynx_/acars-decoder",
 	"version": "0.1.0",
 	"description": "ACARS message parsing, reassembly and documented application decoding for browsers and Node.js",
 	"type": "module",

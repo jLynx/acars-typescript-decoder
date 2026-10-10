@@ -9,7 +9,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?logo=nodedotjs&logoColor=white)](#nodejs-support-policy)
 
 ACARS (Aircraft Communications Addressing and Reporting System) carries messages
-between aircraft and ground stations worldwide. **acars-decoder** turns supported
+between aircraft and ground stations worldwide. **@jlynx\_/acars-decoder** turns supported
 payloads into readable summaries and fields, reassembles consecutive message blocks
 and reads ARINC 618 frames.
 
@@ -30,7 +30,7 @@ A recognized label or report header does not imply its measurements are decoded.
 Contributions are welcome. You can use this library in your own applications,
 including commercial and closed-source software, under the [MIT license](LICENSE).
 The repository is [**acars-typescript-decoder**](https://github.com/jLynx/acars-typescript-decoder); the npm package name is
-**acars-decoder**. The package has not yet been published to npm.
+**@jlynx\_/acars-decoder**. The package has not yet been published to npm.
 
 ## Node.js support policy
 
@@ -56,10 +56,10 @@ npm ci
 npm run build
 npm pack
 # In your consuming project:
-npm install /path/to/acars-decoder-0.1.0.tgz
+npm install /path/to/jlynx_-acars-decoder-0.1.0.tgz
 ```
 
-Once published, the package will be installed with `npm install acars-decoder`.
+Once published, the package will be installed with `npm install @jlynx_/acars-decoder`.
 It is a separate package from the MIT-licensed `@airframes/acars-decoder` dependency.
 
 ## Publishing
@@ -78,7 +78,7 @@ package name. CI currently validates packages without publishing them.
 ### Decode a message
 
 ```ts
-import { decode } from 'acars-decoder';
+import { decode } from '@jlynx_/acars-decoder';
 
 const result = decode({
 	label: '3L',
@@ -98,7 +98,7 @@ the format defines them.
 ### Reassemble a source log
 
 ```ts
-import { decodeLog, type AcarsRecord } from 'acars-decoder';
+import { decodeLog, type AcarsRecord } from '@jlynx_/acars-decoder';
 
 const blocks: AcarsRecord[] = []; // complete received envelopes from ONE source
 const messages = decodeLog(blocks);
@@ -120,8 +120,8 @@ to a viewer-specific count.
 ### Optional airport names
 
 ```ts
-import { createDecoder } from 'acars-decoder';
-import { airportName } from 'acars-decoder/airports';
+import { createDecoder } from '@jlynx_/acars-decoder';
+import { airportName } from '@jlynx_/acars-decoder/airports';
 
 const decoder = createDecoder({ airportLookup: airportName });
 const atis = decoder.decode({ label: '5D', text: 'NZAA' });
@@ -134,7 +134,7 @@ unknown codes remain visible. Only explicitly identified airport fields are enri
 ### Custom formats
 
 ```ts
-import { createDecoder, type AcarsPlugin } from 'acars-decoder';
+import { createDecoder, type AcarsPlugin } from '@jlynx_/acars-decoder';
 
 const plugin: AcarsPlugin = {
 	name: 'my-airline',
@@ -160,7 +160,7 @@ original envelopes and assembly notes remain preserved. Plugins are synchronous.
 
 ### Framing and lower-level readers
 
-Use `acars-decoder/framing` to load transport readers without application decoders.
+Use `@jlynx_/acars-decoder/framing` to load transport readers without application decoders.
 `AcarsFramer.bit()` accepts demodulated bits, validates parity and block CRC, then
 calls your callback with parity-bearing bytes. `decodeFrame()` interprets those
 validated bytes, excluding the BCS. `decodeFrame()` alone checks parity/layout;
@@ -168,7 +168,7 @@ it cannot verify a BCS that is absent. IQ/audio demodulation, radio drivers, VDL
 HFDL and SATCOM transport are outside this package.
 
 `interpretArinc`, `decodeAdsc` and `decodeCpdlc` are exported for protocol use.
-`acars-decoder/formats` exposes lower-level readers that require normalized records;
+`@jlynx_/acars-decoder/formats` exposes lower-level readers that require normalized records;
 they may throw on malformed binary data and do not provide input validation or
 airport enrichment. Prefer `decode`/`decodeLog` for applications.
 
