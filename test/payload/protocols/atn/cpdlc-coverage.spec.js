@@ -63,33 +63,33 @@ describe('pinned ATN CPDLC schema conformance', () => {
 			expect(result.structureComplete).toBe(true);
 		},
 	);
-	it.each(entries.filter(([, node]) => node.kind === 'sequence' && node.members.some((member) => member.optional)))(
-		'checks optional bitmaps for %s',
-		(type, node) => {
-			const optional = node.members.filter((member) => member.optional);
-			const count = optional.length;
-			const masks =
-				count <= 10
-					? Array.from({ length: 2 ** count }, (_, mask) =>
-							Array.from({ length: count }, (_, i) => Boolean(mask & (2 ** i))),
-						)
-					: [
-							Array(count).fill(false),
-							Array(count).fill(true),
-							...Array.from({ length: count }, (_, at) => Array.from({ length: count }, (_, i) => i === at)),
-						];
-			for (const mask of masks) {
-				const fixture = wire(type, mask),
-					result = decodeAtnCpdlc(fixture.bytes, fixture.options);
-				expect(find(result.value, type)?.children.map((member) => member.name)).toEqual(
-					node.members
-						.filter((member) => !member.optional || mask[optional.indexOf(member)])
-						.map((member) => member.name),
-				);
-				expect(result.structureComplete).toBe(true);
-			}
-		},
-	);
+	it.each(
+		entries
+			.filter(([, node]) => node.kind === 'sequence' && node.members.some((member) => member.optional))
+			.flatMap(([type, node]) => {
+				const optional = node.members.filter((member) => member.optional);
+				const count = optional.length;
+				const masks =
+					count <= 10
+						? Array.from({ length: 2 ** count }, (_, mask) =>
+								Array.from({ length: count }, (_, i) => Boolean(mask & (2 ** i))),
+							)
+						: [
+								Array(count).fill(false),
+								Array(count).fill(true),
+								...Array.from({ length: count }, (_, at) => Array.from({ length: count }, (_, i) => i === at)),
+							];
+				// Give each bitmap its own timeout and failure label, including all 1024 RouteClearance cases.
+				return masks.map((mask) => [type, mask.map(Number).join(''), mask, node, optional]);
+			}),
+	)('checks optional bitmap for %s: %s', (type, _bitmap, mask, node, optional) => {
+		const fixture = wire(type, mask),
+			result = decodeAtnCpdlc(fixture.bytes, fixture.options);
+		expect(find(result.value, type)?.children.map((member) => member.name)).toEqual(
+			node.members.filter((member) => !member.optional || mask[optional.indexOf(member)]).map((member) => member.name),
+		);
+		expect(result.structureComplete).toBe(true);
+	});
 	it.each(Object.keys(nodes))('rejects shorter byte prefixes for %s', (type) => {
 		const fixture = wire(type);
 		for (let count = 0; count < fixture.bytes.length; count++)
