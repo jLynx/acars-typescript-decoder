@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+test-results/
+package-lock.json
+src/reference/airports/airports.json
+src/payload/reference/labels.json
+LICENSE
+THIRD_PARTY_NOTICES.txt

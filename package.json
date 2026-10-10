@@ -1,0 +1,83 @@
+{
+	"name": "acars-decoder",
+	"version": "0.1.0",
+	"description": "ACARS message parsing, reassembly and documented application decoding for browsers and Node.js",
+	"type": "module",
+	"license": "MIT",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"sideEffects": false,
+	"exports": {
+		"./framing": {
+			"types": "./dist/framing.d.ts",
+			"import": "./dist/framing.js"
+		},
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./airports": {
+			"types": "./dist/airports.d.ts",
+			"import": "./dist/airports.js"
+		},
+		"./formats": {
+			"types": "./dist/formats.d.ts",
+			"import": "./dist/formats.js"
+		}
+	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.txt",
+		"docs"
+	],
+	"scripts": {
+		"build": "node scripts/build.mjs",
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint . --max-warnings 0",
+		"lint:fix": "eslint . --fix --max-warnings 0",
+		"format": "prettier . --write",
+		"format:check": "prettier . --check",
+		"check:structure": "node scripts/check-structure.mjs",
+		"check": "npm run lint && npm run format:check && npm run check:structure && npm run typecheck",
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:data": "python -m unittest discover -s test/airport-db -p test_*.py",
+		"test:package": "node scripts/package-smoke.mjs",
+		"build:airport-db": "python scripts/airport-db/build.py",
+		"build:acars-labels": "python scripts/acars-data/build-labels.py",
+		"prepack": "npm run check && npm test && npm run build"
+	},
+	"dependencies": {
+		"@airframes/acars-decoder": "1.9.2",
+		"pako": "^2.1.0"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@types/node": "^22.20.5",
+		"@types/pako": "^2.0.4",
+		"@vitest/coverage-v8": "^5.0.3",
+		"esbuild": "^0.28.2",
+		"eslint": "^10.12.0",
+		"eslint-config-prettier": "^10.1.8",
+		"globals": "^17.13.0",
+		"prettier": "^3.9.9",
+		"rollup": "^4.64.3",
+		"rollup-plugin-dts": "^6.5.1",
+		"typescript": "~5.9.3",
+		"typescript-eslint": "^8.71.1",
+		"vitest": "^5.0.3"
+	},
+	"engines": {
+		"node": "^22.13.0 || >=24"
+	},
+	"keywords": [
+		"acars",
+		"aviation",
+		"decoder",
+		"ads-c",
+		"cpdlc",
+		"typescript",
+		"miam"
+	]
+}

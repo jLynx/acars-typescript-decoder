@@ -1,0 +1,11 @@
+export { createDecoder, decode, decodeLog } from './api';
+export { interpretAcars } from './payload/interpret';
+export { interpretAcarsLog } from './payload/context';
+export { labelDescription, ACARS_LABELS } from './payload/catalogue';
+export { AcarsFramer, acarsCrc, oddParity } from './framing/framing';
+export { decodeAcars as decodeFrame } from './framing/messages';
+export { interpretArinc } from './payload/arinc';
+export { decodeAdsc } from './payload/protocols/adsc';
+export { decodeCpdlc } from './payload/protocols/cpdlc';
+export type { AcarsRecord, AcarsReport, AcarsInput, AcarsDecoder, AcarsPlugin, DecoderOptions } from './types';
+export type { AcarsInterpretation, AcarsField, AcarsLabel, InterpretedAcarsRecord } from './payload/types';
