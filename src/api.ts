@@ -3,10 +3,10 @@ import type { AcarsInterpretation } from './payload/types';
 import { interpretAcars } from './payload/interpret';
 import { interpretAcarsLog } from './payload/context';
 import { describeAirports } from './payload/reference/airports';
-import { isRecord } from './validation';
+import { validInterpretation } from './plugin-validation';
 
 /** Normalize a received payload; reception metadata is optional for single messages. */
-function normalize(input: AcarsInput): AcarsRecord {
+export function normalize(input: AcarsInput): AcarsRecord {
 	validateInput(input);
 	return {
 		...input,
@@ -50,23 +50,6 @@ function pluginResult(message: AcarsRecord, options: DecoderOptions): AcarsInter
 			// A third-party plugin must not stop built-in decoders or reception.
 		}
 	}
-}
-
-function validInterpretation(value: unknown): value is AcarsInterpretation {
-	if (!isRecord(value)) return false;
-	return (
-		typeof value.title === 'string' &&
-		typeof value.summary === 'string' &&
-		typeof value.coverage === 'string' &&
-		['decoded', 'partial', 'unknown'].includes(value.coverage) &&
-		(value.coverageDetail === undefined || typeof value.coverageDetail === 'string') &&
-		Array.isArray(value.fields) &&
-		value.fields.every(
-			(field: unknown) => isRecord(field) && typeof field.label === 'string' && typeof field.value === 'string',
-		) &&
-		Array.isArray(value.notes) &&
-		value.notes.every((note: unknown) => typeof note === 'string')
-	);
 }
 
 /** Plugins are checked in caller order before the built-in format decoders. */

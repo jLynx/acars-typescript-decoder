@@ -1,63 +1,33 @@
 # acars-typescript-decoder
 
 [![npm version](https://img.shields.io/npm/v/%40jlynx_%2Facars-decoder?logo=npm)](https://www.npmjs.com/package/@jlynx_/acars-decoder)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![CI](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml/badge.svg)](https://github.com/jLynx/acars-typescript-decoder/actions/workflows/ci.yml)
 [![Contributors](https://img.shields.io/github/contributors/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/graphs/contributors)
 [![Activity](https://img.shields.io/github/commit-activity/m/jLynx/acars-typescript-decoder)](https://github.com/jLynx/acars-typescript-decoder/pulse)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?logo=nodedotjs&logoColor=white)](#nodejs-support-policy)
 
-ACARS (Aircraft Communications Addressing and Reporting System) carries messages
-between aircraft and ground stations worldwide. **@jlynx\_/acars-decoder** turns supported
-payloads into readable summaries and fields, reassembles consecutive message blocks
-and reads ARINC 618 frames.
+Decode ACARS aircraft messages in JavaScript or TypeScript, locally in Node.js or
+modern browsers. Published as **@jlynx\_/acars-decoder** on npm.
 
-Written in TypeScript for JavaScript and TypeScript applications, the library runs
-locally in Node.js and browsers. It combines documented airline formats, binary
-ADS-C/FANS CPDLC readers, MIAM CORE v1/v2 transfers and Boeing OHMA/RYKO compressed
-JSON. Original messages are preserved, and results distinguish decoded, partial
-and unknown payloads.
+- Read supported airline, weather, ADS-C and FANS CPDLC messages.
+- Reassemble ACARS blocks, MIAM files and OHMA/RYKO conversations.
+- Import receiver logs or use lower-level VDL2, HFDL and Aero readers.
+- Preserve original data and distinguish decoded, partial and unknown results.
 
-The project builds on research and implementations from
-[Airframes](https://github.com/airframesio/acars-decoder-typescript),
-[libacars](https://github.com/szpajder/libacars),
-[datalink](https://github.com/xoolive/datalink) and
-[Skyshark](https://github.com/ckuethe/skyshark). See the
-[coverage and source references](docs/coverage.md) for supported formats and gaps.
-A recognized label or report header does not imply its measurements are decoded.
-
-Contributions are welcome. You can use this library in your own applications,
-including commercial and closed-source software, under the [MIT license](LICENSE).
-The repository is [**acars-typescript-decoder**](https://github.com/jLynx/acars-typescript-decoder); the npm package name is
-**@jlynx\_/acars-decoder**, available on [npm](https://www.npmjs.com/package/@jlynx_/acars-decoder).
-
-## Node.js support policy
-
-- Runtime: Node.js 22.x starting at 22.13.0, or Node.js 24 and later.
-- CI configuration: Node.js 22.x, 24.x and 26.x on Linux, with Python 3.14 for generator tests.
-- Distribution: ESM targeting ES2022, with bundled TypeScript declarations and source maps.
-- Browser support: modern browsers providing ES2022 and standard Web APIs. Runtime decoding uses no Node-only APIs or network requests.
-- Node type definitions are a development dependency and do not force consumers to install a particular `@types/node` version.
-
-Development type-checking and consumer checks use stable TypeScript 7.0.2 (`tsc`).
-ESLint and declaration bundling still require the TypeScript 6 compiler API. The
-package follows Microsoft's [side-by-side installation guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0):
-`@typescript/native` aliases TypeScript 7, while `typescript` aliases the official
-`@typescript/typescript6` compatibility package. This preserves type-aware linting;
-both compilers are development dependencies and are absent from consumer installs.
+Support varies by format. Recognizing a label does not mean its measurements are
+decoded; see the [coverage guide](docs/coverage.md) for exact scopes and limitations.
 
 ## Installation
-
-Install from npm:
 
 ```sh
 npm install @jlynx_/acars-decoder
 ```
 
-It is a separate package from the MIT-licensed `@airframes/acars-decoder` dependency.
+This is a separate package from `@airframes/acars-decoder`.
 
-## Usage
+## Quick start
 
 ### Decode a message
 
@@ -73,100 +43,74 @@ const result = decode({
 console.log(result.title, result.coverage, result.fields);
 ```
 
-`label` and `text` are required. Direction defaults to `downlink`. Reception time
-defaults to the current time; provide the actual timestamp when interpreting
-time-only reports. Omitted dates may be inferred from reception and are identified
-in the interpretation. Field values are display strings; units are included when
-the format defines them.
+`label` and `text` are required. Direction defaults to `downlink`; provide the
+actual reception timestamp for time-only reports. Field values are display strings
+with units where defined.
 
-### Reassemble a source log
+### Receiver streams
 
 ```ts
-import { decodeLog, type AcarsRecord } from '@jlynx_/acars-decoder';
+import { createDecoderSession, adaptReceiverRecord } from '@jlynx_/acars-decoder';
 
-const blocks: AcarsRecord[] = []; // complete received envelopes from ONE source
-const messages = decodeLog(blocks);
+const session = createDecoderSession();
+const received = adaptReceiverRecord({ label: 'Q0', text: '', timestamp: 1791576000 });
+
+if (received) {
+	const record = session.push(received.message, received.source);
+	console.log(record.interpretation, record.assemblies);
+}
 ```
 
-Each record needs a unique positive `id`, millisecond `receivedAt`, registration,
-mode, acknowledgement, label, block ID, direction, text and ETB `continuation` flag.
-Provide `messageNumber` and `flight` when received. Call separately for independent
-channels/sources. Results are chronological copies; original `text` is preserved
-and the final block receives `assembledText` only after consecutive A–Z message
-suffixes and final ETX arrive. Missing blocks never get silently filled.
+Adapters support acarsdec, vdlm2dec, dumpvdl2, dumphfdl and JAERO records.
+Sessions keep bounded, isolated source windows; use `snapshot()` to retrieve
+earlier records completed by later arrivals.
 
-Batches allow up to 10,000 records, individual/assembled payloads up to 8,192
-characters, and assemblies up to 26 blocks. Reassembly permits two minutes between
-blocks and five minutes overall. Calls do not retain pending messages: pass the
-retained source log again as new blocks arrive. The library does not truncate logs
-to a viewer-specific count.
+### Command line
 
-### Optional airport names
-
-```ts
-import { createDecoder } from '@jlynx_/acars-decoder';
-import { airportName } from '@jlynx_/acars-decoder/airports';
-
-const decoder = createDecoder({ airportLookup: airportName });
-const atis = decoder.decode({ label: '5D', text: 'NZAA' });
+```sh
+acars-decode messages.jsonl
+acars-decode --capture capture.json
 ```
 
-The optional offline OurAirports snapshot contains 11,764 airports. The main entry
-does not import it. You can supply your own lookup returning a name or `undefined`;
-unknown codes remain visible. Only explicitly identified airport fields are enriched.
+The CLI also accepts JSONL from stdin and writes interpreted JSONL. Capture mode
+reads grouped `sources[].messages` viewer exports.
 
-### Custom formats
+## More APIs
 
-```ts
-import { createDecoder, type AcarsPlugin } from '@jlynx_/acars-decoder';
+| Need                                | API                              |
+| ----------------------------------- | -------------------------------- |
+| Reassemble a retained source log    | `decodeLog(records)`             |
+| Add plugins or an airport lookup    | `createDecoder(options)`         |
+| Load optional offline airport names | `@jlynx_/acars-decoder/airports` |
+| Read frames and transport protocols | `@jlynx_/acars-decoder/framing`  |
+| Access lower-level format readers   | `@jlynx_/acars-decoder/formats`  |
 
-const plugin: AcarsPlugin = {
-	name: 'my-airline',
-	decode(message) {
-		if (message.label !== 'ZZ' || message.text !== 'HELLO') return undefined;
-		return {
-			title: 'Greeting',
-			summary: 'Hello received.',
-			coverage: 'decoded',
-			fields: [],
-			notes: [],
-		};
-	},
-};
+See the [usage guide](docs/usage.md) for examples and API constraints.
+Prefer `decode` or `decodeLog` for applications. Lower-level readers may throw on
+malformed data and do not provide the same validation or enrichment.
 
-const decoder = createDecoder({ plugins: [plugin] });
-```
+## Documentation
 
-Plugins run in caller order before built-in results, receive frozen envelope copies
-and must return the documented interpretation shape. Exceptions and malformed
-results fall through. For logs, plugins receive assembled text where available;
-original envelopes and assembly notes remain preserved. Plugins are synchronous.
+- [Usage guide](docs/usage.md): log reassembly, plugins, airports and transport examples.
+- [Decoding coverage](docs/coverage.md): supported formats, integrity checks and limits.
+- [Observed capture formats](docs/capture-formats.md): aircraft reports and maintenance XML.
+- [Completion checklist](docs/completion-roadmap.md): implemented scopes and remaining work.
+- [Upstream audit](docs/upstream-audit.md) and [source manifest](docs/upstreams.json): provenance and pinned revisions.
 
-### Framing and lower-level readers
+## Node.js support policy
 
-Use `@jlynx_/acars-decoder/framing` to load transport readers without application decoders.
-`AcarsFramer.bit()` accepts demodulated bits, validates parity and block CRC, then
-calls your callback with parity-bearing bytes. `decodeFrame()` interprets those
-validated bytes, excluding the BCS. `decodeFrame()` alone checks parity/layout;
-it cannot verify a BCS that is absent. IQ/audio demodulation, radio drivers, VDL2,
-HFDL and SATCOM transport are outside this package.
-
-`interpretArinc`, `decodeAdsc` and `decodeCpdlc` are exported for protocol use.
-`@jlynx_/acars-decoder/formats` exposes lower-level readers that require normalized records;
-they may throw on malformed binary data and do not provide input validation or
-airport enrichment. Prefer `decode`/`decodeLog` for applications.
+- Node.js 22.13+ within 22.x, or Node.js 24 and later.
+- Modern ES2022 browsers; runtime decoding requires no network or Node-only APIs.
+- ESM distribution with bundled TypeScript declarations and source maps.
 
 ## Development
 
-Use the latest stable Node.js 26 for development; supported older runtimes remain
-in CI. Dependencies use stable releases, and Dependabot checks npm packages and
-GitHub Actions weekly. Dependency updates must pass the same lint, type, decoder,
-data and package checks before merging.
+Use Node.js 26 and Python 3.14 for development.
 
 ```sh
+npm ci
 npm run check
 npm test
-npm run test:coverage
 npm run test:data
 npm run build
 npm run test:package
@@ -174,27 +118,20 @@ npm run test:package
 
 ## Contributions
 
-New decoders, documented message formats, regression fixtures and improvements to
-existing coverage are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the strict
-lint rules, validation checks and requirements for licensed sources and tests.
-
-The community [ACARS Message Documentation](https://github.com/airframesio/acars-message-documentation)
-is a useful research reference. Include the source and expected field meanings
-when adding a format, and preserve unknown data rather than assigning speculative
-meanings or units. The [coverage guide](docs/coverage.md) lists areas for further work.
+Documented formats, regression fixtures and improvements are welcome. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for source, licensing and validation requirements.
 
 ## Contributors
 
-| Contributor                       | Description                    |
-| --------------------------------- | ------------------------------ |
-| [jLynx](https://github.com/jLynx) | Project creator and maintainer |
-
-Upstream authors and data providers are credited in
-[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) and the
-[source reference guide](docs/coverage.md).
+Created and maintained by [jLynx](https://github.com/jLynx), building on work from
+[Airframes](https://github.com/airframesio/acars-decoder-typescript),
+[libacars](https://github.com/szpajder/libacars),
+[datalink](https://github.com/xoolive/datalink) and
+[Skyshark](https://github.com/ckuethe/skyshark).
 
 ## License
 
-Licensed under **MIT**. See [LICENSE](LICENSE) for the full terms. Upstream
-components retain their required notices, and the optional OurAirports dataset
-is public domain. Proprietary reports still require their specifications to decode.
+The combined package is **GPL-3.0-or-later**; see [LICENSE](LICENSE).
+Original component notices are retained in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt)
+and [historical MIT terms](docs/MIT-LICENSE.txt). The optional OurAirports dataset
+is public domain.

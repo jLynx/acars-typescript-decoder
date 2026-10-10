@@ -24,6 +24,18 @@ const record = (id, text, extra = {}) => ({
 });
 
 describe('observed POS and DF report headers', () => {
+	it('preserves the documented Airframes twelve-column POS position and altitude', () => {
+		const result = decode(
+			record(1, 'POS082150, N 3885,W 7841,---,308,26922,  51,22290, 529,  19,-225,6', {
+				label: '10',
+				continuation: false,
+			}),
+		);
+		expect(result.coverage).toBe('partial');
+		expect(field(result, 'Aircraft Position')).toBe('38.850 N, 78.410 W');
+		expect(field(result, 'Altitude')).toBe('22290 feet');
+		expect(result.notes.join(' ')).toContain('Airframes (label-10-pos)');
+	});
 	it('recognizes POS fields without interpreting ambiguous compact coordinates or numeric columns', () => {
 		const result = decode(record(1, 'POS100423, S 3703,E17470,0425,100,200,300', { label: '10', continuation: false }));
 		expect(result).toMatchObject({ title: 'Position report', coverage: 'partial' });

@@ -46,3 +46,27 @@ export interface AcarsDecoder {
 	decode: (message: AcarsInput) => AcarsInterpretation;
 	decodeLog: (messages: readonly AcarsRecord[]) => InterpretedAcarsRecord[];
 }
+
+export interface DecoderSessionOptions extends DecoderOptions {
+	/** Maximum retained sources (default 16, maximum 128). */
+	maxSources?: number;
+	/** Maximum retained blocks per source (default 512, maximum 10000). */
+	maxRecords?: number;
+	/** Maximum retained text characters per source (default 1048576). */
+	maxCharacters?: number;
+	/** Reception-time retention window (default twenty minutes). */
+	retentionMs?: number;
+}
+
+export interface DecoderSession {
+	push: (message: AcarsInput, source?: string) => InterpretedAcarsRecord;
+	/** Reinterpret a retained source window, including records completed by a late arrival. */
+	snapshot: (source?: string) => InterpretedAcarsRecord[];
+	reset: (source?: string) => void;
+	stats: () => { sources: number; records: number; characters: number; evictedRecords: number };
+}
+
+export interface DecoderSourceState {
+	records: AcarsRecord[];
+	highWatermark: number;
+}

@@ -19,6 +19,15 @@ const record = (label, text, direction = 'downlink') => ({
 const field = (result, name) => result.fields.find((item) => item.label === name)?.value;
 
 describe('combined text payload formats', () => {
+	it('retains the specific Airframes label-16 fields alongside generic classifier metadata', () => {
+		const result = interpretAcars(record('16', '005236,36787,0135,  97,N 38.364 W 75.226'));
+		expect(field(result, 'Message Timestamp')).toBe('00:52:36 UTC (date not supplied)');
+		expect(field(result, 'Altitude')).toBe('36787 feet');
+		expect(field(result, 'Estimated Time of Arrival')).toBe('01:35:00 UTC (date not supplied)');
+		expect(field(result, 'Aircraft Position')).toBe('38.364 N, 75.226 W');
+		expect(field(result, 'Time code (raw)')).toBe('005236');
+		expect(field(result, 'Field count')).toBe('5');
+	});
 	it.each(['21', '22', '31', '36', '44'])('extracts explicit decimal coordinates on label %s', (label) => {
 		const result = interpretText(record(label, 'N28.282 W82.571'));
 		expect(field(result, 'Latitude')).toBe('28.282°');

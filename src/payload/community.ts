@@ -109,7 +109,14 @@ export function interpretCommunity(
 	let interpretation: AcarsInterpretation | undefined;
 	try {
 		const result: unknown = decoder.decode({ label: message.label, sublabel, text }, { debug: false });
-		if (validResult(result)) interpretation = convert(result);
+		if (validResult(result)) {
+			interpretation = convert(result);
+			const preamble = /^[A-Z]\d{2}[A-Z]([A-Z0-9]{2})(\d{4})/.exec(text);
+			if (interpretation && preamble) {
+				const flight = interpretation.fields.find((field) => field.label === 'Flight Number');
+				if (flight?.value === `${preamble[1]}${Number(preamble[2])}`) flight.value = preamble[1] + preamble[2];
+			}
+		}
 	} catch {
 		// A malformed payload must not prevent reception or the rest of the message list from rendering.
 	}

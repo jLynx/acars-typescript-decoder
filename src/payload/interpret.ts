@@ -21,6 +21,10 @@ import { interpretUplink } from './protocols/uplink';
 import { interpretMiam } from './protocols/miam';
 import { interpretOhma } from './protocols/ohma';
 import { describeAirports } from './reference/airports';
+import { interpretAts } from './protocols/ats/text';
+import { interpretMiamEmbedded } from './protocols/miam/embedded';
+import { interpretTof } from '@/payload/reports/boeing';
+import { interpretRtr } from '@/payload/reports/maintenance';
 
 const links: Record<string, string> = {
 	V: 'VHF ACARS',
@@ -71,13 +75,15 @@ function interpretPayload(message: AcarsRecord): AcarsInterpretation {
 	}
 	let result: AcarsInterpretation | undefined;
 	if (message.label === 'SA') result = interpretAdvisory(message);
-	if (message.label === '10') result = interpretTakeoff(message) ?? interpretPos(message);
+	if (message.label === '10') result = interpretLabel10(message);
 	if (message.label === '49') result = interpretMonitoring(message);
 	if (message.label === '3L') result = interpretPosition(message);
 	if (message.label === '1L') result = interpretOperations(message);
 	if (message.label === '2L') result = interpretLoad(message);
 	if (message.label === '80') result = interpretMovement(message);
 	if (result) return result;
+	const ats = interpretAts(message);
+	if (ats) return ats;
 	const binary = interpretArinc(message.text, message.direction);
 	if (binary) return binary;
 	if (['H1', 'AA', 'A6', 'BA'].includes(message.label)) return interpretApplication(message);
@@ -89,6 +95,14 @@ function interpretPayload(message: AcarsRecord): AcarsInterpretation {
 			: (interpretCommunity(message) ?? event);
 	}
 	return event ?? interpretFallback(message);
+}
+
+function interpretLabel10(message: AcarsRecord): AcarsInterpretation | undefined {
+	const takeoff = interpretTakeoff(message);
+	if (takeoff) return takeoff;
+	const position = interpretPos(message);
+	if (!position) return;
+	return interpretCommunity(message) ?? position;
 }
 
 function interpretFallback(message: AcarsRecord): AcarsInterpretation {
@@ -114,7 +128,7 @@ function interpretFallback(message: AcarsRecord): AcarsInterpretation {
 }
 
 function interpretApplication(message: AcarsRecord): AcarsInterpretation {
-	let text = message.text.trim();
+	let text = message.text.trimStart();
 	const sublabel =
 		message.label === 'H1'
 			? (message.direction === 'downlink' ? /^#([A-Z0-9]{2})B/ : /^- #([A-Z0-9]{2})/).exec(text)
@@ -122,25 +136,46 @@ function interpretApplication(message: AcarsRecord): AcarsInterpretation {
 	if (sublabel) text = text.slice(sublabel[0].length);
 	const mfi = sublabel ? /^\/([A-Z0-9]{2}) /.exec(text) : null;
 	if (mfi) text = text.slice(mfi[0].length);
-	const report = sublabel?.[1] === 'DF' ? interpretReport(text, message.receivedAt) : undefined;
+	const report = interpretReportApplication(text, message, sublabel?.[1]);
 	const result =
-		interpretOhma({ ...message, text }) ??
-		interpretArinc(text, message.direction) ??
+		interpretStructured({ ...message, text }) ??
 		report ??
 		interpretText({ ...message, text }) ??
 		interpretCommunity(message, text, sublabel?.[1]) ??
-		(sublabel?.[1] === 'DF' ? interpretDf(text) : undefined) ??
+		(sublabel?.[1] === 'DF' ? interpretDf(text, message.continuation) : undefined) ??
 		interpretTagged({ ...message, text }) ??
 		unknown(message);
-	result.fields.unshift(
-		...(sublabel ? [{ label: 'H1 sublabel', value: sublabel[1] }] : []),
-		...(mfi ? [{ label: 'Message function', value: mfi[1] }] : []),
-	);
+	result.fields.unshift(...applicationEnvelope(sublabel?.[1], mfi?.[1]));
 	return result;
+}
+
+function interpretStructured(message: AcarsRecord): AcarsInterpretation | undefined {
+	return (
+		interpretAts(message) ??
+		interpretArinc(message.text, message.direction) ??
+		interpretMiam(message) ??
+		interpretOhma(message)
+	);
+}
+
+function applicationEnvelope(sublabel?: string, mfi?: string) {
+	return [
+		...(sublabel ? [{ label: 'H1 sublabel', value: sublabel }] : []),
+		...(mfi ? [{ label: 'Message function', value: mfi }] : []),
+	];
 }
 
 function interpretReport(text: string, receivedAt: number): AcarsInterpretation | undefined {
 	return interpretAirbus(text, receivedAt) ?? interpretAcm(text) ?? interpretApm(text);
+}
+
+function interpretReportApplication(
+	text: string,
+	message: AcarsRecord,
+	sublabel?: string,
+): AcarsInterpretation | undefined {
+	if (message.direction === 'downlink' && sublabel === 'CF' && !message.continuation) return interpretRtr(text);
+	return sublabel === 'DF' ? interpretReport(text, message.receivedAt) : interpretTof(text, sublabel);
 }
 
 function unknown(message: AcarsRecord): AcarsInterpretation {
@@ -183,5 +218,6 @@ export function interpretAcars(
 		interpretation.notes.push(
 			'This block continues in another transmission (ETB); blocks are not reassembled until every consecutive block and the final ETX arrive.',
 		);
+	interpretMiamEmbedded(interpretation, message, (embedded) => interpretAcars(embedded, airportLookup));
 	return describeAirports(interpretation, airportLookup);
 }

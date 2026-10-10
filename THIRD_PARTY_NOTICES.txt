@@ -59,7 +59,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-xoolive/datalink (Rust FANS CPDLC catalogue/layouts, MIAM headers and ADS-C reference fixtures)
+xoolive/datalink (Rust FANS CPDLC, ATS/AOC text, MIAM, ADS-C fixtures,
+AVLC/XID/X.25/CLNP/COTP/IDRP and HFDL wire layouts and fixtures)
 https://github.com/xoolive/datalink
 
 MIT License
@@ -86,7 +87,8 @@ SOFTWARE.
 
 
 
-szpajder/libacars (C ADS-C scales, tag definitions, ARINC CRC, downlink reassembly and MIAM headers)
+szpajder/libacars (C ADS-C scales, ARINC CRC, uplink/downlink reassembly,
+FANS ASN.1 member layouts/constraints, MIAM lifecycle and OHMA reassembly)
 https://github.com/szpajder/libacars
 
 MIT License
@@ -186,3 +188,210 @@ freely, subject to the following restrictions:
 
   Jean-loup Gailly        Mark Adler
   jloup@gzip.org          madler@alumni.caltech.edu
+
+
+NetBSD ES-IS address lists and ISH timer
+--------------------------------------
+
+Adapted in src/transport/network/esis.ts from sys/netiso/esis.c and esis.h.
+Repository: https://github.com/NetBSD/src
+Revision: 8c101a16ae09856a61284f770c2099b38186fe7c
+Licenses: BSD-3-Clause and IBM permission notice, reproduced below.
+
+/*-
+ * Copyright (c) 1991, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)esis.c	8.3 (Berkeley) 3/20/95
+ */
+
+/***********************************************************
+		Copyright IBM Corporation 1987
+
+                      All Rights Reserved
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of IBM not be
+used in advertising or publicity pertaining to distribution of the
+software without specific, written prior permission.
+
+IBM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+IBM BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
+ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+SOFTWARE.
+
+******************************************************************/
+
+
+dumphfdl system-table layout
+https://github.com/szpajder/dumphfdl
+Revision bb7234bdf12ff1ca5f1dc99a5710555f968c4e6e
+Copyright (c) Tomasz Lemiech <szpajder@gmail.com>
+
+GPL-3.0-or-later. Adapted src/systable.c station/frequency decoding in
+src/transport/hfdl/system-table.ts. Full GNU GPL version 3 is in LICENSE.
+Local bounds, indexed assembly and serial comparison are independently authored.
+Original repository MIT notice is retained in docs/MIT-LICENSE.txt.
+
+
+dumpvdl2 IDRP, ATN security label and XID parameter layouts
+https://github.com/szpajder/dumpvdl2
+Revision 686e87f2294ef6275855ba7364bd4bb9a0f8f56a
+Copyright (c) 2017-2026 Tomasz Lemiech <szpajder@gmail.com>
+
+Adapted src/idrp.c and src/atn.c in src/transport/network/idrp and atn/security.ts.
+Adapted src/xid.c parameter catalogue/fields in src/transport/xid/parameters.ts.
+This program is free software: you can redistribute it and/or modify it under
+GNU GPL version 3, or (at your option) any later version. It is distributed
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. Full GPL version 3 is in LICENSE.
+The port adds independent bounds/validation and preserves unverified authentication.
+
+Wireshark ATN extended transport checksum
+https://github.com/wireshark/wireshark
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Laurent Deniel <laurent.deniel@free.fr>
+Ralf Schneider <Ralf.Schneider@t-online.de>
+Copyright 1998 Gerald Combs <gerald@wireshark.org>
+SPDX-License-Identifier: GPL-2.0-or-later
+
+Adapted epan/dissectors/packet-osi.c checksum/pseudo-trailer logic in
+src/transport/network/atn/integrity.ts. This combined distribution elects
+GPL version 3 under the source's later-version permission. Full terms in LICENSE.
+The upstream 16-bit routine is marked untested; external verification remains pending.
+
+JAERO Aero signal units and receiver JSON layouts
+https://github.com/jontio/JAERO
+Revision 1d4e515921244aec1d85a03f5f38b4e7818fdbe6
+Adapted JAERO/aerol.cpp, aerol.h and mainwindow.cpp in src/transport/aero
+and src/transport/receivers.ts; independent bounded streaming state and fixtures.
+
+The MIT License (MIT)
+
+Copyright (c) 2015-2019 Jonathan Olds
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Python-Metar core weather token layouts and scales
+https://github.com/python-metar/python-metar
+Revision 281fb19e4f8870074844cba5e4b390a1f5fe7c6e
+Adapted metar/Metar.py in src/payload/protocols/text/metar.
+The source header names BSD-2-Clause; the repository LICENSE contains the
+following single redistribution condition, reproduced verbatim:
+
+Copyright (c) 2004-2018, Tom Pollard
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+Wireshark ATN ULCS short headers and presentation layouts
+https://github.com/wireshark/wireshark
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-ulcs/packet-atn-ulcs-template.c and
+atn-ulcs.asn in src/payload/protocols/atn.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.
+
+dumpvdl2 B2 CPDLC and ADS-C v2 data-only descriptors
+https://github.com/szpajder/dumpvdl2
+Revision 686e87f2294ef6275855ba7364bd4bb9a0f8f56a
+src/asn1 generated CPDLCMessageSetVersion2BCVersion1, ADSMessageSetVersion2,
+PMCPDLCAPDUsVersion1, PMADSCAPDUVersion1 and ATNCommonTypes tables extracted
+without execution by scripts/upstream/atn-b2-schema.py into
+src/payload/protocols/atn/b2/schema.json. Generated source headers identify
+asn1c-0.9.28 and the original ASN.1 module names. No C runtime copied or executed.
+GPL-3.0-or-later; the dumpvdl2 notice reproduced above and LICENSE apply.
+The bounded TypeScript reader and independent/conformance fixtures are locally authored.
+
+FANS data-only ASN.1 schema descriptors
+MIT libacars revision 9af09a0121d4ec577339cbd4c7420d7519da48fa
+213 libacars/asn1/FANS*.c descriptors extracted without executing upstream code
+into src/payload/protocols/cpdlc/schema.json by scripts/upstream/fans-schema.py.
+The libacars copyright and MIT permission notice reproduced above apply.
+The bounded generic UPER reader and synthetic conformance encoder are locally authored.
+
+Wireshark ATN ACSE and CMMessageSetVersion1 layouts
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-ulcs/atn-ulcs.asn and atn-cm/atn-cm.asn
+in src/payload/protocols/atn/acse*.ts and cm*.ts.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.
+
+Wireshark ATN CPDLC version 1 data-only schemas
+Revision ad85ea3cb5af4e9665f1b3e3cda5bee94b71ab73
+Adapted epan/dissectors/asn1/atn-cpdlc/atn-cpdlc.asn and generated
+epan/dissectors/packet-atn-cpdlc.c into src/payload/protocols/atn/cpdlc-schema.json.
+Extracted by locally authored scripts/upstream/atn-schema.py without execution.
+By Mathias Guettler <guettler@web.de>, Copyright 2013
+Copyright 1998 Gerald Combs
+SPDX-License-Identifier: GPL-2.0-or-later
+This combined distribution elects GPL version 3. Full terms in LICENSE.

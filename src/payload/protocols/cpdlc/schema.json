@@ -1,0 +1,1748 @@
+{
+	"revision": "9af09a0121d4ec577339cbd4c7420d7519da48fa",
+	"nodes": {
+		"FANSAircraftEquipmentCode": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["cOMNAVApproachEquipmentAvailable", "FANSCOMNAVApproachEquipmentAvailable", false],
+				["comnavequipmentstatus-seqOf", "FANSCOMNAVEquipmentStatusSequence", true],
+				["sSREquipmentAvailable", "FANSSSREquipmentAvailable", false]
+			]
+		},
+		"FANSAircraftFlightIdentification": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 2, 7]
+		},
+		"FANSAircraftType": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 2, 2, 2, 5]
+		},
+		"FANSAirport": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 0, 0, 4, 4]
+		},
+		"FANSAirportDeparture": {
+			"kind": "FANSAirport",
+			"constraints": null
+		},
+		"FANSAirportDestination": {
+			"kind": "FANSAirport",
+			"constraints": null
+		},
+		"FANSAirwayIdentifier": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 1, 5]
+		},
+		"FANSAirwayIntercept": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 1, 5]
+		},
+		"FANSAltimeter": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["altimeterEnglish", "FANSAltimeterEnglish", false],
+				["altimeterMetric", "FANSAltimeterMetric", false]
+			]
+		},
+		"FANSAltimeterEnglish": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 2200, 3200, -1, -1, 0, 0]
+		},
+		"FANSAltimeterMetric": {
+			"kind": "NativeInteger",
+			"constraints": [13, 13, 7500, 12500, -1, -1, 0, 0]
+		},
+		"FANSAltitude": {
+			"kind": "CHOICE",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0],
+			"members": [
+				["altitudeQNH", "FANSAltitudeQNH", false],
+				["altitudeQNHMeters", "FANSAltitudeQNHMeters", false],
+				["altitudeQFE", "FANSAltitudeQFE", false],
+				["altitudeQFEMeters", "FANSAltitudeQFEMeters", false],
+				["altitudeGNSSFeet", "FANSAltitudeGNSSFeet", false],
+				["altitudeGNSSMeters", "FANSAltitudeGNSSMeters", false],
+				["altitudeFlightLevel", "FANSAltitudeFlightLevel", false],
+				["altitudeFlightLevelMetric", "FANSAltitudeFlightLevelMetric", false]
+			]
+		},
+		"FANSAltitudeAltitude": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 2, 2],
+			"members": [["", "FANSAltitude", true]]
+		},
+		"FANSAltitudeFlightLevel": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 30, 600, -1, -1, 0, 0]
+		},
+		"FANSAltitudeFlightLevelMetric": {
+			"kind": "NativeInteger",
+			"constraints": [11, 11, 100, 2000, -1, -1, 0, 0]
+		},
+		"FANSAltitudeGNSSFeet": {
+			"kind": "NativeInteger",
+			"constraints": [18, -1, 0, 150000, -1, -1, 0, 0]
+		},
+		"FANSAltitudeGNSSMeters": {
+			"kind": "NativeInteger",
+			"constraints": [16, 16, 0, 50000, -1, -1, 0, 0]
+		},
+		"FANSAltitudePosition": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["altitude", "FANSAltitude", false],
+				["position", "FANSPosition", false]
+			]
+		},
+		"FANSAltitudeQFE": {
+			"kind": "NativeInteger",
+			"constraints": [12, 12, 0, 2100, -1, -1, 0, 0]
+		},
+		"FANSAltitudeQFEMeters": {
+			"kind": "NativeInteger",
+			"constraints": [13, 13, 0, 7000, -1, -1, 0, 0]
+		},
+		"FANSAltitudeQNH": {
+			"kind": "NativeInteger",
+			"constraints": [12, 12, 0, 2500, -1, -1, 0, 0]
+		},
+		"FANSAltitudeQNHMeters": {
+			"kind": "NativeInteger",
+			"constraints": [14, 14, 0, 16000, -1, -1, 0, 0]
+		},
+		"FANSAltitudeRestriction": {
+			"kind": "FANSAltitude",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0]
+		},
+		"FANSAltitudeSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["altitude", "FANSAltitude", false],
+				["speed", "FANSSpeed", false]
+			]
+		},
+		"FANSAltitudeSpeedSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["altitude", "FANSAltitude", false],
+				["speed-seqOf", "FANSSpeedSpeed", false]
+			]
+		},
+		"FANSAltitudeTime": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["altitude", "FANSAltitude", false],
+				["time", "FANSTime", false]
+			]
+		},
+		"FANSATCDownlinkMessage": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["aTCMessageheader", "FANSATCMessageHeader", false],
+				["aTCDownlinkmsgelementid", "FANSATCDownlinkMsgElementId", false],
+				["aTCdownlinkmsgelementid-seqOf", "FANSATCDownlinkMsgElementIdSequence", true]
+			]
+		},
+		"FANSATCDownlinkMsgElementId": {
+			"kind": "CHOICE",
+			"constraints": [8, 8, 0, 128, -1, -1, 0, 0],
+			"members": [
+				["dM0NULL", "NULL", false],
+				["dM1NULL", "NULL", false],
+				["dM2NULL", "NULL", false],
+				["dM3NULL", "NULL", false],
+				["dM4NULL", "NULL", false],
+				["dM5NULL", "NULL", false],
+				["dM6Altitude", "FANSAltitude", false],
+				["dM7AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["dM8Altitude", "FANSAltitude", false],
+				["dM9Altitude", "FANSAltitude", false],
+				["dM10Altitude", "FANSAltitude", false],
+				["dM11PositionAltitude", "FANSPositionAltitude", false],
+				["dM12PositionAltitude", "FANSPositionAltitude", false],
+				["dM13TimeAltitude", "FANSTimeAltitude", false],
+				["dM14TimeAltitude", "FANSTimeAltitude", false],
+				["dM15DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["dM16PositionDistanceOffsetDirection", "FANSPositionDistanceOffsetDirection", false],
+				["dM17TimeDistanceOffsetDirection", "FANSTimeDistanceOffsetDirection", false],
+				["dM18Speed", "FANSSpeed", false],
+				["dM19SpeedSpeed", "FANSSpeedSpeed", false],
+				["dM20NULL", "NULL", false],
+				["dM21Frequency", "FANSFrequency", false],
+				["dM22Position", "FANSPosition", false],
+				["dM23ProcedureName", "FANSProcedureName", false],
+				["dM24RouteClearance", "FANSRouteClearance", false],
+				["dM25NULL", "NULL", false],
+				["dM26PositionRouteClearance", "FANSPositionRouteClearance", false],
+				["dM27DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["dM28Altitude", "FANSAltitude", false],
+				["dM29Altitude", "FANSAltitude", false],
+				["dM30Altitude", "FANSAltitude", false],
+				["dM31Position", "FANSPosition", false],
+				["dM32Altitude", "FANSAltitude", false],
+				["dM33Position", "FANSPosition", false],
+				["dM34Speed", "FANSSpeed", false],
+				["dM35Degrees", "FANSDegrees", false],
+				["dM36Degrees", "FANSDegrees", false],
+				["dM37Altitude", "FANSAltitude", false],
+				["dM38Altitude", "FANSAltitude", false],
+				["dM39Speed", "FANSSpeed", false],
+				["dM40RouteClearance", "FANSRouteClearance", false],
+				["dM41NULL", "NULL", false],
+				["dM42Position", "FANSPosition", false],
+				["dM43Time", "FANSTime", false],
+				["dM44Position", "FANSPosition", false],
+				["dM45Position", "FANSPosition", false],
+				["dM46Time", "FANSTime", false],
+				["dM47BeaconCode", "FANSBeaconCode", false],
+				["dM48PositionReport", "FANSPositionReport", false],
+				["dM49Speed", "FANSSpeed", false],
+				["dM50SpeedSpeed", "FANSSpeedSpeed", false],
+				["dM51NULL", "NULL", false],
+				["dM52NULL", "NULL", false],
+				["dM53NULL", "NULL", false],
+				["dM54Altitude", "FANSAltitude", false],
+				["dM55NULL", "NULL", false],
+				["dM56NULL", "NULL", false],
+				["dM57RemainingFuelRemainingSouls", "FANSRemainingFuelRemainingSouls", false],
+				["dM58NULL", "NULL", false],
+				["dM59PositionRouteClearance", "FANSPositionRouteClearance", false],
+				["dM60DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["dM61Altitude", "FANSAltitude", false],
+				["dM62ErrorInformation", "FANSErrorInformation", false],
+				["dM63NULL", "NULL", false],
+				["dM64ICAOfacilitydesignation", "FANSICAOfacilityDesignation", false],
+				["dM65NULL", "NULL", false],
+				["dM66NULL", "NULL", false],
+				["dM67FreeText", "FANSFreeText", false],
+				["dM68FreeText", "FANSFreeText", false],
+				["dM69NULL", "NULL", false],
+				["dM70Degrees", "FANSDegrees", false],
+				["dM71Degrees", "FANSDegrees", false],
+				["dM72Altitude", "FANSAltitude", false],
+				["dM73VersionNumber", "FANSVersionNumber", false],
+				["dM74NULL", "NULL", false],
+				["dM75NULL", "NULL", false],
+				["dM76AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["dM77AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["dM78TimeDistanceToFromPosition", "FANSTimeDistanceToFromPosition", false],
+				["dM79ATISCode", "FANSATISCode", false],
+				["dM80DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["dM81NULL", "NULL", false],
+				["dM82NULL", "NULL", false],
+				["dM83NULL", "NULL", false],
+				["dM84NULL", "NULL", false],
+				["dM85NULL", "NULL", false],
+				["dM86NULL", "NULL", false],
+				["dM87NULL", "NULL", false],
+				["dM88NULL", "NULL", false],
+				["dM89NULL", "NULL", false],
+				["dM90NULL", "NULL", false],
+				["dM91NULL", "NULL", false],
+				["dM92NULL", "NULL", false],
+				["dM93NULL", "NULL", false],
+				["dM94NULL", "NULL", false],
+				["dM95NULL", "NULL", false],
+				["dM96NULL", "NULL", false],
+				["dM97NULL", "NULL", false],
+				["dM98NULL", "NULL", false],
+				["dM99NULL", "NULL", false],
+				["dM100NULL", "NULL", false],
+				["dM101NULL", "NULL", false],
+				["dM102NULL", "NULL", false],
+				["dM103NULL", "NULL", false],
+				["dM104NULL", "NULL", false],
+				["dM105NULL", "NULL", false],
+				["dM106NULL", "NULL", false],
+				["dM107NULL", "NULL", false],
+				["dM108NULL", "NULL", false],
+				["dM109NULL", "NULL", false],
+				["dM110NULL", "NULL", false],
+				["dM111NULL", "NULL", false],
+				["dM112NULL", "NULL", false],
+				["dM113NULL", "NULL", false],
+				["dM114NULL", "NULL", false],
+				["dM115NULL", "NULL", false],
+				["dM116NULL", "NULL", false],
+				["dM117NULL", "NULL", false],
+				["dM118NULL", "NULL", false],
+				["dM119NULL", "NULL", false],
+				["dM120NULL", "NULL", false],
+				["dM121NULL", "NULL", false],
+				["dM122NULL", "NULL", false],
+				["dM123NULL", "NULL", false],
+				["dM124NULL", "NULL", false],
+				["dM125NULL", "NULL", false],
+				["dM126NULL", "NULL", false],
+				["dM127NULL", "NULL", false],
+				["dM128NULL", "NULL", false]
+			]
+		},
+		"FANSATCDownlinkMsgElementIdSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 2, 2, 1, 4],
+			"members": [["", "FANSATCDownlinkMsgElementId", true]]
+		},
+		"FANSATCMessageHeader": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["msgIdentificationNumber", "FANSMsgIdentificationNumber", false],
+				["msgReferenceNumber", "FANSMsgReferenceNumber", true],
+				["timestamp", "FANSTimestamp", true]
+			]
+		},
+		"FANSATCUplinkMessage": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["aTCMessageheader", "FANSATCMessageHeader", false],
+				["aTCuplinkmsgelementId", "FANSATCUplinkMsgElementId", false],
+				["aTCuplinkmsgelementid-seqOf", "FANSATCUplinkMsgElementIdSequence", true]
+			]
+		},
+		"FANSATCUplinkMsgElementId": {
+			"kind": "CHOICE",
+			"constraints": [8, 8, 0, 182, -1, -1, 0, 0],
+			"members": [
+				["uM0NULL", "NULL", false],
+				["uM1NULL", "NULL", false],
+				["uM2NULL", "NULL", false],
+				["uM3NULL", "NULL", false],
+				["uM4NULL", "NULL", false],
+				["uM5NULL", "NULL", false],
+				["uM6Altitude", "FANSAltitude", false],
+				["uM7Time", "FANSTime", false],
+				["uM8Position", "FANSPosition", false],
+				["uM9Time", "FANSTime", false],
+				["uM10Position", "FANSPosition", false],
+				["uM11Time", "FANSTime", false],
+				["uM12Position", "FANSPosition", false],
+				["uM13TimeAltitude", "FANSTimeAltitude", false],
+				["uM14PositionAltitude", "FANSPositionAltitude", false],
+				["uM15TimeAltitude", "FANSTimeAltitude", false],
+				["uM16PositionAltitude", "FANSPositionAltitude", false],
+				["uM17TimeAltitude", "FANSTimeAltitude", false],
+				["uM18PositionAltitude", "FANSPositionAltitude", false],
+				["uM19Altitude", "FANSAltitude", false],
+				["uM20Altitude", "FANSAltitude", false],
+				["uM21TimeAltitude", "FANSTimeAltitude", false],
+				["uM22PositionAltitude", "FANSPositionAltitude", false],
+				["uM23Altitude", "FANSAltitude", false],
+				["uM24TimeAltitude", "FANSTimeAltitude", false],
+				["uM25PositionAltitude", "FANSPositionAltitude", false],
+				["uM26AltitudeTime", "FANSAltitudeTime", false],
+				["uM27AltitudePosition", "FANSAltitudePosition", false],
+				["uM28AltitudeTime", "FANSAltitudeTime", false],
+				["uM29AltitudePosition", "FANSAltitudePosition", false],
+				["uM30AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["uM31AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["uM32AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["uM33Altitude", "FANSAltitude", false],
+				["uM34Altitude", "FANSAltitude", false],
+				["uM35Altitude", "FANSAltitude", false],
+				["uM36Altitude", "FANSAltitude", false],
+				["uM37Altitude", "FANSAltitude", false],
+				["uM38Altitude", "FANSAltitude", false],
+				["uM39Altitude", "FANSAltitude", false],
+				["uM40Altitude", "FANSAltitude", false],
+				["uM41Altitude", "FANSAltitude", false],
+				["uM42PositionAltitude", "FANSPositionAltitude", false],
+				["uM43PositionAltitude", "FANSPositionAltitude", false],
+				["uM44PositionAltitude", "FANSPositionAltitude", false],
+				["uM45PositionAltitude", "FANSPositionAltitude", false],
+				["uM46PositionAltitude", "FANSPositionAltitude", false],
+				["uM47PositionAltitude", "FANSPositionAltitude", false],
+				["uM48PositionAltitude", "FANSPositionAltitude", false],
+				["uM49PositionAltitude", "FANSPositionAltitude", false],
+				["uM50PositionAltitudeAltitude", "FANSPositionAltitudeAltitude", false],
+				["uM51PositionTime", "FANSPositionTime", false],
+				["uM52PositionTime", "FANSPositionTime", false],
+				["uM53PositionTime", "FANSPositionTime", false],
+				["uM54PositionTimeTime", "FANSPositionTimeTime", false],
+				["uM55PositionSpeed", "FANSPositionSpeed", false],
+				["uM56PositionSpeed", "FANSPositionSpeed", false],
+				["uM57PositionSpeed", "FANSPositionSpeed", false],
+				["uM58PositionTimeAltitude", "FANSPositionTimeAltitude", false],
+				["uM59PositionTimeAltitude", "FANSPositionTimeAltitude", false],
+				["uM60PositionTimeAltitude", "FANSPositionTimeAltitude", false],
+				["uM61PositionAltitudeSpeed", "FANSPositionAltitudeSpeed", false],
+				["uM62TimePositionAltitude", "FANSTimePositionAltitude", false],
+				["uM63TimePositionAltitudeSpeed", "FANSTimePositionAltitudeSpeed", false],
+				["uM64DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["uM65PositionDistanceOffsetDirection", "FANSPositionDistanceOffsetDirection", false],
+				["uM66TimeDistanceOffsetDirection", "FANSTimeDistanceOffsetDirection", false],
+				["uM67NULL", "NULL", false],
+				["uM68Position", "FANSPosition", false],
+				["uM69Time", "FANSTime", false],
+				["uM70Position", "FANSPosition", false],
+				["uM71Time", "FANSTime", false],
+				["uM72NULL", "NULL", false],
+				["uM73Predepartureclearance", "FANSPredepartureClearance", false],
+				["uM74Position", "FANSPosition", false],
+				["uM75Position", "FANSPosition", false],
+				["uM76TimePosition", "FANSTimePosition", false],
+				["uM77PositionPosition", "FANSPositionPosition", false],
+				["uM78AltitudePosition", "FANSAltitudePosition", false],
+				["uM79PositionRouteClearance", "FANSPositionRouteClearance", false],
+				["uM80RouteClearance", "FANSRouteClearance", false],
+				["uM81ProcedureName", "FANSProcedureName", false],
+				["uM82DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["uM83PositionRouteClearance", "FANSPositionRouteClearance", false],
+				["uM84PositionProcedureName", "FANSPositionProcedureName", false],
+				["uM85RouteClearance", "FANSRouteClearance", false],
+				["uM86PositionRouteClearance", "FANSPositionRouteClearance", false],
+				["uM87Position", "FANSPosition", false],
+				["uM88PositionPosition", "FANSPositionPosition", false],
+				["uM89TimePosition", "FANSTimePosition", false],
+				["uM90AltitudePosition", "FANSAltitudePosition", false],
+				["uM91HoldClearance", "FANSHoldClearance", false],
+				["uM92PositionAltitude", "FANSPositionAltitude", false],
+				["uM93Time", "FANSTime", false],
+				["uM94DirectionDegrees", "FANSDirectionDegrees", false],
+				["uM95DirectionDegrees", "FANSDirectionDegrees", false],
+				["uM96NULL", "NULL", false],
+				["uM97PositionDegrees", "FANSPositionDegrees", false],
+				["uM98DirectionDegrees", "FANSDirectionDegrees", false],
+				["uM99ProcedureName", "FANSProcedureName", false],
+				["uM100TimeSpeed", "FANSTimeSpeed", false],
+				["uM101PositionSpeed", "FANSPositionSpeed", false],
+				["uM102AltitudeSpeed", "FANSAltitudeSpeed", false],
+				["uM103TimeSpeedSpeed", "FANSTimeSpeedSpeed", false],
+				["uM104PositionSpeedSpeed", "FANSPositionSpeedSpeed", false],
+				["uM105AltitudeSpeedSpeed", "FANSAltitudeSpeedSpeed", false],
+				["uM106Speed", "FANSSpeed", false],
+				["uM107NULL", "NULL", false],
+				["uM108Speed", "FANSSpeed", false],
+				["uM109Speed", "FANSSpeed", false],
+				["uM110SpeedSpeed", "FANSSpeedSpeed", false],
+				["uM111Speed", "FANSSpeed", false],
+				["uM112Speed", "FANSSpeed", false],
+				["uM113Speed", "FANSSpeed", false],
+				["uM114Speed", "FANSSpeed", false],
+				["uM115Speed", "FANSSpeed", false],
+				["uM116NULL", "NULL", false],
+				["uM117ICAOunitnameFrequency", "FANSICAOUnitNameFrequency", false],
+				["uM118PositionICAOunitnameFrequency", "FANSPositionICAOUnitNameFrequency", false],
+				["uM119TimeICAOunitnameFrequency", "FANSTimeICAOunitnameFrequency", false],
+				["uM120ICAOunitnameFrequency", "FANSICAOUnitNameFrequency", false],
+				["uM121PositionICAOunitnameFrequency", "FANSPositionICAOUnitNameFrequency", false],
+				["uM122TimeICAOunitnameFrequency", "FANSTimeICAOunitnameFrequency", false],
+				["uM123BeaconCode", "FANSBeaconCode", false],
+				["uM124NULL", "NULL", false],
+				["uM125NULL", "NULL", false],
+				["uM126NULL", "NULL", false],
+				["uM127NULL", "NULL", false],
+				["uM128Altitude", "FANSAltitude", false],
+				["uM129Altitude", "FANSAltitude", false],
+				["uM130Position", "FANSPosition", false],
+				["uM131NULL", "NULL", false],
+				["uM132NULL", "NULL", false],
+				["uM133NULL", "NULL", false],
+				["uM134NULL", "NULL", false],
+				["uM135NULL", "NULL", false],
+				["uM136NULL", "NULL", false],
+				["uM137NULL", "NULL", false],
+				["uM138NULL", "NULL", false],
+				["uM139NULL", "NULL", false],
+				["uM140NULL", "NULL", false],
+				["uM141NULL", "NULL", false],
+				["uM142NULL", "NULL", false],
+				["uM143NULL", "NULL", false],
+				["uM144NULL", "NULL", false],
+				["uM145NULL", "NULL", false],
+				["uM146NULL", "NULL", false],
+				["uM147NULL", "NULL", false],
+				["uM148Altitude", "FANSAltitude", false],
+				["uM149AltitudePosition", "FANSAltitudePosition", false],
+				["uM150AltitudeTime", "FANSAltitudeTime", false],
+				["uM151Speed", "FANSSpeed", false],
+				["uM152DistanceOffsetDirection", "FANSDistanceOffsetDirection", false],
+				["uM153Altimeter", "FANSAltimeter", false],
+				["uM154NULL", "NULL", false],
+				["uM155Position", "FANSPosition", false],
+				["uM156NULL", "NULL", false],
+				["uM157Frequency", "FANSFrequency", false],
+				["uM158ATISCode", "FANSATISCode", false],
+				["uM159ErrorInformation", "FANSErrorInformation", false],
+				["uM160ICAOfacilitydesignation", "FANSICAOfacilityDesignation", false],
+				["uM161NULL", "NULL", false],
+				["uM162NULL", "NULL", false],
+				["uM163ICAOfacilitydesignationTp4table", "FANSICAOFacilityDesignationTp4Table", false],
+				["uM164NULL", "NULL", false],
+				["uM165NULL", "NULL", false],
+				["uM166NULL", "NULL", false],
+				["uM167NULL", "NULL", false],
+				["uM168NULL", "NULL", false],
+				["uM169FreeText", "FANSFreeText", false],
+				["uM170FreeText", "FANSFreeText", false],
+				["uM171VerticalRate", "FANSVerticalRate", false],
+				["uM172VerticalRate", "FANSVerticalRate", false],
+				["uM173VerticalRate", "FANSVerticalRate", false],
+				["uM174VerticalRate", "FANSVerticalRate", false],
+				["uM175Altitude", "FANSAltitude", false],
+				["uM176NULL", "NULL", false],
+				["uM177NULL", "NULL", false],
+				["uM178NULL", "NULL", false],
+				["uM179NULL", "NULL", false],
+				["uM180AltitudeAltitude", "FANSAltitudeAltitude", false],
+				["uM181ToFromPosition", "FANSToFromPosition", false],
+				["uM182NULL", "NULL", false]
+			]
+		},
+		"FANSATCUplinkMsgElementIdSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 2, 2, 1, 4],
+			"members": [["", "FANSATCUplinkMsgElementId", true]]
+		},
+		"FANSATISCode": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 0, 0, 1, 1]
+		},
+		"FANSATWAlongTrackWaypoint": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["aTWdistance", "FANSATWDistance", false],
+				["speed", "FANSSpeed", true],
+				["aTWaltitudesequence", "FANSATWAltitudeSequence", true]
+			]
+		},
+		"FANSATWAlongTrackWaypointSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 3, 3, 1, 8],
+			"members": [["", "FANSATWAlongTrackWaypoint", true]]
+		},
+		"FANSATWAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["aTWAltitudeTolerance", "FANSATWAltitudeTolerance", false],
+				["altitude", "FANSAltitude", false]
+			]
+		},
+		"FANSATWAltitudeSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 1, 1, 1, 2],
+			"members": [["", "FANSATWAltitude", true]]
+		},
+		"FANSATWAltitudeTolerance": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 2, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "at",
+				"1": "atorabove",
+				"2": "atorbelow"
+			}
+		},
+		"FANSATWDistance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["atwDistanceTolerance", "FANSATWDistanceTolerance", false],
+				["distance", "FANSDistance", false]
+			]
+		},
+		"FANSATWDistanceTolerance": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "plus",
+				"1": "minus"
+			}
+		},
+		"FANSBeaconCode": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 4, 4],
+			"members": [["", "FANSBeaconCodeOctalDigit", true]]
+		},
+		"FANSBeaconCodeOctalDigit": {
+			"kind": "NativeInteger",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0]
+		},
+		"FANSCOMNAVApproachEquipmentAvailable": {
+			"kind": "BOOLEAN",
+			"constraints": null
+		},
+		"FANSCOMNAVEquipmentStatus": {
+			"kind": "NativeEnumerated",
+			"constraints": [4, 4, 0, 15, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "aloranA",
+				"1": "cloranC",
+				"2": "ddme",
+				"3": "edecca",
+				"4": "fadf",
+				"5": "ggnss",
+				"6": "hhfRTF",
+				"7": "iinertialNavigation",
+				"8": "lils",
+				"9": "momega",
+				"10": "ovor",
+				"11": "pdoppler",
+				"12": "rrnavRouteEquipment",
+				"13": "ttacan",
+				"14": "uuhfRTF",
+				"15": "vvhfRTF"
+			}
+		},
+		"FANSCOMNAVEquipmentStatusSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 4, 4, 1, 16],
+			"members": [["", "FANSCOMNAVEquipmentStatus", true]]
+		},
+		"FANSDegreeIncrement": {
+			"kind": "NativeInteger",
+			"constraints": [5, 5, 1, 20, -1, -1, 0, 0]
+		},
+		"FANSDegrees": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["degreesMagnetic", "FANSDegreesMagnetic", false],
+				["degreesTrue", "FANSDegreesTrue", false]
+			]
+		},
+		"FANSDegreesMagnetic": {
+			"kind": "NativeInteger",
+			"constraints": [9, 9, 1, 360, -1, -1, 0, 0]
+		},
+		"FANSDegreesTrue": {
+			"kind": "NativeInteger",
+			"constraints": [9, 9, 1, 360, -1, -1, 0, 0]
+		},
+		"FANSDirection": {
+			"kind": "NativeEnumerated",
+			"constraints": [4, 4, 0, 10, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "left",
+				"1": "right",
+				"2": "eitherSide",
+				"3": "north",
+				"4": "south",
+				"5": "east",
+				"6": "west",
+				"7": "northEast",
+				"8": "northWest",
+				"9": "southEast",
+				"10": "southWest"
+			}
+		},
+		"FANSDirectionDegrees": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["direction", "FANSDirection", false],
+				["degrees", "FANSDegrees", false]
+			]
+		},
+		"FANSDistance": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["distanceNm", "FANSDistanceNm", false],
+				["distanceKm", "FANSDistanceKm", false]
+			]
+		},
+		"FANSDistanceKm": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 1, 1024, -1, -1, 0, 0]
+		},
+		"FANSDistanceNm": {
+			"kind": "NativeInteger",
+			"constraints": [14, 14, 0, 9999, -1, -1, 0, 0]
+		},
+		"FANSDistanceOffset": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["distanceOffsetNm", "FANSDistanceOffsetNm", false],
+				["distanceOffsetKm", "FANSDistanceOffsetKm", false]
+			]
+		},
+		"FANSDistanceOffsetDirection": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["distanceOffset", "FANSDistanceOffset", false],
+				["direction", "FANSDirection", false]
+			]
+		},
+		"FANSDistanceOffsetKm": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 1, 256, -1, -1, 0, 0]
+		},
+		"FANSDistanceOffsetNm": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 1, 128, -1, -1, 0, 0]
+		},
+		"FANSEFCtime": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSErrorInformation": {
+			"kind": "NativeEnumerated",
+			"constraints": [5, 5, 0, 16, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "applicationError",
+				"1": "duplicateMsgIdentificationNumber",
+				"2": "unrecognizedMsgReferenceNumber",
+				"3": "endServiceWithPendingMsgs",
+				"4": "endServiceWithNoValidResponse",
+				"5": "insufficientMsgStorageCapacity",
+				"6": "noAvailableMsgIdentificationNumber",
+				"7": "commandedTermination",
+				"8": "insufficientData",
+				"9": "unexpectedData",
+				"10": "invalidData",
+				"11": "reservedErrorMsg1",
+				"12": "reservedErrorMsg2",
+				"13": "reservedErrorMsg3",
+				"14": "reservedErrorMsg4",
+				"15": "reservedErrorMsg5",
+				"16": "reservedErrorMsg6"
+			}
+		},
+		"FANSFixName": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 1, 5]
+		},
+		"FANSFixNext": {
+			"kind": "FANSPosition",
+			"constraints": [3, 3, 0, 4, -1, -1, 0, 0]
+		},
+		"FANSFixNextPlusOne": {
+			"kind": "FANSPosition",
+			"constraints": [3, 3, 0, 4, -1, -1, 0, 0]
+		},
+		"FANSFreeText": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 8, 8, 1, 256]
+		},
+		"FANSFrequency": {
+			"kind": "CHOICE",
+			"constraints": [2, 2, 0, 3, -1, -1, 0, 0],
+			"members": [
+				["frequencyhf", "FANSFrequencyhf", false],
+				["frequencyvhf", "FANSFrequencyvhf", false],
+				["frequencyuhf", "FANSFrequencyuhf", false],
+				["frequencysatchannel", "FANSFrequencysatchannel", false]
+			]
+		},
+		"FANSFrequencyDeparture": {
+			"kind": "FANSFrequencyvhf",
+			"constraints": null
+		},
+		"FANSFrequencyhf": {
+			"kind": "NativeInteger",
+			"constraints": [15, 15, 2850, 28000, -1, -1, 0, 0]
+		},
+		"FANSFrequencysatchannel": {
+			"kind": "NumericString",
+			"constraints": [4, 4, 32, 57, 0, 0, 12, 12]
+		},
+		"FANSFrequencyuhf": {
+			"kind": "NativeInteger",
+			"constraints": [18, -1, 225000, 399975, -1, -1, 0, 0]
+		},
+		"FANSFrequencyvhf": {
+			"kind": "NativeInteger",
+			"constraints": [15, -1, 117000, 138000, -1, -1, 0, 0]
+		},
+		"FANSHoldatwaypoint": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["holdatwaypointspeedlow", "FANSHoldatwaypointSpeedLow", true],
+				["aTWaltitude", "FANSATWAltitude", true],
+				["holdatwaypointspeedhigh", "FANSHoldatwaypointSpeedHigh", true],
+				["direction", "FANSDirection", true],
+				["degrees", "FANSDegrees", true],
+				["eFCtime", "FANSEFCtime", true],
+				["legType", "FANSLegType", true]
+			]
+		},
+		"FANSHoldatwaypointSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 3, 3, 1, 8],
+			"members": [["", "FANSHoldatwaypoint", true]]
+		},
+		"FANSHoldatwaypointSpeedHigh": {
+			"kind": "FANSSpeed",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0]
+		},
+		"FANSHoldatwaypointSpeedLow": {
+			"kind": "FANSSpeed",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0]
+		},
+		"FANSHoldClearance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["altitude", "FANSAltitude", false],
+				["degrees", "FANSDegrees", false],
+				["direction", "FANSDirection", false],
+				["legType", "FANSLegType", true]
+			]
+		},
+		"FANSICAOfacilityDesignation": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 0, 0, 4, 4]
+		},
+		"FANSICAOFacilityDesignationTp4Table": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["iCAOFacilityDesignation", "FANSICAOfacilityDesignation", false],
+				["tp4table", "FANSTp4table", false]
+			]
+		},
+		"FANSICAOFacilityFunction": {
+			"kind": "NativeEnumerated",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "center",
+				"1": "approach",
+				"2": "tower",
+				"3": "final",
+				"4": "groundControl",
+				"5": "clearanceDelivery",
+				"6": "departure",
+				"7": "control"
+			}
+		},
+		"FANSICAOFacilityIdentification": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["iCAOfacilitydesignation", "FANSICAOfacilityDesignation", false],
+				["iCAOfacilityname", "FANSICAOFacilityName", false]
+			]
+		},
+		"FANSICAOFacilityName": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 4, 4, 3, 18]
+		},
+		"FANSICAOUnitName": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["iCAOFacilityIdentification", "FANSICAOFacilityIdentification", false],
+				["iCAOFacilityFunction", "FANSICAOFacilityFunction", false]
+			]
+		},
+		"FANSICAOUnitNameFrequency": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["iCAOUnitName", "FANSICAOUnitName", false],
+				["frequency", "FANSFrequency", false]
+			]
+		},
+		"FANSIcing": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 3, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "trace",
+				"1": "light",
+				"2": "moderate",
+				"3": "severe"
+			}
+		},
+		"FANSInterceptCourseFrom": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["interceptCourceFromSelection", "FANSInterceptCourseFromSelection", false],
+				["degrees", "FANSDegrees", false]
+			]
+		},
+		"FANSInterceptCourseFromSelection": {
+			"kind": "CHOICE",
+			"constraints": [2, 2, 0, 3, -1, -1, 0, 0],
+			"members": [
+				["publishedIdentifier", "FANSPublishedIdentifier", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", false],
+				["placeBearingPlaceBearing", "FANSPlaceBearingPlaceBearing", false],
+				["placeBearingDistance", "FANSPlaceBearingDistance", false]
+			]
+		},
+		"FANSInterceptCourseFromSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 2, 2, 1, 4],
+			"members": [["", "FANSInterceptCourseFrom", true]]
+		},
+		"FANSLatitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["latitudeDegrees", "FANSLatitudeDegrees", false],
+				["minutesLatLon", "FANSMinutesLatLon", true],
+				["latitudeDirection", "FANSLatitudeDirection", false]
+			]
+		},
+		"FANSLatitudeDegrees": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 0, 90, -1, -1, 0, 0]
+		},
+		"FANSLatitudeDirection": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "north",
+				"1": "south"
+			}
+		},
+		"FANSLatitudeLongitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["latitude", "FANSLatitude", false],
+				["longitude", "FANSLongitude", false]
+			]
+		},
+		"FANSLatitudeLongitudeSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 7, 7, 1, 128],
+			"members": [["", "FANSLatitudeLongitude", true]]
+		},
+		"FANSLatitudeReportingPoints": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["latitudeDirection", "FANSLatitudeDirection", false],
+				["latitudeDegrees", "FANSLatitudeDegrees", false]
+			]
+		},
+		"FANSLatLonReportingPoints": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["latitudeReportingPoints", "FANSLatitudeReportingPoints", false],
+				["longitudeReportingPoints", "FANSLongitudeReportingPoints", false]
+			]
+		},
+		"FANSLegDistance": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["legDistanceEnglish", "FANSLegDistanceEnglish", false],
+				["legDistanceMetric", "FANSLegDistanceMetric", false]
+			]
+		},
+		"FANSLegDistanceEnglish": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 1, 999, -1, -1, 0, 0]
+		},
+		"FANSLegDistanceMetric": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 1, 128, -1, -1, 0, 0]
+		},
+		"FANSLegTime": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 1, 99, -1, -1, 0, 0]
+		},
+		"FANSLegType": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["legDistance", "FANSLegDistance", false],
+				["legTime", "FANSLegTime", false]
+			]
+		},
+		"FANSLongitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["longitudeDegrees", "FANSLongitudeDegrees", false],
+				["minutesLatLon", "FANSMinutesLatLon", true],
+				["longitudeDirection", "FANSLongitudeDirection", false]
+			]
+		},
+		"FANSLongitudeDegrees": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 0, 180, -1, -1, 0, 0]
+		},
+		"FANSLongitudeDirection": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "east",
+				"1": "west"
+			}
+		},
+		"FANSLongitudeReportingPoints": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["longitudeDirection", "FANSLongitudeDirection", false],
+				["longitudeDegrees", "FANSLongitudeDegrees", false]
+			]
+		},
+		"FANSMinutesLatLon": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 0, 599, -1, -1, 0, 0]
+		},
+		"FANSMsgIdentificationNumber": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 0, 63, -1, -1, 0, 0]
+		},
+		"FANSMsgReferenceNumber": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 0, 63, -1, -1, 0, 0]
+		},
+		"FANSNavaid": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 2, 2, 1, 4]
+		},
+		"FANSPDCrevision": {
+			"kind": "NativeInteger",
+			"constraints": [4, 4, 1, 16, -1, -1, 0, 0]
+		},
+		"FANSPlaceBearing": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["fixName", "FANSFixName", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", true],
+				["degrees", "FANSDegrees", false]
+			]
+		},
+		"FANSPlaceBearingDistance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["fixName", "FANSFixName", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", true],
+				["degrees", "FANSDegrees", false],
+				["distance", "FANSDistance", false]
+			]
+		},
+		"FANSPlaceBearingPlaceBearing": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 2, 2],
+			"members": [["", "FANSPlaceBearing", true]]
+		},
+		"FANSPosition": {
+			"kind": "CHOICE",
+			"constraints": [3, 3, 0, 4, -1, -1, 0, 0],
+			"members": [
+				["fixName", "FANSFixName", false],
+				["navaid", "FANSNavaid", false],
+				["airport", "FANSAirport", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", false],
+				["placeBearingDistance", "FANSPlaceBearingDistance", false]
+			]
+		},
+		"FANSPositionAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["altitude", "FANSAltitude", false]
+			]
+		},
+		"FANSPositionAltitudeAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["altitude-seqOf", "FANSAltitudeAltitude", false]
+			]
+		},
+		"FANSPositionAltitudeSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["altitude", "FANSAltitude", false],
+				["speed", "FANSSpeed", false]
+			]
+		},
+		"FANSPositionCurrent": {
+			"kind": "FANSPosition",
+			"constraints": [3, 3, 0, 4, -1, -1, 0, 0]
+		},
+		"FANSPositionDegrees": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["degrees", "FANSDegrees", false]
+			]
+		},
+		"FANSPositionDistanceOffsetDirection": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["distanceOffset", "FANSDistanceOffset", false],
+				["direction", "FANSDirection", false]
+			]
+		},
+		"FANSPositionICAOUnitNameFrequency": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["iCAOUnitName", "FANSICAOUnitName", false],
+				["frequency", "FANSFrequency", false]
+			]
+		},
+		"FANSPositionPosition": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 2, 2],
+			"members": [["", "FANSPosition", true]]
+		},
+		"FANSPositionProcedureName": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["procedureName", "FANSProcedureName", false]
+			]
+		},
+		"FANSPositionReport": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["positioncurrent", "FANSPositionCurrent", false],
+				["timeatpositioncurrent", "FANSTimeAtPositionCurrent", false],
+				["altitude", "FANSAltitude", false],
+				["fixnext", "FANSFixNext", true],
+				["timeetaatfixnext", "FANSTimeEtaAtFixNext", true],
+				["fixnextplusone", "FANSFixNextPlusOne", true],
+				["timeetadestination", "FANSTimeEtaDestination", true],
+				["remainingFuel", "FANSRemainingFuel", true],
+				["temperature", "FANSTemperature", true],
+				["winds", "FANSWinds", true],
+				["turbulence", "FANSTurbulence", true],
+				["icing", "FANSIcing", true],
+				["speed", "FANSSpeed", true],
+				["speedground", "FANSSpeedGround", true],
+				["verticalChange", "FANSVerticalChange", true],
+				["trackAngle", "FANSTrackAngle", true],
+				["trueHeading", "FANSTrueheading", true],
+				["distance", "FANSDistance", true],
+				["supplementaryInformation", "FANSSupplementaryInformation", true],
+				["reportedWaypointPosition", "FANSReportedWaypointPosition", true],
+				["reportedWaypointTime", "FANSReportedWaypointTime", true],
+				["reportedWaypointAltitude", "FANSReportedWaypointAltitude", true]
+			]
+		},
+		"FANSPositionRouteClearance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["routeClearance", "FANSRouteClearance", false]
+			]
+		},
+		"FANSPositionSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["speed", "FANSSpeed", false]
+			]
+		},
+		"FANSPositionSpeedSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["speed-seqOf", "FANSSpeedSpeed", false]
+			]
+		},
+		"FANSPositionTime": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["time", "FANSTime", false]
+			]
+		},
+		"FANSPositionTimeAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["time", "FANSTime", false],
+				["altitude", "FANSAltitude", false]
+			]
+		},
+		"FANSPositionTimeTime": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["time-seqOf", "FANSTimeTime", false]
+			]
+		},
+		"FANSPredepartureClearance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["aircraftFlightIdentification", "FANSAircraftFlightIdentification", false],
+				["aircraftType", "FANSAircraftType", true],
+				["aircraftEquipmentCode", "FANSAircraftEquipmentCode", true],
+				["timeDepartureEdct", "FANSTimeDepartureEdct", false],
+				["routeClearance", "FANSRouteClearance", false],
+				["altitudeRestriction", "FANSAltitudeRestriction", true],
+				["frequencyDeparture", "FANSFrequencyDeparture", false],
+				["beaconCode", "FANSBeaconCode", false],
+				["pDCrevision", "FANSPDCrevision", false]
+			]
+		},
+		"FANSProcedure": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 1, 6]
+		},
+		"FANSProcedureApproach": {
+			"kind": "FANSProcedureName",
+			"constraints": null
+		},
+		"FANSProcedureArrival": {
+			"kind": "FANSProcedureName",
+			"constraints": null
+		},
+		"FANSProcedureDeparture": {
+			"kind": "FANSProcedureName",
+			"constraints": null
+		},
+		"FANSProcedureName": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["procedureType", "FANSProcedureType", false],
+				["procedure", "FANSProcedure", false],
+				["procedureTransition", "FANSProcedureTransition", true]
+			]
+		},
+		"FANSProcedureTransition": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 3, 3, 1, 5]
+		},
+		"FANSProcedureType": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 2, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "arrival",
+				"1": "approach",
+				"2": "departure"
+			}
+		},
+		"FANSPublishedIdentifier": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["fixName", "FANSFixName", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", true]
+			]
+		},
+		"FANSRemainingFuel": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["hours", "FANSTimehours", false],
+				["minutes", "FANSTimeminutes", false]
+			]
+		},
+		"FANSRemainingFuelRemainingSouls": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["remainingFuel", "FANSRemainingFuel", false],
+				["remainingSouls", "FANSRemainingSouls", false]
+			]
+		},
+		"FANSRemainingSouls": {
+			"kind": "NativeInteger",
+			"constraints": [10, 10, 1, 1024, -1, -1, 0, 0]
+		},
+		"FANSReportedWaypointAltitude": {
+			"kind": "FANSAltitude",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0]
+		},
+		"FANSReportedWaypointPosition": {
+			"kind": "FANSPosition",
+			"constraints": [3, 3, 0, 4, -1, -1, 0, 0]
+		},
+		"FANSReportedWaypointTime": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSReportingPoints": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["latLonReportingPoints", "FANSLatLonReportingPoints", false],
+				["degreeIncrement", "FANSDegreeIncrement", true]
+			]
+		},
+		"FANSRouteClearance": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["airportDeparture", "FANSAirportDeparture", true],
+				["airportDestination", "FANSAirportDestination", true],
+				["runwayDeparture", "FANSRunwayDeparture", true],
+				["procedureDeparture", "FANSProcedureDeparture", true],
+				["runwayArrival", "FANSRunwayArrival", true],
+				["procedureApproach", "FANSProcedureApproach", true],
+				["procedureArrival", "FANSProcedureArrival", true],
+				["airwayIntercept", "FANSAirwayIntercept", true],
+				["routeinformation-seqOf", "FANSRouteInformationSequence", true],
+				["routeInformationAdditional", "FANSRouteInformationAdditional", true]
+			]
+		},
+		"FANSRouteInformation": {
+			"kind": "CHOICE",
+			"constraints": [3, 3, 0, 5, -1, -1, 0, 0],
+			"members": [
+				["publishedIdentifier", "FANSPublishedIdentifier", false],
+				["latitudeLongitude", "FANSLatitudeLongitude", false],
+				["placeBearingPlaceBearing", "FANSPlaceBearingPlaceBearing", false],
+				["placeBearingDistance", "FANSPlaceBearingDistance", false],
+				["airwayIdentifier", "FANSAirwayIdentifier", false],
+				["trackDetail", "FANSTrackDetail", false]
+			]
+		},
+		"FANSRouteInformationAdditional": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["aTWalongtrackwaypointsequence", "FANSATWAlongTrackWaypointSequence", true],
+				["reportingPoints", "FANSReportingPoints", true],
+				["interceptCourseFromSequence", "FANSInterceptCourseFromSequence", true],
+				["holdAtWaypointSequence", "FANSHoldatwaypointSequence", true],
+				["waypointSpeedAltitudeSequence", "FANSWaypointSpeedAltitudesequence", true],
+				["rTArequiredtimearrivalsequenc", "FANSRTARequiredTimeArrivalSequence", true]
+			]
+		},
+		"FANSRouteInformationSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 7, 7, 1, 128],
+			"members": [["", "FANSRouteInformation", true]]
+		},
+		"FANSRTARequiredTimeArrival": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["rTATime", "FANSRTATime", false],
+				["rTATolerance", "FANSRTATolerance", true]
+			]
+		},
+		"FANSRTARequiredTimeArrivalSequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 5, 5, 1, 32],
+			"members": [["", "FANSRTARequiredTimeArrival", true]]
+		},
+		"FANSRTATime": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["timeTolerance", "FANSTimeTolerance", false]
+			]
+		},
+		"FANSRTATolerance": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 1, 150, -1, -1, 0, 0]
+		},
+		"FANSRunway": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["runwayDirection", "FANSRunwayDirection", false],
+				["runwayConfiguration", "FANSRunwayConfiguration", false]
+			]
+		},
+		"FANSRunwayArrival": {
+			"kind": "FANSRunway",
+			"constraints": null
+		},
+		"FANSRunwayConfiguration": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 3, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "left",
+				"1": "right",
+				"2": "center",
+				"3": "none"
+			}
+		},
+		"FANSRunwayDeparture": {
+			"kind": "FANSRunway",
+			"constraints": null
+		},
+		"FANSRunwayDirection": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 1, 36, -1, -1, 0, 0]
+		},
+		"FANSSpeed": {
+			"kind": "CHOICE",
+			"constraints": [3, 3, 0, 7, -1, -1, 0, 0],
+			"members": [
+				["speedIndicated", "FANSSpeedIndicated", false],
+				["speedIndicatedMetric", "FANSSpeedIndicatedMetric", false],
+				["speedTrue", "FANSSpeedTrue", false],
+				["speedTrueMetric", "FANSSpeedTrueMetric", false],
+				["speedGround", "FANSSpeedGround", false],
+				["speedGroundMetric", "FANSSpeedGroundMetric", false],
+				["speedMach", "FANSSpeedMach", false],
+				["speedMachLarge", "FANSSpeedMachLarge", false]
+			]
+		},
+		"FANSSpeedGround": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 7, 70, -1, -1, 0, 0]
+		},
+		"FANSSpeedGroundMetric": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 10, 265, -1, -1, 0, 0]
+		},
+		"FANSSpeedIndicated": {
+			"kind": "NativeInteger",
+			"constraints": [5, 5, 7, 38, -1, -1, 0, 0]
+		},
+		"FANSSpeedIndicatedMetric": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 10, 137, -1, -1, 0, 0]
+		},
+		"FANSSpeedMach": {
+			"kind": "NativeInteger",
+			"constraints": [5, 5, 61, 92, -1, -1, 0, 0]
+		},
+		"FANSSpeedMachLarge": {
+			"kind": "NativeInteger",
+			"constraints": [9, 9, 93, 604, -1, -1, 0, 0]
+		},
+		"FANSSpeedSpeed": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 2, 2],
+			"members": [["", "FANSSpeed", true]]
+		},
+		"FANSSpeedTrue": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 7, 70, -1, -1, 0, 0]
+		},
+		"FANSSpeedTrueMetric": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, 10, 137, -1, -1, 0, 0]
+		},
+		"FANSSSREquipmentAvailable": {
+			"kind": "NativeEnumerated",
+			"constraints": [3, 3, 0, 6, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "nnil",
+				"1": "atransponderModeA",
+				"2": "ctransponderModeAandC",
+				"3": "xtransponderModeS",
+				"4": "ptransponderModeSPA",
+				"5": "itransponderModeSID",
+				"6": "stransponderModeSPAID"
+			}
+		},
+		"FANSSupplementaryInformation": {
+			"kind": "FANSFreeText",
+			"constraints": null
+		},
+		"FANSTemperature": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["temperatureC", "FANSTemperatureC", false],
+				["temperatureF", "FANSTemperatureF", false]
+			]
+		},
+		"FANSTemperatureC": {
+			"kind": "NativeInteger",
+			"constraints": [7, 7, -80, 47, -1, -1, 0, 0]
+		},
+		"FANSTemperatureF": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, -105, 150, -1, -1, 0, 0]
+		},
+		"FANSTime": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["hours", "FANSTimehours", false],
+				["minutes", "FANSTimeminutes", false]
+			]
+		},
+		"FANSTimeAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["altitude", "FANSAltitude", false]
+			]
+		},
+		"FANSTimeAtPositionCurrent": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSTimeDepartureEdct": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSTimeDistanceOffsetDirection": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["distanceOffset", "FANSDistanceOffset", false],
+				["direction", "FANSDirection", false]
+			]
+		},
+		"FANSTimeDistanceToFromPosition": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["distance", "FANSDistance", false],
+				["toFrom", "FANSToFrom", false],
+				["position", "FANSPosition", false]
+			]
+		},
+		"FANSTimeEtaAtFixNext": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSTimeEtaDestination": {
+			"kind": "FANSTime",
+			"constraints": null
+		},
+		"FANSTimehours": {
+			"kind": "NativeInteger",
+			"constraints": [5, 5, 0, 23, -1, -1, 0, 0]
+		},
+		"FANSTimeICAOunitnameFrequency": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["iCAOUnitName", "FANSICAOUnitName", false],
+				["frequency", "FANSFrequency", false]
+			]
+		},
+		"FANSTimeminutes": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 0, 59, -1, -1, 0, 0]
+		},
+		"FANSTimePosition": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["position", "FANSPosition", false]
+			]
+		},
+		"FANSTimePositionAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["position", "FANSPosition", false],
+				["altitude", "FANSAltitude", false]
+			]
+		},
+		"FANSTimePositionAltitudeSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["position", "FANSPosition", false],
+				["altitude", "FANSAltitude", false],
+				["speed", "FANSSpeed", false]
+			]
+		},
+		"FANSTimeSeconds": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 0, 59, -1, -1, 0, 0]
+		},
+		"FANSTimeSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["speed", "FANSSpeed", false]
+			]
+		},
+		"FANSTimeSpeedSpeed": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["time", "FANSTime", false],
+				["speed-seqOf", "FANSSpeedSpeed", false]
+			]
+		},
+		"FANSTimestamp": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["hours", "FANSTimehours", false],
+				["minutes", "FANSTimeminutes", false],
+				["seconds", "FANSTimeSeconds", false]
+			]
+		},
+		"FANSTimeTime": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 0, 0, 2, 2],
+			"members": [["", "FANSTime", true]]
+		},
+		"FANSTimeTolerance": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 2, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "at",
+				"1": "atorafter",
+				"2": "atorbefore"
+			}
+		},
+		"FANSToFrom": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "to",
+				"1": "from"
+			}
+		},
+		"FANSToFromPosition": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["toFrom", "FANSToFrom", false],
+				["position", "FANSPosition", false]
+			]
+		},
+		"FANSTp4table": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "labelA",
+				"1": "labelB"
+			}
+		},
+		"FANSTrackAngle": {
+			"kind": "FANSDegrees",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0]
+		},
+		"FANSTrackDetail": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["trackName", "FANSTrackName", false],
+				["latitudeLongitude-seqOf", "FANSLatitudeLongitudeSequence", false]
+			]
+		},
+		"FANSTrackName": {
+			"kind": "IA5String",
+			"constraints": [7, 7, 0, 127, 2, 2, 3, 6]
+		},
+		"FANSTrueheading": {
+			"kind": "FANSDegrees",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0]
+		},
+		"FANSTurbulence": {
+			"kind": "NativeEnumerated",
+			"constraints": [2, 2, 0, 2, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "light",
+				"1": "moderate",
+				"2": "severe"
+			}
+		},
+		"FANSVersionNumber": {
+			"kind": "NativeInteger",
+			"constraints": [4, 4, 0, 15, -1, -1, 0, 0]
+		},
+		"FANSVerticalChange": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["verticalDirection", "FANSVerticalDirection", false],
+				["verticalRate", "FANSVerticalRate", false]
+			]
+		},
+		"FANSVerticalDirection": {
+			"kind": "NativeEnumerated",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"enumeration": {
+				"0": "up",
+				"1": "down"
+			}
+		},
+		"FANSVerticalRate": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["verticalRateEnglish", "FANSVerticalRateEnglish", false],
+				["verticalRateMetric", "FANSVerticalRateMetric", false]
+			]
+		},
+		"FANSVerticalRateEnglish": {
+			"kind": "NativeInteger",
+			"constraints": [6, 6, 0, 60, -1, -1, 0, 0]
+		},
+		"FANSVerticalRateMetric": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 0, 200, -1, -1, 0, 0]
+		},
+		"FANSWaypointSpeedAltitude": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["position", "FANSPosition", false],
+				["speed", "FANSSpeed", true],
+				["aTWaltitudesequence", "FANSATWAltitudeSequence", true]
+			]
+		},
+		"FANSWaypointSpeedAltitudesequence": {
+			"kind": "SEQUENCE_OF",
+			"constraints": [-1, -1, 0, 0, 5, 5, 1, 32],
+			"members": [["", "FANSWaypointSpeedAltitude", true]]
+		},
+		"FANSWindDirection": {
+			"kind": "NativeInteger",
+			"constraints": [9, 9, 1, 360, -1, -1, 0, 0]
+		},
+		"FANSWinds": {
+			"kind": "SEQUENCE",
+			"constraints": null,
+			"members": [
+				["windDirection", "FANSWindDirection", false],
+				["windSpeed", "FANSWindSpeed", false]
+			]
+		},
+		"FANSWindSpeed": {
+			"kind": "CHOICE",
+			"constraints": [1, 1, 0, 1, -1, -1, 0, 0],
+			"members": [
+				["windSpeedEnglish", "FANSWindSpeedEnglish", false],
+				["windSpeedMetric", "FANSWindSpeedMetric", false]
+			]
+		},
+		"FANSWindSpeedEnglish": {
+			"kind": "NativeInteger",
+			"constraints": [8, 8, 0, 255, -1, -1, 0, 0]
+		},
+		"FANSWindSpeedMetric": {
+			"kind": "NativeInteger",
+			"constraints": [9, 9, 0, 511, -1, -1, 0, 0]
+		}
+	}
+}

@@ -1,6 +1,7 @@
 // FANS position-report layouts from MIT xoolive/datalink.
 import type { Bits } from './bits';
 import * as values from './cpdlc-values';
+import { verticalRate, distance } from './cpdlc/extended';
 
 export function positionReport(bits: Bits): string {
 	const flags = Array.from({ length: 19 }, () => bits.read(1));
@@ -13,7 +14,7 @@ export function positionReport(bits: Bits): string {
 		['Fuel endurance', endurance],
 		['Temperature', temperature],
 		['Wind', wind],
-		['Turbulence code', (reader) => String(reader.read(2))],
+		['Turbulence code', (reader) => String(reader.constrained(2, 0, 2))],
 		['Icing code', (reader) => String(reader.read(2))],
 		['Speed', values.speed],
 		['Ground speed', (reader) => `${(reader.read(6) + 7) * 10} kt`],
@@ -31,7 +32,7 @@ export function positionReport(bits: Bits): string {
 }
 
 function endurance(bits: Bits): string {
-	return `${bits.read(5)} hours ${bits.constrained(6, 0, 59)} minutes`;
+	return `${bits.constrained(5, 0, 23)} hours ${bits.constrained(6, 0, 59)} minutes`;
 }
 
 function temperature(bits: Bits): string {
@@ -47,11 +48,5 @@ function wind(bits: Bits): string {
 
 function vertical(bits: Bits): string {
 	const down = bits.read(1);
-	const metric = bits.read(1);
-	return `${down ? 'Down' : 'Up'} ${bits.read(metric ? 8 : 6) * (metric ? 10 : 100)} ${metric ? 'm/min' : 'ft/min'}`;
-}
-
-function distance(bits: Bits): string {
-	const metric = bits.read(1);
-	return metric ? `${bits.read(10) + 1} km` : `${bits.read(14) / 10} NM`;
+	return `${down ? 'Down' : 'Up'} ${verticalRate(bits)}`;
 }

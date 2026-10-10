@@ -1,7 +1,7 @@
 import { build } from 'esbuild';
 import { rollup } from 'rollup';
 import { dts } from 'rollup-plugin-dts';
-import { mkdir, rm } from 'node:fs/promises';
+import { mkdir, rm, chmod } from 'node:fs/promises';
 import path from 'node:path';
 
 // Clear only this package's resolved output directory so old split chunks cannot ship.
@@ -26,3 +26,15 @@ for (const entry of ['index', 'airports', 'formats', 'framing']) {
 	await bundle.write({ file: `dist/${entry}.d.ts`, format: 'es' });
 	await bundle.close();
 }
+await build({
+	entryPoints: ['src/cli/replay.ts'],
+	outfile: 'dist/cli.js',
+	bundle: true,
+	format: 'esm',
+	platform: 'node',
+	target: 'node22',
+	packages: 'external',
+	tsconfig: 'tsconfig.json',
+	banner: { js: '#!/usr/bin/env node' },
+});
+await chmod('dist/cli.js', 0o755);
