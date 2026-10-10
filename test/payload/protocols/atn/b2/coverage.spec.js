@@ -72,28 +72,31 @@ describe('pinned B2 CPDLC and ADS-C v2 descriptor conformance', () => {
 		},
 	);
 	it.each(
-		entries.filter(([, node]) => node.kind === 'sequence' && node.members.some((m) => m.optional && !m.extension)),
-	)('reads %s optional fields', (type, node) => {
-		const root = node.members.filter((m) => !m.extension),
-			optional = root.filter((m) => m.optional),
-			count = optional.length;
-		const masks =
-			count <= 9
-				? Array.from({ length: 2 ** count }, (_, mask) =>
-						Array.from({ length: count }, (_, i) => Boolean(mask & (2 ** i))),
-					)
-				: [
-						Array(count).fill(false),
-						Array(count).fill(true),
-						...Array.from({ length: count }, (_, at) => Array.from({ length: count }, (_, i) => i === at)),
-					];
-		for (const mask of masks) {
-			const fixture = wire(type, mask),
-				result = decodeAtnB2Structure(fixture.bytes, fixture.options);
-			expect(find(result.value, type)?.children.map((v) => v.name)).toEqual(
-				root.filter((m) => !m.optional || m.defaultValue !== undefined || mask[optional.indexOf(m)]).map((m) => m.name),
-			);
-			expect(result.structureComplete).toBe(true);
-		}
+		entries
+			.filter(([, node]) => node.kind === 'sequence' && node.members.some((m) => m.optional && !m.extension))
+			.flatMap(([type, node]) => {
+				const root = node.members.filter((m) => !m.extension),
+					optional = root.filter((m) => m.optional),
+					count = optional.length;
+				const masks =
+					count <= 9
+						? Array.from({ length: 2 ** count }, (_, mask) =>
+								Array.from({ length: count }, (_, i) => Boolean(mask & (2 ** i))),
+							)
+						: [
+								Array(count).fill(false),
+								Array(count).fill(true),
+								...Array.from({ length: count }, (_, at) => Array.from({ length: count }, (_, i) => i === at)),
+							];
+				// Keep every bitmap assertion, with its own timeout and diagnostic name under coverage.
+				return masks.map((mask) => [type, mask.map(Number).join(''), mask, root, optional]);
+			}),
+	)('reads %s optional bitmap %s', (type, _bitmap, mask, root, optional) => {
+		const fixture = wire(type, mask),
+			result = decodeAtnB2Structure(fixture.bytes, fixture.options);
+		expect(find(result.value, type)?.children.map((v) => v.name)).toEqual(
+			root.filter((m) => !m.optional || m.defaultValue !== undefined || mask[optional.indexOf(m)]).map((m) => m.name),
+		);
+		expect(result.structureComplete).toBe(true);
 	});
 });
